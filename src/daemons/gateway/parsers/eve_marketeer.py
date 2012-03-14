@@ -5,6 +5,7 @@ import csv
 import logging
 import datetime
 from StringIO import StringIO
+from src.daemons.gateway.parsers.exceptions import InvalidMarketOrderDataError
 from src.core.market_data import MarketOrder, ORDER_TYPE_BUY, ORDER_TYPE_SELL
 
 logger = logging.getLogger(__name__)
@@ -48,7 +49,14 @@ def parse_from_request(request):
 
         # Now we cast each bit of data as a poor man's validator.
         order_id = int(order_id)
-        order_type = ORDER_TYPE_BUY if order_type == "b" else ORDER_TYPE_SELL
+
+        if order_type == "s":
+            order_type = ORDER_TYPE_SELL
+        elif order_type == "b":
+            order_type = ORDER_TYPE_BUY
+        else:
+            raise InvalidMarketOrderDataError("Invalid order type.")
+
         solar_system_id = int(solar_system_id)
         station_id = int(station_id)
         price = float(price)

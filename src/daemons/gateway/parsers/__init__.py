@@ -1,2 +1,2 @@
 #noinspection PyUnresolvedReferences
-from src.daemons.gateway.parsers import eve_marketeer
+import eve_marketeer

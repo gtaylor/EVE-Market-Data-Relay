@@ -8,7 +8,7 @@ Queue Service (SQS), where the worker processes can pull them from for
 processing.
 """
 from gevent import monkey; monkey.patch_all()
-from bottle import route, run, request, post
+from bottle import route, run, request, post, default_app
 
 from src.daemons.gateway import parsers
 
@@ -22,10 +22,13 @@ def upload_eve_marketeer():
     for order in order_generator:
         print order
 
-# Start the built-in Bottle server for development, for now.
-run(
-    host='localhost',
-    port=8080,
-    server='gevent',
-    reloader=True
-)
+if __name__ == '__main__':
+    # Start the built-in Bottle server for development, for now.
+    run(
+        host='localhost',
+        port=8080,
+        server='gevent',
+        reloader=True
+    )
+else:
+    application = default_app()

@@ -1,20 +1,15 @@
 """
 Data structures for representing market data.
 """
+import datetime
 from string import Template
+import simplejson
 
 # Some order type defines. Use these constants instead of "buy" and "sell"
 # where possible.
 ORDER_TYPE_BUY = "buy"
 ORDER_TYPE_SELL = "sell"
 ORDER_TYPES = [ORDER_TYPE_BUY, ORDER_TYPE_SELL]
-
-class InvalidMarketOrderDataError(Exception):
-    """
-    Raise this when invalid market order data is passed into MarketOrder's
-    constructor.
-    """
-    pass
 
 
 class MarketOrder(object):
@@ -44,10 +39,6 @@ class MarketOrder(object):
         :param int order_range: No idea what this is.
         """
         self.order_id = order_id
-
-        if order_type not in ORDER_TYPES:
-            raise InvalidMarketOrderDataError("Invalid order type.")
-
         self.order_type = order_type
         self.region_id = region_id
         self.solar_system_id = solar_system_id
@@ -95,4 +86,53 @@ class MarketOrder(object):
             order_issue_date = self.order_issue_date,
             order_duration = self.order_duration,
             order_range = self.order_range,
+        )
+
+    def to_json(self):
+        """
+        Encodes this object to a JSON string.
+
+        :rtype: str
+        """
+        return simplejson.dumps(dict(
+            order_id = self.order_id,
+            order_type = self.order_type,
+            region_id = self.region_id,
+            solar_system_id = self.solar_system_id,
+            station_id = self.station_id,
+            type_id = self.type_id,
+            price = self.price,
+            volume_entered = self.volume_entered,
+            volume_remaining = self.volume_remaining,
+            minimum_volume = self.minimum_volume,
+            order_issue_date = datetime.datetime.strftime(
+                self.order_issue_date, "%Y-%m-%d %H:%M:%S"),
+            order_duration = self.order_duration,
+            order_range = self.order_range,
+        ))
+
+    @staticmethod
+    def from_json(json_str):
+        """
+        Convenience method used to de-code a JSON string to a MarketOrder
+        instance.
+
+        :rtype: MarketOrder
+        """
+        json_dict = simplejson.loads(json_str)
+        return MarketOrder(
+            order_id = json_dict['order_id'],
+            order_type = json_dict['order_type'],
+            region_id = json_dict['region_id'],
+            solar_system_id = json_dict['solar_system_id'],
+            station_id = json_dict['station_id'],
+            type_id = json_dict['type_id'],
+            price = json_dict['price'],
+            volume_entered = json_dict['volume_entered'],
+            volume_remaining = json_dict['volume_remaining'],
+            minimum_volume = json_dict['minimum_volume'],
+            order_issue_date = datetime.datetime.strptime(
+                json_dict['order_issue_date'], "%Y-%m-%d %H:%M:%S"),
+            order_duration = json_dict['order_duration'],
+            order_range = json_dict['order_range'],
         )
