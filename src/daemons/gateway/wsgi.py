@@ -1,27 +1,31 @@
-import csv
-from StringIO import StringIO
+"""
+This WSGI application accepts market data uploads from various uploader clients.
+The various URLs below are structured to pass off the parsing based on what
+format the data is in.
+
+The parsed representation of the order is then sent off to Amazon Simple
+Queue Service (SQS), where the worker processes can pull them from for
+processing.
+"""
+from gevent import monkey; monkey.patch_all()
 from bottle import route, run, request, post
 
+from src.daemons.gateway import parsers
+
 @post('/api/upload/')
-def index():
-    print "FORMS", request.forms.items()
+def upload_eve_marketeer():
+    """
+    This view accepts uploads in EVE Marketeer or EVE Marketdata format. These
+    typically arrive via the EVE Unified Uploader client.
+    """
+    order_generator = parsers.eve_marketeer.parse_from_request(request)
+    for order in order_generator:
+        print order
 
-    log = request.forms.log
-    log_buf = StringIO(log)
-    for row in csv.reader(log_buf, delimiter=','):
-        order_id, \
-        buy_sell, \
-        solar_system_id, \
-        station_id, \
-        price, \
-        vol_entered,\
-        vol_remaining, \
-        min_volume, \
-        order_issuedate, \
-        order_duration, \
-        order_range = row
-
-    upload_type = request.forms.upload_type
-    region_id = request.forms.region_id
-
-run(host='localhost', port=8080)
+# Start the built-in Bottle server for development, for now.
+run(
+    host='localhost',
+    port=8080,
+    server='gevent',
+    reloader=True
+)
