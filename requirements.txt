@@ -2,3 +2,4 @@ bottle
 simplejson
 gevent
 nose
+boto
