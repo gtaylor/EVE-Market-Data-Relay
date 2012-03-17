@@ -2,8 +2,8 @@
 Data structures for representing market data.
 """
 import datetime
-from string import Template
 import simplejson
+from string import Template
 
 # Some order type defines. Use these constants instead of "buy" and "sell"
 # where possible.
@@ -11,12 +11,73 @@ ORDER_TYPE_BUY = "buy"
 ORDER_TYPE_SELL = "sell"
 ORDER_TYPES = [ORDER_TYPE_BUY, ORDER_TYPE_SELL]
 
+class SerializableOrderList(list):
+    """
+    A list of MarketOrder objects, with some convenience methods for
+    serialization.
+    """
+    def to_json(self):
+        """
+        Encodes this list of MarketOrder instances to a JSON string.
+
+        :rtype: str
+        """
+        json_list = []
+        for order in self:
+            #noinspection PyUnresolvedReferences
+            json_list.append(dict(
+                order_id = order.order_id,
+                order_type = order.order_type,
+                region_id = order.region_id,
+                solar_system_id = order.solar_system_id,
+                station_id = order.station_id,
+                type_id = order.type_id,
+                price = order.price,
+                volume_entered = order.volume_entered,
+                volume_remaining = order.volume_remaining,
+                minimum_volume = order.minimum_volume,
+                order_issue_date = datetime.datetime.strftime(
+                    order.order_issue_date, "%Y-%m-%d %H:%M:%S"),
+                order_duration = order.order_duration,
+                order_range = order.order_range,
+            ))
+
+        return simplejson.dumps(json_list)
+
+    @staticmethod
+    def from_json(json_str):
+        """
+        Convenience method used to de-code a JSON string to a
+        SerializableOrderList instance that contains MarketOrder instances.
+
+        :rtype: SerializableOrderList
+        """
+        order_list = SerializableOrderList()
+        json_list = simplejson.loads(json_str)
+        for order in json_list:
+            order_list.append(MarketOrder(
+                order_id = order['order_id'],
+                order_type = order['order_type'],
+                region_id = order['region_id'],
+                solar_system_id = order['solar_system_id'],
+                station_id = order['station_id'],
+                type_id = order['type_id'],
+                price = order['price'],
+                volume_entered = order['volume_entered'],
+                volume_remaining = order['volume_remaining'],
+                minimum_volume = order['minimum_volume'],
+                order_issue_date = datetime.datetime.strptime(
+                    order['order_issue_date'], "%Y-%m-%d %H:%M:%S"),
+                order_duration = order['order_duration'],
+                order_range = order['order_range'],
+            ))
+
+        return order_list
 
 class MarketOrder(object):
     """
     Represents a market buy or sell order.
     """
-
     def __init__(self, order_id, order_type, region_id, solar_system_id,
                  station_id, type_id,
                  price, volume_entered, volume_remaining, minimum_volume,
@@ -52,12 +113,12 @@ class MarketOrder(object):
         self.order_duration = order_duration
         self.order_range = order_range
 
-    def __str__(self):
+    def __repr__(self):
         """
         Basic string representation of the order.
         """
         template = Template(
-            "Market Order: \n"
+            "<Market Order: \n"
             " order_id: $order_id\n"
             " order_type: $order_type\n"
             " region_id: $region_id\n"
@@ -70,7 +131,7 @@ class MarketOrder(object):
             " minimum_volume: $minimum_volume\n"
             " order_issue_date: $order_issue_date\n"
             " order_duration: $order_duration\n"
-            " order_range: $order_range\n"
+            " order_range: $order_range>\n"
         )
         return template.substitute(
             order_id = self.order_id,
@@ -86,53 +147,4 @@ class MarketOrder(object):
             order_issue_date = self.order_issue_date,
             order_duration = self.order_duration,
             order_range = self.order_range,
-        )
-
-    def to_json(self):
-        """
-        Encodes this object to a JSON string.
-
-        :rtype: str
-        """
-        return simplejson.dumps(dict(
-            order_id = self.order_id,
-            order_type = self.order_type,
-            region_id = self.region_id,
-            solar_system_id = self.solar_system_id,
-            station_id = self.station_id,
-            type_id = self.type_id,
-            price = self.price,
-            volume_entered = self.volume_entered,
-            volume_remaining = self.volume_remaining,
-            minimum_volume = self.minimum_volume,
-            order_issue_date = datetime.datetime.strftime(
-                self.order_issue_date, "%Y-%m-%d %H:%M:%S"),
-            order_duration = self.order_duration,
-            order_range = self.order_range,
-        ))
-
-    @staticmethod
-    def from_json(json_str):
-        """
-        Convenience method used to de-code a JSON string to a MarketOrder
-        instance.
-
-        :rtype: MarketOrder
-        """
-        json_dict = simplejson.loads(json_str)
-        return MarketOrder(
-            order_id = json_dict['order_id'],
-            order_type = json_dict['order_type'],
-            region_id = json_dict['region_id'],
-            solar_system_id = json_dict['solar_system_id'],
-            station_id = json_dict['station_id'],
-            type_id = json_dict['type_id'],
-            price = json_dict['price'],
-            volume_entered = json_dict['volume_entered'],
-            volume_remaining = json_dict['volume_remaining'],
-            minimum_volume = json_dict['minimum_volume'],
-            order_issue_date = datetime.datetime.strptime(
-                json_dict['order_issue_date'], "%Y-%m-%d %H:%M:%S"),
-            order_duration = json_dict['order_duration'],
-            order_range = json_dict['order_range'],
         )

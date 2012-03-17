@@ -11,7 +11,8 @@ from gevent import monkey; monkey.patch_all()
 from bottle import run, request, post, default_app
 
 from src.daemons.gateway import parsers
-from src.core.market_sqs import enqueue_order
+from src.core.market_sqs import enqueue_orders
+from src.core.market_data import SerializableOrderList
 
 @post('/api/market-order/upload/eve_marketeer/')
 def upload_eve_marketeer():
@@ -19,10 +20,15 @@ def upload_eve_marketeer():
     This view accepts uploads in EVE Marketeer or EVE Marketdata format. These
     typically arrive via the EVE Unified Uploader client.
     """
+    order_list = SerializableOrderList()
     order_generator = parsers.eve_marketeer.parse_from_request(request)
     for order in order_generator:
-        print order
-        enqueue_order(order)
+        order_list.append(order)
+
+    if order_list:
+        print "Pushing %d orders." % len(order_list)
+        enqueue_orders(order_list)
+
     return '1'
 
 if __name__ == '__main__':
