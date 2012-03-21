@@ -3,7 +3,7 @@ This WSGI application accepts market data uploads from various uploader clients.
 The various URLs below are structured to pass off the parsing based on what
 format the data is in.
 
-The parsed representation of the order is then sent off to the worker nodes,
+The parsed representation of the order is then sent off to the processor nodes,
 where the data is parsed, some light validation is performed, then passed off
 to the relay for re-broadcasting to consumers.
 """

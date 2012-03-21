@@ -7,21 +7,24 @@ import logging
 from logging.config import dictConfig
 import settings
 dictConfig(settings.LOGGING)
-logger = logging.getLogger('src.daemons.gateway.wsgi')
+logger = logging.getLogger('src.daemons.processor.main')
 
 import gevent
 from gevent.pool import Pool
 from gevent import monkey; gevent.monkey.patch_all()
 from gevent_zeromq import zmq
-
 from src.daemons.processor import order_processor
 
+# These form the connection to the Gateway daemon(s) upstream.
 context = zmq.Context()
 receiver = context.socket(zmq.PULL)
 receiver.connect("ipc:///tmp/order-publisher.sock")
 
 # We use a greenlet pool to cap the number of workers at a reasonable level.
 greenlet_pool = Pool(size=settings.NUM_PROCESSOR_WORKERS)
+
+logger.info("Processor daemon started, waiting for jobs...")
+logger.info("Worker pool size: %d" % greenlet_pool.size)
 
 while True:
     # Since receiver.recv() blocks when no messages are available, this loop
