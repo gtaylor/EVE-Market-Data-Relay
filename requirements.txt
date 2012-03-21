@@ -1,5 +1,5 @@
 bottle
 simplejson
 gevent
+gevent-zeromq
 nose
-boto

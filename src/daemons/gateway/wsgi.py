@@ -3,9 +3,9 @@ This WSGI application accepts market data uploads from various uploader clients.
 The various URLs below are structured to pass off the parsing based on what
 format the data is in.
 
-The parsed representation of the order is then sent off to Amazon Simple
-Queue Service (SQS), where the worker processes can pull them from for
-processing.
+The parsed representation of the order is then sent off to the worker nodes,
+where the data is parsed, some light validation is performed, then passed off
+to the relay for re-broadcasting to consumers.
 """
 # Logging has to be configured first before we do anything.
 import logging
@@ -46,10 +46,10 @@ def upload_eve_marketeer():
     # Goofy, but apparently expected by EVE Market Data Uploader.
     return '1'
 
-# Fire up gevent workers send the market orders to Amazon SQS in the background
-# without blocking the WSGI app.
-for worker_num in range(settings.NUM_GATEWAY_UPLOAD_WORKERS):
-    logger.info("Spawning order->SQS push worker.")
+# Fire up gevent workers that send raw market order data to processor processes
+# in the background without blocking the WSGI app.
+for worker_num in range(settings.NUM_GATEWAY_SENDER_WORKERS):
+    logger.info("Spawning Gateway->Processor PUSH worker.")
     gevent.spawn(order_pusher.worker)
 
 if __name__ == '__main__':
