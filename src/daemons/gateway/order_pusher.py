@@ -6,6 +6,7 @@ gateway WSGI app.
 import logging
 from gevent.queue import Queue
 from gevent_zeromq import zmq
+import settings
 
 logger = logging.getLogger(__name__)
 
@@ -15,7 +16,11 @@ ORDER_UPLOAD_QUEUE = Queue()
 # This socket is used to push market data out to worker processes over ZeroMQ.
 ZMQ_CONTEXT = zmq.Context()
 ORDER_SENDER = ZMQ_CONTEXT.socket(zmq.PUSH)
-ORDER_SENDER.bind("ipc:///tmp/order-publisher.sock")
+# Get the list of transports to bind from settings. This allows us to listen
+# for processor connections from multiple places (UNIX sockets + TCP sockets).
+# By default, we only listen for UNIX domain sockets.
+for binding in settings.GATEWAY_SENDER_BINDINGS:
+    ORDER_SENDER.bind(binding)
 
 def worker():
     """

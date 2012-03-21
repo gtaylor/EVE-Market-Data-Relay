@@ -18,7 +18,13 @@ from src.daemons.processor import order_processor
 # These form the connection to the Gateway daemon(s) upstream.
 context = zmq.Context()
 receiver = context.socket(zmq.PULL)
-receiver.connect("ipc:///tmp/order-publisher.sock")
+# Get the remote gateway binding points from settings. This allows us to add
+# additional gateways, which can be local or remote. If multiple bindings are
+# specified (IE: local gateway, plus a remote gateway), jobs are routed via
+# a fair-queue strategy.
+# See: http://api.zeromq.org/2-1:zmq-socket (The ZMQ_PULL section)
+for binding in settings.PROCESSOR_RECEIVER_BINDINGS:
+    receiver.connect(binding)
 
 # We use a greenlet pool to cap the number of workers at a reasonable level.
 greenlet_pool = Pool(size=settings.NUM_PROCESSOR_WORKERS)
