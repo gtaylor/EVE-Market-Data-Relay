@@ -1,9 +1,13 @@
 """
 The worker function in this module performs the order processing.
 """
+import logging
 
-def worker(order_data):
+logger = logging.getLogger(__name__)
+
+def worker(order_data, sender):
     """
     TODO: Make this useful.
     """
-    print order_data
+    logger.info('Processing one job.')
+    sender.send(order_data)

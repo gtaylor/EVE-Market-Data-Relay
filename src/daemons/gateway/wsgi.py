@@ -41,7 +41,7 @@ def upload_eve_marketeer():
     if order_list:
         # Send the entire list of orders that came in this request to a gevent
         # queue, where they'll await pushing to an Amazon SQS queue.
-        order_pusher.ORDER_UPLOAD_QUEUE.put(order_list)
+        order_pusher.order_upload_queue.put(order_list)
 
     # Goofy, but apparently expected by EVE Market Data Uploader.
     return '1'

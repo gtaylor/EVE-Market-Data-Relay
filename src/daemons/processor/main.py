@@ -26,6 +26,10 @@ receiver = context.socket(zmq.PULL)
 for binding in settings.PROCESSOR_RECEIVER_BINDINGS:
     receiver.connect(binding)
 
+sender = context.socket(zmq.PUSH)
+for binding in settings.RELAY_RECEIVER_BINDINGS:
+    sender.connect(binding)
+
 # We use a greenlet pool to cap the number of workers at a reasonable level.
 greenlet_pool = Pool(size=settings.NUM_PROCESSOR_WORKERS)
 
@@ -36,4 +40,4 @@ while True:
     # Since receiver.recv() blocks when no messages are available, this loop
     # stays under control. If something is available and the greenlet pool
     # has greenlets available for use, work gets done.
-    greenlet_pool.spawn(order_processor.worker, receiver.recv())
+    greenlet_pool.spawn(order_processor.worker, receiver.recv(), sender)

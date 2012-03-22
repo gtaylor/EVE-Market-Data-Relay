@@ -12,7 +12,14 @@ NUM_GATEWAY_SENDER_WORKERS = 3
 # just allows local socket connections, though you could easily allow local
 # UNIX sockets PLUS TCP sockets.
 # See: http://api.zeromq.org/2-1:zmq-bind
-GATEWAY_SENDER_BINDINGS = ["ipc:///tmp/order-publisher.sock"]
+GATEWAY_SENDER_BINDINGS = ["ipc:///tmp/broker-receiver.sock"]
+
+#
+## Broker Daemon Settings
+#
+
+BROKER_RECEIVER_BINDINGS = ["ipc:///tmp/broker-receiver.sock"]
+BROKER_SENDER_BINDINGS = ["ipc:///tmp/broker-sender.sock"]
 
 #
 ## Processor Daemon Settings
@@ -24,7 +31,15 @@ NUM_PROCESSOR_WORKERS = 2
 # only connects to the local gateway bound to a UNIX domain socket. You could,
 # however, add additional gateways to the list, remote or local.
 # See: http://api.zeromq.org/2-1:zmq-connect
-PROCESSOR_RECEIVER_BINDINGS = ["ipc:///tmp/order-publisher.sock"]
+PROCESSOR_RECEIVER_BINDINGS = ["ipc:///tmp/broker-sender.sock"]
+PROCESSOR_SENDER_BINDINGS = ["ipc:///tmp/relay-receiver.sock"]
+
+#
+## Relay Daemon Settings
+#
+RELAY_RECEIVER_BINDINGS = ["ipc:///tmp/relay-receiver.sock"]
+RELAY_SENDER_BINDINGS = ["ipc:///tmp/relay-sender.sock"]
+
 
 LOGGING = {
     'version': 1,
