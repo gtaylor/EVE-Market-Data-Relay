@@ -1,6 +1,6 @@
 """
-The processor daemon accepts the raw market data, parses it, performs some
-very simple validation, then passes it on to the relay.
+The processor daemon PULLs the raw market data from a broker, parses it,
+performs some very simple validation, then PUSHes it on to a relay.
 """
 # Logging has to be configured first before we do anything.
 import logging

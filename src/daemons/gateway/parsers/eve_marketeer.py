@@ -10,29 +10,31 @@ from src.core.market_data import MarketOrder, ORDER_TYPE_BUY, ORDER_TYPE_SELL
 
 logger = logging.getLogger(__name__)
 
-def parse_from_request(request):
+def parse_from_payload(payload):
     """
-    Given a request, parse the contents and return a generator of
+    Given a job dict payload, parse the contents and return a generator of
     :py:class:`src.core.market_data.MarketOrder` instances. Each instance
     represents a market order.
-    """
-    #print "FORMS", request.forms.items()
 
-    # This is a CSV string that has line breaks as line separators.
-    log = request.forms.log
+    :param dict payload: A job dict.
+    :rtype: generator
+    :returns: A generator that pops out
+        :py:class:`src.core.market_data.MarketOrder` instances.
+    """
+    log = payload['log']
+    upload_type = payload['upload_type']
+    type_id = payload['type_id']
+    region_id = payload['region_id']
+
     # Stuff the string here so the csv reader module can pull from it.
     # TODO: Look at getting the csv reader to read the string directly.
     log_buf = StringIO(log)
 
-    upload_type = request.forms.upload_type
     if upload_type != 'orders':
         # This isn't an orders upload, we want no part in it.
         logger.error("Upload type other than 'order' found. Yuck.")
         return
 
-    # The item type ID.
-    type_id = request.forms.type_id
-    region_id = request.forms.region_id
     # Parse the market log buffer as a CSV.
     for row in csv.reader(log_buf, delimiter=','):
         order_id,\

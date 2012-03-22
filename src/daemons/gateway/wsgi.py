@@ -3,7 +3,7 @@ This WSGI application accepts market data uploads from various uploader clients.
 The various URLs below are structured to pass off the parsing based on what
 format the data is in.
 
-The parsed representation of the order is then sent off to the processor nodes,
+The order data is re-packaged, then sent off to the processor nodes,
 where the data is parsed, some light validation is performed, then passed off
 to the relay for re-broadcasting to consumers.
 """
@@ -19,8 +19,6 @@ from gevent import monkey; gevent.monkey.patch_all()
 #noinspection PyUnresolvedReferences
 from bottle import run, request, post, default_app
 
-from src.core.market_data import SerializableOrderList
-from src.daemons.gateway import parsers
 from src.daemons.gateway import order_pusher
 
 @post('/api/market-order/upload/eve_marketeer/')
@@ -29,19 +27,22 @@ def upload_eve_marketeer():
     This view accepts uploads in EVE Marketeer or EVE Marketdata format. These
     typically arrive via the EVE Unified Uploader client.
     """
-    # Orders are lumped into this list sub-class, which has JSON-serialization
-    # methods on it.
-    order_list = SerializableOrderList()
+    # Job dicts are a way to package/wrap uploaded data in a way that lets
+    # the processor nodes know what format the upload is in. The payload attrib
+    # contains the format-specific stuff.
+    job_dict = {
+        'format': 'eve_marketeer',
+        'payload': {
+            'upload_type': request.forms.upload_type,
+            'type_id': request.forms.type_id,
+            'region_id': request.forms.region_id,
+            'log': request.forms.log,
+        }
+    }
 
-    # This generator spits out the MarketOrder instances the user sent.
-    order_generator = parsers.eve_marketeer.parse_from_request(request)
-    for order in order_generator:
-        order_list.append(order)
-
-    if order_list:
-        # Send the entire list of orders that came in this request to a gevent
-        # queue, where they'll await pushing to an Amazon SQS queue.
-        order_pusher.order_upload_queue.put(order_list)
+    # The job dict gets shoved into a gevent queue, where it awaits sending
+    # to the processors via the src.daemons.gateway.order_pusher module.
+    order_pusher.order_upload_queue.put(job_dict)
 
     # Goofy, but apparently expected by EVE Market Data Uploader.
     return '1'
