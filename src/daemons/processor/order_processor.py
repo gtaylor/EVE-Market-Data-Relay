@@ -49,7 +49,12 @@ def parser_order(job_json):
 
 def worker(job_json, sender):
     """
-    TODO: Make this useful.
+    Parses the job dict into a SerializableOrderList of MarketOrder instances.
+    This gets dumped to JSON and sent on to the relays for sending to the
+    subscribers.
+
+    :param str job_json: The job dict from the broker/gateway.
+    :param zmq.socket: The socket to send orders to the relays with.
     """
     logger.info('Processing one job.')
 
