@@ -47,6 +47,27 @@ def upload_eve_marketeer():
     # Goofy, but apparently expected by EVE Market Data Uploader.
     return '1'
 
+@post('/api/market-order/upload/unified/')
+def upload_eve_marketeer():
+    """
+    This view accepts uploads in Unified Uploader format. These
+    typically arrive via the EVE Unified Uploader client.
+    """
+    print "BODY", request.body.read()
+    job_dict = {
+        'format': 'unified',
+        'payload': {
+            'body': request.body.read(),
+        }
+    }
+
+    # The job dict gets shoved into a gevent queue, where it awaits sending
+    # to the processors via the src.daemons.gateway.order_pusher module.
+    order_pusher.order_upload_queue.put(job_dict)
+
+    # Goofy, but apparently expected by EVE Market Data Uploader.
+    return '1'
+
 # Fire up gevent workers that send raw market order data to processor processes
 # in the background without blocking the WSGI app.
 for worker_num in range(settings.NUM_GATEWAY_SENDER_WORKERS):

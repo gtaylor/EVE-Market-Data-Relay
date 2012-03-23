@@ -5,8 +5,9 @@ import csv
 import logging
 import datetime
 from StringIO import StringIO
-from src.daemons.gateway.parsers.exceptions import InvalidMarketOrderDataError
+from src.core.market_data import SerializableOrderList
 from src.core.market_data import MarketOrder, ORDER_TYPE_BUY, ORDER_TYPE_SELL
+from src.daemons.gateway.parsers.exceptions import InvalidMarketOrderDataError
 
 logger = logging.getLogger(__name__)
 
@@ -21,6 +22,10 @@ def parse_from_payload(payload):
     :returns: A generator that pops out
         :py:class:`src.core.market_data.MarketOrder` instances.
     """
+    # Orders are lumped into this list sub-class, which has JSON-serialization
+    # methods on it.
+    order_list = SerializableOrderList()
+
     log = payload['log']
     upload_type = payload['upload_type']
     type_id = payload['type_id']
@@ -73,8 +78,10 @@ def parse_from_payload(payload):
         # Finally, instantiate and pop out a MarketOrder instance, which will
         # be re-serialized in our standard format and sent to SQS for the
         # workers to pull and save.
-        yield MarketOrder(
+        order_list.append(MarketOrder(
             order_id, order_type, region_id, solar_system_id, station_id,
             type_id, price, volume_entered, volume_remaining, minimum_volume,
             order_issue_date, order_duration, order_range,
-        )
+        ))
+
+        return order_list

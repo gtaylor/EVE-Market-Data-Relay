@@ -18,9 +18,6 @@ def parser_order(job_json):
     :returns: A serializable list of MarketOrder objects.
     """
     job_dict = simplejson.loads(job_json)
-    # Orders are lumped into this list sub-class, which has JSON-serialization
-    # methods on it.
-    order_list = SerializableOrderList()
 
     # The format attrib on the job dict determines which parser to use.
     order_format = job_dict.get('format', 'unknown')
@@ -33,17 +30,13 @@ def parser_order(job_json):
         logger.error('Job dict has no payload key. Discarding.')
         return
 
-    if order_format == 'eve_marketeer':
-        order_generator = parsers.eve_marketeer.parse_from_payload(payload)
+    if order_format == 'unified':
+        order_list = parsers.unified.parse_from_payload(payload)
+    elif order_format == 'eve_marketeer':
+        order_list = parsers.eve_marketeer.parse_from_payload(payload)
     else:
         logger.error('Unknown order format encountered. Discarding.')
         return
-
-    # This generator spits out the MarketOrder instances that user sent. Since
-    # one item can have many orders, we add each order entry to our
-    # SerializableOrderList instance.
-    for order in order_generator:
-        order_list.append(order)
 
     return order_list
 
