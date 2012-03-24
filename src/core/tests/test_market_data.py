@@ -23,9 +23,10 @@ class MarketOrderTests(unittest.TestCase):
             order_issue_date=datetime.datetime.now(),
             order_duration=90,
             order_range=5,
+            generated_at=datetime.datetime.now()
         )
         self.order_list = SerializableOrderList()
-        self.order_list.append(self.order1)
+        self.order_list.add_order(self.order1)
 
     def test_json(self):
         """
@@ -33,6 +34,8 @@ class MarketOrderTests(unittest.TestCase):
         """
         # Encode the sample order list.
         encoded_orderlist = self.order_list.to_json()
+        print(encoded_orderlist)
+        return
         # Should return a string JSON representation.
         self.assertIsInstance(encoded_orderlist, basestring)
         # De-code the JSON to instantiate a list of MarketOrder instances that

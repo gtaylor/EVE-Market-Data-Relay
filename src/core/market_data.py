@@ -11,38 +11,122 @@ ORDER_TYPE_BUY = "buy"
 ORDER_TYPE_SELL = "sell"
 ORDER_TYPES = [ORDER_TYPE_BUY, ORDER_TYPE_SELL]
 
-class SerializableOrderList(list):
+SPEC_TO_KWARG_CONVERSION = {
+    'price': 'price',
+    'volRemaining': 'volume_remaining',
+    'range': 'order_range',
+    'orderID': 'order_id',
+    'volEntered': 'volume_entered',
+    'minVolume': 'minimum_volume',
+    'bid': 'order_type',
+    'issueDate': 'order_issue_date',
+    'duration': 'order_duration',
+    'stationID': 'station_id',
+    'solarSystemID': 'solar_system_id',
+}
+# Do the reverse.
+KWARG_TO_SPEC_CONVERSION = {}
+for key, item in SPEC_TO_KWARG_CONVERSION.items():
+    KWARG_TO_SPEC_CONVERSION[item] = key
+
+class SerializableOrderList(object):
     """
     A list of MarketOrder objects, with some convenience methods for
     serialization.
     """
+    result_type = "orders"
+    version = "0.1alpha"
+
+    def __init__(self, upload_keys=None, order_generator=None, columns=None,
+                 *args, **kwargs):
+        self._orders = {}
+
+        if not upload_keys:
+            self.upload_keys = [
+                {'name': 'eve-market-data-relay', 'key': 'default'},
+            ]
+        else:
+            self.upload_keys = upload_keys
+
+        if not order_generator:
+            self.order_generator = {'name': 'Unknown', 'version': 'Unknown'}
+        else:
+            self.order_generator = order_generator
+
+        if not columns:
+            self.columns = [
+                'price', 'volRemaining', 'range', 'orderID', 'volEntered',
+                'minVolume', 'bid', 'issueDate', 'duration', 'stationID',
+                'solarSystemID',
+            ]
+        else:
+            self.columns = columns
+
+    def add_order(self, order):
+        key = '%s_%s' % (order.order_type, order.region_id)
+        if not self._orders.has_key(key):
+            self._orders[key] = []
+
+        self._orders[key].append(order)
+
     def to_json(self):
         """
         Encodes this list of MarketOrder instances to a JSON string.
 
         :rtype: str
         """
-        json_list = []
-        for order in self:
+        rowsets = []
+        for key, orders in self._orders.items():
+            rows = []
+            for order in orders:
+                issue_date = datetime.datetime.strftime(
+                    order.order_issue_date, "%Y-%m-%d %H:%M:%S")
+
+                rows.append([
+                    order.price,
+                    order.volume_remaining,
+                    order.order_range,
+                    order.order_id,
+                    order.volume_entered,
+                    order.minimum_volume,
+                    order.order_type,
+                    issue_date,
+                    order.order_duration,
+                    order.station_id,
+                    order.solar_system_id,
+                ])
+
             #noinspection PyUnresolvedReferences
-            json_list.append(dict(
-                order_id = order.order_id,
-                order_type = order.order_type,
-                region_id = order.region_id,
-                solar_system_id = order.solar_system_id,
-                station_id = order.station_id,
-                type_id = order.type_id,
-                price = order.price,
-                volume_entered = order.volume_entered,
-                volume_remaining = order.volume_remaining,
-                minimum_volume = order.minimum_volume,
-                order_issue_date = datetime.datetime.strftime(
-                    order.order_issue_date, "%Y-%m-%d %H:%M:%S"),
-                order_duration = order.order_duration,
-                order_range = order.order_range,
+            rowsets.append(dict(
+                generatedAt = datetime.datetime.strftime(
+                    orders[0].order_issue_date, "%Y-%m-%d %H:%M:%S"),
+                regionID = orders[0].region_id,
+                typeID = orders[0].type_id,
+                rows = rows,
             ))
 
-        return simplejson.dumps(json_list)
+        json_dict = {
+            'resultType': self.result_type,
+            'version': self.version,
+            'uploadKeys': self.upload_keys,
+            'generator': self.order_generator,
+            'currentTime': 'TESTING',
+            'columns': self.columns,
+            'rowsets': rowsets,
+        }
+
+        return simplejson.dumps(json_dict, indent=4 * ' ')
+
+    def _columns_to_kwargs(self, columns, row):
+        kwdict = {}
+
+        counter = 0
+        for column in columns:
+            kwarg_name = SPEC_TO_KWARG_CONVERSION[column]
+            kwdict[kwarg_name] = row[counter]
+            counter += 1
+
+        return kwdict
 
     @staticmethod
     def from_json(json_str):
@@ -52,25 +136,29 @@ class SerializableOrderList(list):
 
         :rtype: SerializableOrderList
         """
-        order_list = SerializableOrderList()
-        json_list = simplejson.loads(json_str)
-        for order in json_list:
-            order_list.append(MarketOrder(
-                order_id = order['order_id'],
-                order_type = order['order_type'],
-                region_id = order['region_id'],
-                solar_system_id = order['solar_system_id'],
-                station_id = order['station_id'],
-                type_id = order['type_id'],
-                price = order['price'],
-                volume_entered = order['volume_entered'],
-                volume_remaining = order['volume_remaining'],
-                minimum_volume = order['minimum_volume'],
-                order_issue_date = datetime.datetime.strptime(
-                    order['order_issue_date'], "%Y-%m-%d %H:%M:%S"),
-                order_duration = order['order_duration'],
-                order_range = order['order_range'],
-            ))
+        json_dict = simplejson.loads(json_str)
+
+        order_list = SerializableOrderList(
+            upload_keys=json_dict['uploadKeys'],
+            order_generator=json_dict['generator'],
+            columns=json_dict['columns'],
+        )
+
+        for rowset in json_dict['rowsets']:
+            generated_at = rowset['generatedAt']
+            region_id = rowset['regionID']
+            type_id = rowset['typeID']
+
+            for row in rowset['rows']:
+                order_kwargs = order_list._columns_to_kwargs(
+                    order_list.columns, row
+                )
+                order_kwargs.update({
+                    'region_id': region_id,
+                    'type_id': type_id,
+                    'generated_at': generated_at,
+                })
+                order_list.add_order(MarketOrder(**order_kwargs))
 
         return order_list
 
@@ -81,7 +169,7 @@ class MarketOrder(object):
     def __init__(self, order_id, order_type, region_id, solar_system_id,
                  station_id, type_id,
                  price, volume_entered, volume_remaining, minimum_volume,
-                 order_issue_date, order_duration, order_range):
+                 order_issue_date, order_duration, order_range, generated_at):
         """
         :param int order_id: The unique order ID for this order.
         :param str order_type: One of 'buy' or 'sell'.
@@ -98,6 +186,7 @@ class MarketOrder(object):
             first posted.
         :param int order_duration: The duration (in days) of the order.
         :param int order_range: No idea what this is.
+        :param datetime.datetime generated_at: Time of generation.
         """
         self.order_id = order_id
         self.order_type = order_type
@@ -112,6 +201,7 @@ class MarketOrder(object):
         self.order_issue_date = order_issue_date
         self.order_duration = order_duration
         self.order_range = order_range
+        self.generated_at = generated_at
 
     def __repr__(self):
         """
