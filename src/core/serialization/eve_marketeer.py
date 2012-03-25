@@ -5,11 +5,16 @@ import csv
 import logging
 import datetime
 from StringIO import StringIO
-from src.core.market_data import SerializableOrderList
-from src.core.market_data import MarketOrder, ORDER_TYPE_BUY, ORDER_TYPE_SELL
+from src.core.market_data import SerializableOrderList, MarketOrder
 from src.core.serialization.exceptions import InvalidMarketOrderDataError
 
 logger = logging.getLogger(__name__)
+
+# Some order type defines. Use these constants instead of "buy" and "sell"
+# where possible.
+ORDER_TYPE_BUY = "buy"
+ORDER_TYPE_SELL = "sell"
+ORDER_TYPES = [ORDER_TYPE_BUY, ORDER_TYPE_SELL]
 
 def parse_from_payload(payload):
     """
@@ -58,9 +63,9 @@ def parse_from_payload(payload):
         order_id = int(order_id)
 
         if order_type == "s":
-            order_type = ORDER_TYPE_SELL
+            is_bid = False
         elif order_type == "b":
-            order_type = ORDER_TYPE_BUY
+            is_bid = True
         else:
             raise InvalidMarketOrderDataError("Invalid order type.")
 
@@ -78,10 +83,11 @@ def parse_from_payload(payload):
         # Finally, instantiate and pop out a MarketOrder instance, which will
         # be re-serialized in our standard format and sent to SQS for the
         # workers to pull and save.
-        order_list.append(MarketOrder(
-            order_id, order_type, region_id, solar_system_id, station_id,
+        order_list.add_order(MarketOrder(
+            order_id, is_bid, region_id, solar_system_id, station_id,
             type_id, price, volume_entered, volume_remaining, minimum_volume,
             order_issue_date, order_duration, order_range,
+            datetime.datetime.now()
         ))
 
         return order_list

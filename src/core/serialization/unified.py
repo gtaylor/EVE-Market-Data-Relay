@@ -4,7 +4,7 @@ Parser for the Unified uploader format.
 import logging
 import datetime
 import simplejson
-from src.core.market_data import MarketOrder, ORDER_TYPE_BUY, ORDER_TYPE_SELL
+from src.core.market_data import MarketOrder
 from src.core.market_data import SerializableOrderList
 
 logger = logging.getLogger(__name__)
@@ -16,12 +16,12 @@ SPEC_TO_KWARG_CONVERSION = {
     'orderID': 'order_id',
     'volEntered': 'volume_entered',
     'minVolume': 'minimum_volume',
-    'bid': 'order_type',
+    'bid': 'is_bid',
     'issueDate': 'order_issue_date',
     'duration': 'order_duration',
     'stationID': 'station_id',
     'solarSystemID': 'solar_system_id',
-    }
+}
 # Do the reverse.
 KWARG_TO_SPEC_CONVERSION = {}
 for key, item in SPEC_TO_KWARG_CONVERSION.items():
@@ -38,18 +38,21 @@ def _columns_to_kwargs(columns, row):
 
     return kwdict
 
-def parse_from_payload(payload):
+def parse_iso8601_str(iso_str):
+    return datetime.datetime.strptime(iso_str, "%Y-%m-%dT%H:%M:%S" )
+
+def parse_from_json(json_str):
     """
     Given a job dict payload, parse the contents and return a generator of
     :py:class:`src.core.market_data.MarketOrder` instances. Each instance
     represents a market order.
 
-    :param dict payload: A job dict.
+    :param str json_str: JSON representation of the unified order.
     :rtype: generator
     :returns: A generator that pops out
         :py:class:`src.core.market_data.MarketOrder` instances.
     """
-    json_dict = simplejson.loads(payload['body'])
+    json_dict = simplejson.loads(json_str)
 
     order_list = SerializableOrderList(
         upload_keys=json_dict['uploadKeys'],
@@ -58,7 +61,7 @@ def parse_from_payload(payload):
     )
 
     for rowset in json_dict['rowsets']:
-        generated_at = rowset['generatedAt']
+        generated_at = parse_iso8601_str(rowset['generatedAt'])
         region_id = rowset['regionID']
         type_id = rowset['typeID']
 
@@ -69,11 +72,14 @@ def parse_from_payload(payload):
                 'type_id': type_id,
                 'generated_at': generated_at,
             })
+
+            order_kwargs['order_issue_date'] = parse_iso8601_str(order_kwargs['order_issue_date'])
+
             order_list.add_order(MarketOrder(**order_kwargs))
 
     return order_list
 
-def order_list_to_json(order_list):
+def encode_to_json(order_list):
     """
     Encodes this list of MarketOrder instances to a JSON string.
 
@@ -83,8 +89,7 @@ def order_list_to_json(order_list):
     for key, orders in order_list._orders.items():
         rows = []
         for order in orders:
-            issue_date = datetime.datetime.strftime(
-                order.order_issue_date, "%Y-%m-%d %H:%M:%S")
+            issue_date = order.order_issue_date.replace(microsecond=0).isoformat()
 
             rows.append([
                 order.price,
@@ -93,17 +98,16 @@ def order_list_to_json(order_list):
                 order.order_id,
                 order.volume_entered,
                 order.minimum_volume,
-                order.order_type,
+                order.is_bid,
                 issue_date,
                 order.order_duration,
                 order.station_id,
                 order.solar_system_id,
-                ])
+            ])
 
         #noinspection PyUnresolvedReferences
         rowsets.append(dict(
-            generatedAt = datetime.datetime.strftime(
-                orders[0].order_issue_date, "%Y-%m-%d %H:%M:%S"),
+            generatedAt = orders[0].order_issue_date.replace(microsecond=0).isoformat(),
             regionID = orders[0].region_id,
             typeID = orders[0].type_id,
             rows = rows,
@@ -114,7 +118,7 @@ def order_list_to_json(order_list):
         'version': order_list.version,
         'uploadKeys': order_list.upload_keys,
         'generator': order_list.order_generator,
-        'currentTime': 'TESTING',
+        'currentTime': datetime.datetime.now().replace(microsecond=0).isoformat(),
         'columns': order_list.columns,
         'rowsets': rowsets,
     }

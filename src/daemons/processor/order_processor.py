@@ -30,7 +30,7 @@ def parser_order(job_json):
         return
 
     if order_format == 'unified':
-        order_list = serialization.unified.parse_from_payload(payload)
+        order_list = serialization.unified.parse_from_json(payload)
     elif order_format == 'eve_marketeer':
         order_list = serialization.eve_marketeer.parse_from_payload(payload)
     else:
@@ -52,4 +52,4 @@ def worker(job_json, sender):
 
     order_list = parser_order(job_json)
     if order_list:
-        sender.send(order_list.to_json())
+        sender.send(serialization.unified.encode_to_json(order_list))
