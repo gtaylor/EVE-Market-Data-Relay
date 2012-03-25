@@ -2,6 +2,7 @@ import unittest
 import datetime
 from src.core import market_data
 from src.core.market_data import MarketOrder, SerializableOrderList
+from src.core import serialization
 
 class MarketOrderTests(unittest.TestCase):
     """
@@ -33,7 +34,7 @@ class MarketOrderTests(unittest.TestCase):
         JSON encoding/de-coding tests.
         """
         # Encode the sample order list.
-        encoded_orderlist = self.order_list.to_json()
+        encoded_orderlist = serialization.unified.order_list_to_json(self.order_list)
         print(encoded_orderlist)
         return
         # Should return a string JSON representation.

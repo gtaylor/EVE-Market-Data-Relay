@@ -7,7 +7,7 @@ import datetime
 from StringIO import StringIO
 from src.core.market_data import SerializableOrderList
 from src.core.market_data import MarketOrder, ORDER_TYPE_BUY, ORDER_TYPE_SELL
-from src.daemons.gateway.parsers.exceptions import InvalidMarketOrderDataError
+from src.core.serialization.exceptions import InvalidMarketOrderDataError
 
 logger = logging.getLogger(__name__)
 
