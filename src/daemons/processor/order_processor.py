@@ -7,7 +7,7 @@ from src.core import serialization
 
 logger = logging.getLogger(__name__)
 
-def parser_order(job_json):
+def parse_order(job_json):
     """
     Routes the order to the correct parser, returns the parsed order in
     Unified Uploader format.
@@ -30,7 +30,7 @@ def parser_order(job_json):
         return
 
     if order_format == 'unified':
-        order_list = serialization.unified.parse_from_json(payload)
+        order_list = serialization.unified.parse_from_json(payload['body'])
     elif order_format == 'eve_marketeer':
         order_list = serialization.eve_marketeer.parse_from_payload(payload)
     else:
@@ -50,6 +50,7 @@ def worker(job_json, sender):
     """
     logger.info('Processing one job.')
 
-    order_list = parser_order(job_json)
+    order_list = parse_order(job_json)
+    print order_list
     if order_list:
         sender.send(serialization.unified.encode_to_json(order_list))

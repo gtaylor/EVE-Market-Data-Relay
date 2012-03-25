@@ -10,9 +10,10 @@ class SerializableOrderList(object):
     serialization.
     """
     result_type = "orders"
+    # Unified market data format revision.
     version = "0.1alpha"
 
-    def __init__(self, upload_keys=None, order_generator=None, columns=None,
+    def __init__(self, upload_keys=None, order_generator=None,
                  *args, **kwargs):
         self._orders = {}
 
@@ -28,15 +29,6 @@ class SerializableOrderList(object):
         else:
             self.order_generator = order_generator
 
-        if not columns:
-            self.columns = [
-                'price', 'volRemaining', 'range', 'orderID', 'volEntered',
-                'minVolume', 'bid', 'issueDate', 'duration', 'stationID',
-                'solarSystemID',
-            ]
-        else:
-            self.columns = columns
-
     def add_order(self, order):
         key = '%s_%s' % (order.is_bid, order.region_id)
         if not self._orders.has_key(key):
@@ -50,14 +42,12 @@ class SerializableOrderList(object):
         """
         template = Template(
             "<SerializableOrderList: \n"
-            " upload_keys: upload_keys\n"
-            " order_generator: order_generator\n"
-            " columns: columns\n"
+            " upload_keys: $upload_keys\n"
+            " order_generator: $order_generator\n"
         )
         list_repr = template.substitute(
             upload_keys = self.upload_keys,
             order_generator = self.order_generator,
-            columns = self.columns,
         )
         for order_list in self._orders.values():
             for order in order_list:
@@ -96,11 +86,19 @@ class MarketOrder(object):
         if not isinstance(is_bid, bool):
             raise TypeError('is_bid should be a bool.')
         self.is_bid = is_bid
-        self.region_id = int(region_id)
-        self.solar_system_id = int(solar_system_id)
+        if region_id:
+            self.region_id = int(region_id)
+        else:
+            # Client lacked the data for result rows.
+            self.region_id = None
+        if solar_system_id:
+            self.solar_system_id = int(solar_system_id)
+        else:
+            # Client lacked the data for result rows.
+            self.solar_system_id = None
         self.station_id = int(station_id)
         self.type_id = int(type_id)
-        self.price = int(price)
+        self.price = float(price)
         self.volume_entered = int(volume_entered)
         self.volume_remaining = int(volume_remaining)
         self.minimum_volume = int(minimum_volume)
@@ -120,7 +118,7 @@ class MarketOrder(object):
         template = Template(
             "<Market Order: \n"
             " order_id: $order_id\n"
-            " is_bid: is_bid\n"
+            " is_bid: $is_bid\n"
             " region_id: $region_id\n"
             " solar_system_id: $solar_system_id\n"
             " station_id: $station_id\n"
