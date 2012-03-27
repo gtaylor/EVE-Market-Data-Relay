@@ -3,7 +3,7 @@ The worker function in this module performs the order processing.
 """
 import logging
 import simplejson
-from src.core import serialization
+from emdr.core import serialization
 
 logger = logging.getLogger(__name__)
 

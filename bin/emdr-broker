@@ -4,7 +4,7 @@ Shell command for starting up the broker that sits behind the gateway,
 feeding jobs to the processors.
 """
 import argparse
-from src.conf import default_settings
+from emdr.conf import default_settings
 
 parser = argparse.ArgumentParser(
     description="The broker connects to a gateway, retrieves un-processed" \
@@ -28,6 +28,6 @@ if parsed.listeners:
     print("* Overriding default broker sender bindings.")
     default_settings.BROKER_SENDER_BINDINGS = parsed.listeners
 
-from src.daemons.broker import main
+from emdr.daemons.broker import main
 # Fire up the broker.
 main.start()

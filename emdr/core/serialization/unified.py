@@ -5,8 +5,8 @@ import logging
 import datetime
 import simplejson
 import dateutil.parser
-from src.core.market_data import MarketOrder
-from src.core.market_data import SerializableOrderList
+from emdr.core.market_data import MarketOrder
+from emdr.core.market_data import SerializableOrderList
 
 logger = logging.getLogger(__name__)
 

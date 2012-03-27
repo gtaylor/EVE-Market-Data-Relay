@@ -5,8 +5,8 @@ import csv
 import logging
 import datetime
 from StringIO import StringIO
-from src.core.market_data import SerializableOrderList, MarketOrder
-from src.core.serialization.exceptions import InvalidMarketOrderDataError
+from emdr.core.market_data import SerializableOrderList, MarketOrder
+from emdr.core.serialization.exceptions import InvalidMarketOrderDataError
 
 logger = logging.getLogger(__name__)
 

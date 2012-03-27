@@ -1,8 +1,8 @@
 import unittest
 import datetime
-from src.core.market_data import MarketOrder, SerializableOrderList
-from src.core.serialization import unified
-from src.core.serialization import eve_marketeer
+from emdr.core.market_data import MarketOrder, SerializableOrderList
+from emdr.core.serialization import unified
+from emdr.core.serialization import eve_marketeer
 
 class BaseSerializationCase(unittest.TestCase):
 

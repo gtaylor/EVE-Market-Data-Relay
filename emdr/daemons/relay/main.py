@@ -7,7 +7,7 @@ that are subscribed to the announcer.
 # Logging has to be configured first before we do anything.
 import logging
 from logging.config import dictConfig
-import settings
+from emdr.conf import default_settings as settings
 dictConfig(settings.LOGGING)
 logger = logging.getLogger('src.daemons.relay.main')
 

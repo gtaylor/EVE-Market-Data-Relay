@@ -4,7 +4,7 @@ Shell command for starting up a processor that pulls jobs from the broker,
 does some work on the data, then sends it to the relay.
 """
 import argparse
-from src.conf import default_settings
+from emdr.conf import default_settings
 
 parser = argparse.ArgumentParser(
     description="The processor connects to the broker, and retrieves raw " \
@@ -29,6 +29,6 @@ if parsed.relays:
     print("* Overriding default broker sender bindings.")
     default_settings.PROCESSOR_SENDER_BINDINGS = parsed.listeners
 
-from src.daemons.processor import main
+from emdr.daemons.processor import main
 # Fire up the processor process.
 main.start()

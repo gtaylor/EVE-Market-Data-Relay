@@ -7,7 +7,7 @@ import logging
 import simplejson
 from gevent.queue import Queue
 from gevent_zeromq import zmq
-import settings
+from emdr.conf import default_settings as settings
 
 logger = logging.getLogger(__name__)
 

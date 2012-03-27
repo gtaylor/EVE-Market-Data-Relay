@@ -10,7 +10,7 @@ to the relay for re-broadcasting to consumers.
 # Logging has to be configured first before we do anything.
 import logging
 from logging.config import dictConfig
-import settings
+from emdr.conf import default_settings as settings
 dictConfig(settings.LOGGING)
 logger = logging.getLogger('src.daemons.gateway.wsgi')
 
@@ -19,7 +19,7 @@ from gevent import monkey; gevent.monkey.patch_all()
 #noinspection PyUnresolvedReferences
 from bottle import run, request, post, default_app
 
-from src.daemons.gateway import order_pusher
+from emdr.daemons.gateway import order_pusher
 
 @post('/api/market-order/upload/eve_marketeer/')
 def upload_eve_marketeer():

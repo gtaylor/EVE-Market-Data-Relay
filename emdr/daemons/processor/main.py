@@ -5,7 +5,7 @@ performs some very simple validation, then PUSHes it on to a relay.
 # Logging has to be configured first before we do anything.
 import logging
 from logging.config import dictConfig
-import settings
+from emdr.conf import default_settings as settings
 dictConfig(settings.LOGGING)
 logger = logging.getLogger('src.daemons.processor.main')
 
@@ -13,7 +13,7 @@ import gevent
 from gevent.pool import Pool
 from gevent import monkey; gevent.monkey.patch_all()
 from gevent_zeromq import zmq
-from src.daemons.processor import order_processor
+from emdr.daemons.processor import order_processor
 
 def start():
     """

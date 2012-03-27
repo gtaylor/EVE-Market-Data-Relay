@@ -5,7 +5,7 @@ or other relays. The data is PUBlished to all SUBscribers, which are user
 applications, and/or other relays.
 """
 import argparse
-from src.conf import default_settings
+from emdr.conf import default_settings
 
 parser = argparse.ArgumentParser(
     description="The relay accepts order data from processors, or other relays. " \
@@ -36,5 +36,5 @@ if parsed.senders:
     default_settings.RELAY_SENDER_BINDINGS = parsed.senders
 
 # Importing this starts the relay.
-from src.daemons.relay import main
+from emdr.daemons.relay import main
 main.start(run_as_announcer=parsed.is_announcer)
