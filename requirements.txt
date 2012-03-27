@@ -4,3 +4,4 @@ gevent
 gevent-zeromq
 nose
 requests
+python-dateutil
