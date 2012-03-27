@@ -21,6 +21,10 @@ parser.add_argument(
     '--send', action='append', dest='senders',
     help="Override default relay sender bindings. This determines how " \
          "other relays or developer applications can connect to this relay.")
+parser.add_argument(
+    '--announcer-mode', action='store_true', dest='is_announcer',
+    help="Override default relay sender bindings. This determines how "\
+         "other relays or developer applications can connect to this relay.")
 
 parsed = parser.parse_args()
 
@@ -29,7 +33,8 @@ if parsed.listeners:
     default_settings.RELAY_RECEIVER_BINDINGS = parsed.listeners
 if parsed.senders:
     print("* Overriding default relay sender bindings.")
-    default_settings.RELAY_SENDER_BINDINGS = parsed.relays
+    default_settings.RELAY_SENDER_BINDINGS = parsed.senders
 
 # Importing this starts the relay.
 from src.daemons.relay import main
+main.start(run_as_announcer=parsed.is_announcer)

@@ -26,7 +26,7 @@ receiver = context.socket(zmq.PULL)
 for binding in settings.PROCESSOR_RECEIVER_BINDINGS:
     receiver.connect(binding)
 
-sender = context.socket(zmq.PUSH)
+sender = context.socket(zmq.PUB)
 for binding in settings.RELAY_RECEIVER_BINDINGS:
     sender.connect(binding)
 
