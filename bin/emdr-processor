@@ -29,5 +29,6 @@ if parsed.relays:
     print("* Overriding default broker sender bindings.")
     default_settings.PROCESSOR_SENDER_BINDINGS = parsed.listeners
 
-# Importing this starts the processor.
 from src.daemons.processor import main
+# Fire up the processor process.
+main.start()

@@ -13,22 +13,29 @@ import gevent
 from gevent import monkey; gevent.monkey.patch_all()
 from gevent_zeromq import zmq
 
-# These form the connection to the Gateway daemon(s) upstream.
-context = zmq.Context()
+def start():
+    """
+    Fires up the broker process.
+    """
+    # These form the connection to the Gateway daemon(s) upstream.
+    context = zmq.Context()
 
-receiver = context.socket(zmq.PULL)
-# See: http://api.zeromq.org/2-1:zmq-socket (The ZMQ_PULL section)
-for binding in settings.BROKER_RECEIVER_BINDINGS:
-    receiver.bind(binding)
+    receiver = context.socket(zmq.PULL)
+    # See: http://api.zeromq.org/2-1:zmq-socket (The ZMQ_PULL section)
+    for binding in settings.BROKER_RECEIVER_BINDINGS:
+        receiver.bind(binding)
 
-sender = context.socket(zmq.PUSH)
-for binding in settings.BROKER_SENDER_BINDINGS:
-    sender.bind(binding)
+    sender = context.socket(zmq.PUSH)
+    for binding in settings.BROKER_SENDER_BINDINGS:
+        sender.bind(binding)
 
-def broker_worker(message):
-    logger.info("Doling out a task to worker.")
-    sender.send(message)
+    def broker_worker(message):
+        logger.info("Doling out a task to worker.")
+        sender.send(message)
 
-logger.info("Broker startup complete, waiting for orders...")
-while True:
-    gevent.spawn(broker_worker, receiver.recv())
+    logger.info("Broker startup complete, waiting for orders...")
+    while True:
+        gevent.spawn(broker_worker, receiver.recv())
+
+if __name__ == '__main__':
+    start()

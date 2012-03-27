@@ -28,5 +28,6 @@ if parsed.listeners:
     print("* Overriding default broker sender bindings.")
     default_settings.BROKER_SENDER_BINDINGS = parsed.listeners
 
-# Importing this starts the broker.
 from src.daemons.broker import main
+# Fire up the broker.
+main.start()
