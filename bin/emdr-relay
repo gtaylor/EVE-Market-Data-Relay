@@ -1,0 +1,35 @@
+#!/usr/bin/env python
+"""
+Shell command for starting up a relay that accepts order data from processors,
+or other relays. The data is PUBlished to all SUBscribers, which are user
+applications, and/or other relays.
+"""
+import argparse
+from src.conf import default_settings
+
+parser = argparse.ArgumentParser(
+    description="The relay accepts order data from processors, or other relays. " \
+                "The data is PUBlished to all SUBscribers, which are developer " \
+                "applications, and/or other relays.",
+)
+parser.add_argument(
+    '--listen', action='append', dest='listeners',
+    help="Overrides default relay receiver bindings. This determines how " \
+         "the processors (or other relays) connects to this relay to PUB " \
+         "messages.")
+parser.add_argument(
+    '--send', action='append', dest='senders',
+    help="Override default relay sender bindings. This determines how " \
+         "other relays or developer applications can connect to this relay.")
+
+parsed = parser.parse_args()
+
+if parsed.listeners:
+    print("* Overriding default relay receiver bindings.")
+    default_settings.RELAY_RECEIVER_BINDINGS = parsed.listeners
+if parsed.senders:
+    print("* Overriding default relay sender bindings.")
+    default_settings.RELAY_SENDER_BINDINGS = parsed.relays
+
+# Importing this starts the relay.
+from src.daemons.relay import main

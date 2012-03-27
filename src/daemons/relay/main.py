@@ -27,5 +27,7 @@ def relay_worker(message):
     print message
     sender.send(message)
 
+logger.info("Relay is now listening for order data.")
+
 while True:
     gevent.spawn(relay_worker, receiver.recv())
