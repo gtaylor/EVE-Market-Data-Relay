@@ -30,13 +30,23 @@ def upload_eve_marketeer():
     # Job dicts are a way to package/wrap uploaded data in a way that lets
     # the processor nodes know what format the upload is in. The payload attrib
     # contains the format-specific stuff.
+    #print "TEST", request.forms.keys()
+    #print "TEST", request.forms.items()
     job_dict = {
         'format': 'eve_marketeer',
         'payload': {
+            # 'orders' or 'history'
             'upload_type': request.forms.upload_type,
             'type_id': request.forms.type_id,
             'region_id': request.forms.region_id,
+            # CSV, with \r\n delimited records.
             'log': request.forms.log,
+            # 'EVEUnifiedUploader'
+            'developer_key': request.forms.developer_key,
+            # String, like '6.0'
+            'version': request.forms.version,
+            # 2012-03-11 01:24:33
+            'generated_at': request.forms.generated_at,
         }
     }
 
@@ -53,7 +63,6 @@ def upload_eve_marketeer():
     This view accepts uploads in Unified Uploader format. These
     typically arrive via the EVE Unified Uploader client.
     """
-    print "BODY", request.body.read()
     job_dict = {
         'format': 'unified',
         'payload': {

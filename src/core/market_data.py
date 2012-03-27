@@ -2,32 +2,7 @@
 Data structures for representing market data.
 """
 import datetime
-import simplejson
 from string import Template
-
-# Some order type defines. Use these constants instead of "buy" and "sell"
-# where possible.
-ORDER_TYPE_BUY = "buy"
-ORDER_TYPE_SELL = "sell"
-ORDER_TYPES = [ORDER_TYPE_BUY, ORDER_TYPE_SELL]
-
-SPEC_TO_KWARG_CONVERSION = {
-    'price': 'price',
-    'volRemaining': 'volume_remaining',
-    'range': 'order_range',
-    'orderID': 'order_id',
-    'volEntered': 'volume_entered',
-    'minVolume': 'minimum_volume',
-    'bid': 'order_type',
-    'issueDate': 'order_issue_date',
-    'duration': 'order_duration',
-    'stationID': 'station_id',
-    'solarSystemID': 'solar_system_id',
-}
-# Do the reverse.
-KWARG_TO_SPEC_CONVERSION = {}
-for key, item in SPEC_TO_KWARG_CONVERSION.items():
-    KWARG_TO_SPEC_CONVERSION[item] = key
 
 class SerializableOrderList(object):
     """
@@ -35,9 +10,10 @@ class SerializableOrderList(object):
     serialization.
     """
     result_type = "orders"
+    # Unified market data format revision.
     version = "0.1alpha"
 
-    def __init__(self, upload_keys=None, order_generator=None, columns=None,
+    def __init__(self, upload_keys=None, order_generator=None,
                  *args, **kwargs):
         self._orders = {}
 
@@ -53,126 +29,44 @@ class SerializableOrderList(object):
         else:
             self.order_generator = order_generator
 
-        if not columns:
-            self.columns = [
-                'price', 'volRemaining', 'range', 'orderID', 'volEntered',
-                'minVolume', 'bid', 'issueDate', 'duration', 'stationID',
-                'solarSystemID',
-            ]
-        else:
-            self.columns = columns
-
     def add_order(self, order):
-        key = '%s_%s' % (order.order_type, order.region_id)
+        key = '%s_%s' % (order.is_bid, order.region_id)
         if not self._orders.has_key(key):
             self._orders[key] = []
 
         self._orders[key].append(order)
 
-    def to_json(self):
+    def __repr__(self):
         """
-        Encodes this list of MarketOrder instances to a JSON string.
-
-        :rtype: str
+        Basic string representation of the order.
         """
-        rowsets = []
-        for key, orders in self._orders.items():
-            rows = []
-            for order in orders:
-                issue_date = datetime.datetime.strftime(
-                    order.order_issue_date, "%Y-%m-%d %H:%M:%S")
-
-                rows.append([
-                    order.price,
-                    order.volume_remaining,
-                    order.order_range,
-                    order.order_id,
-                    order.volume_entered,
-                    order.minimum_volume,
-                    order.order_type,
-                    issue_date,
-                    order.order_duration,
-                    order.station_id,
-                    order.solar_system_id,
-                ])
-
-            #noinspection PyUnresolvedReferences
-            rowsets.append(dict(
-                generatedAt = datetime.datetime.strftime(
-                    orders[0].order_issue_date, "%Y-%m-%d %H:%M:%S"),
-                regionID = orders[0].region_id,
-                typeID = orders[0].type_id,
-                rows = rows,
-            ))
-
-        json_dict = {
-            'resultType': self.result_type,
-            'version': self.version,
-            'uploadKeys': self.upload_keys,
-            'generator': self.order_generator,
-            'currentTime': 'TESTING',
-            'columns': self.columns,
-            'rowsets': rowsets,
-        }
-
-        return simplejson.dumps(json_dict, indent=4 * ' ')
-
-    def _columns_to_kwargs(self, columns, row):
-        kwdict = {}
-
-        counter = 0
-        for column in columns:
-            kwarg_name = SPEC_TO_KWARG_CONVERSION[column]
-            kwdict[kwarg_name] = row[counter]
-            counter += 1
-
-        return kwdict
-
-    @staticmethod
-    def from_json(json_str):
-        """
-        Convenience method used to de-code a JSON string to a
-        SerializableOrderList instance that contains MarketOrder instances.
-
-        :rtype: SerializableOrderList
-        """
-        json_dict = simplejson.loads(json_str)
-
-        order_list = SerializableOrderList(
-            upload_keys=json_dict['uploadKeys'],
-            order_generator=json_dict['generator'],
-            columns=json_dict['columns'],
+        template = Template(
+            "<SerializableOrderList: \n"
+            " upload_keys: $upload_keys\n"
+            " order_generator: $order_generator\n"
         )
+        list_repr = template.substitute(
+            upload_keys = self.upload_keys,
+            order_generator = self.order_generator,
+        )
+        for order_list in self._orders.values():
+            for order in order_list:
+                list_repr += repr(order)
 
-        for rowset in json_dict['rowsets']:
-            generated_at = rowset['generatedAt']
-            region_id = rowset['regionID']
-            type_id = rowset['typeID']
-
-            for row in rowset['rows']:
-                order_kwargs = order_list._columns_to_kwargs(
-                    order_list.columns, row
-                )
-                order_kwargs.update({
-                    'region_id': region_id,
-                    'type_id': type_id,
-                    'generated_at': generated_at,
-                })
-                order_list.add_order(MarketOrder(**order_kwargs))
-
-        return order_list
+        return list_repr
 
 class MarketOrder(object):
     """
     Represents a market buy or sell order.
     """
-    def __init__(self, order_id, order_type, region_id, solar_system_id,
+    def __init__(self, order_id, is_bid, region_id, solar_system_id,
                  station_id, type_id,
                  price, volume_entered, volume_remaining, minimum_volume,
                  order_issue_date, order_duration, order_range, generated_at):
         """
         :param int order_id: The unique order ID for this order.
-        :param str order_type: One of 'buy' or 'sell'.
+        :param bool is_bid: If ``True``, this is a bid (buy order). If ``False``,
+            it's a sell order.
         :param int region_id: The region the order is in.
         :param int solar_system_id: The solar system the order is in.
         :param int station_id: The station the order is in.
@@ -182,25 +76,39 @@ class MarketOrder(object):
         :param int volume_remaining: The quantity remaining in the order.
         :param int minimum_volume: The minimum volume that may remain
             before the order is removed.
-        :param datetime order_issue_date: The time at which the order was
-            first posted.
+        :param datetime.datetime order_issue_date: The time at which the order
+            was first posted.
         :param int order_duration: The duration (in days) of the order.
         :param int order_range: No idea what this is.
         :param datetime.datetime generated_at: Time of generation.
         """
-        self.order_id = order_id
-        self.order_type = order_type
-        self.region_id = region_id
-        self.solar_system_id = solar_system_id
-        self.station_id = station_id
-        self.type_id = type_id
-        self.price = price
-        self.volume_entered = volume_entered
-        self.volume_remaining = volume_remaining
-        self.minimum_volume = minimum_volume
+        self.order_id = int(order_id)
+        if not isinstance(is_bid, bool):
+            raise TypeError('is_bid should be a bool.')
+        self.is_bid = is_bid
+        if region_id:
+            self.region_id = int(region_id)
+        else:
+            # Client lacked the data for result rows.
+            self.region_id = None
+        if solar_system_id:
+            self.solar_system_id = int(solar_system_id)
+        else:
+            # Client lacked the data for result rows.
+            self.solar_system_id = None
+        self.station_id = int(station_id)
+        self.type_id = int(type_id)
+        self.price = float(price)
+        self.volume_entered = int(volume_entered)
+        self.volume_remaining = int(volume_remaining)
+        self.minimum_volume = int(minimum_volume)
+        if not isinstance(order_issue_date, datetime.datetime):
+            raise TypeError('order_issue_date should be a datetime.')
         self.order_issue_date = order_issue_date
-        self.order_duration = order_duration
-        self.order_range = order_range
+        self.order_duration = int(order_duration)
+        self.order_range = int(order_range)
+        if not isinstance(generated_at, datetime.datetime):
+            raise TypeError('generated_at should be a datetime.')
         self.generated_at = generated_at
 
     def __repr__(self):
@@ -210,7 +118,7 @@ class MarketOrder(object):
         template = Template(
             "<Market Order: \n"
             " order_id: $order_id\n"
-            " order_type: $order_type\n"
+            " is_bid: $is_bid\n"
             " region_id: $region_id\n"
             " solar_system_id: $solar_system_id\n"
             " station_id: $station_id\n"
@@ -225,7 +133,7 @@ class MarketOrder(object):
         )
         return template.substitute(
             order_id = self.order_id,
-            order_type = self.order_type,
+            is_bid = self.is_bid,
             region_id = self.region_id,
             solar_system_id = self.solar_system_id,
             station_id = self.station_id,

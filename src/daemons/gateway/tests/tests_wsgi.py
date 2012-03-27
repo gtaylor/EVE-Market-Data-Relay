@@ -13,7 +13,7 @@ class GatewayWSGITests(unittest.TestCase):
     def setUp(self):
         self.order1 = MarketOrder(
             order_id=2413387906,
-            order_type=market_data.ORDER_TYPE_BUY,
+            is_bid=True,
             region_id=10000068,
             solar_system_id=30005316,
             station_id=60011521,
@@ -27,4 +27,4 @@ class GatewayWSGITests(unittest.TestCase):
             order_range=5,
         )
         self.order_list = SerializableOrderList()
-        self.order_list.append(self.order1)
+        self.order_list.add_order(self.order1)

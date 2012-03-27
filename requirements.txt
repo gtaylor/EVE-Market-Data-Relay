@@ -3,3 +3,4 @@ simplejson
 gevent
 gevent-zeromq
 nose
+requests
