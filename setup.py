@@ -10,8 +10,6 @@ required = [
     'simplejson',
     'gevent',
     'gevent-zeromq',
-    'nose',
-    'requests',
     'python-dateutil<2.0',
 ]
 

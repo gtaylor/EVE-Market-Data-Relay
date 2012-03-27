@@ -10,3 +10,4 @@ build
 dist
 *.egg-info
 MANIFEST
+doc_src/_build
