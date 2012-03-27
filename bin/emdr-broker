@@ -1,0 +1,32 @@
+#!/usr/bin/env python
+"""
+Shell command for starting up the broker that sits behind the gateway,
+feeding jobs to the processors.
+"""
+import argparse
+from src.conf import default_settings
+
+parser = argparse.ArgumentParser(
+    description="The broker connects to a gateway, retrieves un-processed" \
+                "orders, and shoves said orders out to processor workers.",
+)
+parser.add_argument(
+    '--gateway', action='append', dest='gateways',
+    help="Overrides default broker receiver bindings. This determines where " \
+         "the broker gets its messages, typically the gateway.")
+parser.add_argument(
+    '--listen', action='append', dest='listeners',
+    help="Override default broker sender bindings. This determines how " \
+         "processor workers will connect to the broker to retrieve new jobs.")
+
+parsed = parser.parse_args()
+
+if parsed.gateways:
+    print("* Overriding default broker receiver bindings.")
+    default_settings.BROKER_RECEIVER_BINDINGS = parsed.gateways
+if parsed.listeners:
+    print("* Overriding default broker sender bindings.")
+    default_settings.BROKER_SENDER_BINDINGS = parsed.listeners
+
+# Importing this starts the broker.
+from src.daemons.broker import main
