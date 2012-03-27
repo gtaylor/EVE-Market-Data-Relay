@@ -35,9 +35,13 @@ simply subscribe to our firehose of EVE market data.
 Core Principles
 ---------------
 
+* There should be no single point of failure. Every component of the
+  architecture should be simple to make redundant using trusted volunteered
+  machines.
 * The application must be able to accept an extremely large number of incoming
-  market orders without performance degrading noticeably.
-* It must be very easy to scale the system.
+  market orders without performance issues.
+* It must be very easy to scale the system without restarts/reconfigs on the
+  primary setup.
 * The broadcasting of the market data needs to happen in a "fan out" manner.
   In this way, we can keep adding additional subscribers without running into
   scalability issues.
@@ -47,16 +51,20 @@ How it all fits together
 
 For any given submitted market order, here is the flow said order goes through::
 
-    (Gateway) -> (Processor) -> (Relay)
+    (Gateway) -> (Broker) -> (Processor) -> (Relay) -> (Applications, other Relays)
 
 First, the order hits the **Gateway**, which is a very light WSGI application.
-The only purpose of the gateway is to queue the order for submission to one of
-many **Processor** daemons. The number of processor daemons can scale up and
-down without any modifications or restarts of the **Gateway**.
+The only purpose of the gateway is to queue the order for submission to
+a **Broker** daemon. Brokers are used to distribute raw order data out to any
+of the many **Processor** daemons. The number of processor daemons can scale
+up and down without any modifications or restarts of any of the components,
+and it is super easy for external people to volunteer their machines by running
+Processor daemons and getting permission to connect ot the Broker.
+Order data gets passed between each component viaZeroMQ_, which is an extremely
+scalable and performant transport/messaging layer.
 
-The message gets passed from the **Gateway** to the **Processor** via
-ZeroMQ_, which is an extremely scalable and performant transport/messaging
-layer. The **Processor** looks at the raw data, parses it, performs some
+Getting back to our example above, the **Processor** gets raw order data from
+a **Broker**, looks at the raw data, parses it, performs some
 really simple validation/verification, then passes it on to our top level
 **Relay** via ZeroMQ_.
 
@@ -74,8 +82,8 @@ to run tier-2 relays*.
 Current Status
 --------------
 
-This project is in early, early development. This is all very experimental,
-so documentation is likely to be minimal until things start settling.
+The software is working, albeit rough. Documentation is next on the list,
+along with stabilization and load testing.
 
 Installation
 ------------
