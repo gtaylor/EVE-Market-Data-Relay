@@ -1,20 +1,56 @@
-.. EVE Market Data Relay documentation master file, created by
-   sphinx-quickstart on Tue Mar 27 00:15:24 2012.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+.. _index:
 
-Welcome to EVE Market Data Relay's documentation!
-=================================================
+.. include:: global.txt
 
-Contents:
+EVE Market Data Relay (EMDR)
+============================
+
+EVE Market Data Relay is  a super-scalable, super-reliable way to accept a large
+amount of user-submitted market data (via uploaders), and re-broadcast said
+data in near real-time to a large number of subscribers.
+
+The end result is that those writing market-data driven applications could
+simply subscribe to a "firehose" of market data, and get going, without having
+to hassle with writing uploaders or data submission APIs. Users wouldn't need
+to be asked to install yet another upload, or twiddle the settings on their
+existing one. More about this can be seen in :doc:`overview`.
+
+Learning more
+-------------
+
+To learn more about EMDR, see the :doc:`overview`.
+
+**License:** EVE Market Data Relay is licensed under the `BSD License`_.
+
+These links may also be useful to you.
+
+* Source repository: https://github.com/gtaylor/EVE-Market-Data-Relay
+* Issue tracker: https://github.com/gtaylor/EVE-Market-Data-Relay/issues
+
+
+Documentation
+-------------
 
 .. toctree::
    :maxdepth: 2
 
+   overview
+   using
 
+EMDR Developer Documentation
+----------------------------
+
+The following topics will be useful to you if you would like to help improve
+EMDR, or volunteer additional computing resources to the network.
+
+.. toctree::
+   :maxdepth: 2
+
+   installation
+   volunteering
 
 Indices and tables
-==================
+------------------
 
 * :ref:`genindex`
 * :ref:`modindex`

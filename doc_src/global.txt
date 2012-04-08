@@ -1,0 +1,15 @@
+.. _GitHub project: https://github.com/gtaylor/EVE-Market-Data-Relay
+.. _issue tracker: https://github.com/gtaylor/EVE-Market-Data-Relay/issues
+
+.. _Python: http://python.org
+.. _nose: http://somethingaboutorange.com/mrl/projects/nose/
+
+.. _virtualenv: http://pypi.python.org/pypi/virtualenv
+.. _virtualenvwrapper: http://www.doughellmann.com/projects/virtualenvwrapper/
+
+.. _git: http://git-scm.com/
+.. _Supervisor: http://supervisord.org/
+
+.. _GitHub: https://github.com/
+
+.. _BSD License: http://opensource.org/licenses/bsd-license.php
