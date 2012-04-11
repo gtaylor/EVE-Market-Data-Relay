@@ -37,8 +37,8 @@ Documentation
 
    overview
    uploading
-   using
    access
+   using
 
 EMDR Developer Documentation
 ----------------------------
