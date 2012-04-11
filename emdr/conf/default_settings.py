@@ -32,12 +32,18 @@ NUM_PROCESSOR_WORKERS = 2
 # however, add additional gateways to the list, remote or local.
 # See: http://api.zeromq.org/2-1:zmq-connect
 PROCESSOR_RECEIVER_BINDINGS = ["ipc:///tmp/broker-sender.sock"]
-PROCESSOR_SENDER_BINDINGS = ["ipc:///tmp/relay-receiver.sock"]
+PROCESSOR_SENDER_BINDINGS = ["ipc:///tmp/announcer-receiver.sock"]
+
+#
+## Announcer Daemon Settings
+#
+ANNOUNCER_RECEIVER_BINDINGS = ["ipc:///tmp/announcer-receiver.sock"]
+ANNOUNCER_SENDER_BINDINGS = ["ipc:///tmp/announcer-sender.sock"]
 
 #
 ## Relay Daemon Settings
 #
-RELAY_RECEIVER_BINDINGS = ["ipc:///tmp/relay-receiver.sock"]
+RELAY_RECEIVER_BINDINGS = ["ipc:///tmp/announcer-sender.sock"]
 RELAY_SENDER_BINDINGS = ["ipc:///tmp/relay-sender.sock"]
 
 

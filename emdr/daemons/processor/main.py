@@ -30,8 +30,8 @@ def start():
     for binding in settings.PROCESSOR_RECEIVER_BINDINGS:
         receiver.connect(binding)
 
-    sender = context.socket(zmq.PUB)
-    for binding in settings.RELAY_RECEIVER_BINDINGS:
+    sender = context.socket(zmq.PUSH)
+    for binding in settings.PROCESSOR_SENDER_BINDINGS:
         sender.connect(binding)
 
     # We use a greenlet pool to cap the number of workers at a reasonable level.

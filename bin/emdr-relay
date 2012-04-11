@@ -1,14 +1,13 @@
 #!/usr/bin/env python
 """
-Shell command for starting up a relay that accepts order data from processors,
-or other relays. The data is PUBlished to all SUBscribers, which are user
-applications, and/or other relays.
+Relays listen to Announcers or other Relays for messages over SUB. Any
+messages received are pushed out to anyone below the Relay via PUB.
 """
 import argparse
 from emdr.conf import default_settings
 
 parser = argparse.ArgumentParser(
-    description="The relay accepts order data from processors, or other relays. " \
+    description="The relay accepts order data from announcers, or other relays. " \
                 "The data is PUBlished to all SUBscribers, which are developer " \
                 "applications, and/or other relays.",
 )
@@ -20,10 +19,6 @@ parser.add_argument(
 parser.add_argument(
     '--send', action='append', dest='senders',
     help="Override default relay sender bindings. This determines how " \
-         "other relays or developer applications can connect to this relay.")
-parser.add_argument(
-    '--announcer-mode', action='store_true', dest='is_announcer',
-    help="Override default relay sender bindings. This determines how "\
          "other relays or developer applications can connect to this relay.")
 
 parsed = parser.parse_args()
@@ -37,4 +32,4 @@ if parsed.senders:
 
 # Importing this starts the relay.
 from emdr.daemons.relay import main
-main.start(run_as_announcer=parsed.is_announcer)
+main.start()

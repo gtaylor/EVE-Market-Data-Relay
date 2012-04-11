@@ -1,13 +1,14 @@
 """
-Relays sit below an announcer, or another relay, and simply repeat what
-they receive over PUB/SUB.
+Announcers are the first daemons to get their mittens on the "finished"
+unified format messages. From here, they PUB the messages out to anyone
+SUBscribing. This could be Relays, or end-users.
 """
 # Logging has to be configured first before we do anything.
 import logging
 from logging.config import dictConfig
 from emdr.conf import default_settings as settings
 dictConfig(settings.LOGGING)
-logger = logging.getLogger('src.daemons.relay.main')
+logger = logging.getLogger('src.daemons.announcer.main')
 
 import gevent
 from gevent import monkey; gevent.monkey.patch_all()
@@ -15,21 +16,19 @@ from gevent_zeromq import zmq
 
 def start():
     """
-    Fires up the relay process.
+    Fires up the announcer process.
     """
-    # These form the connection to the Gateway daemon(s) upstream.
     context = zmq.Context()
 
-    receiver = context.socket(zmq.SUB)
-    receiver.setsockopt(zmq.SUBSCRIBE, '')
-    for binding in settings.RELAY_RECEIVER_BINDINGS:
-        # Relays bind upstream to an Announcer, or another Relay.
-        receiver.connect(binding)
-        logger.info("Listening to %s" % binding)
+    receiver = context.socket(zmq.PULL)
+    for binding in settings.ANNOUNCER_RECEIVER_BINDINGS:
+        logger.info("Accepting connections from %s" % binding)
+        # Processors connect to announcer to PUSH messages.
+        receiver.bind(binding)
 
     sender = context.socket(zmq.PUB)
-    for binding in settings.RELAY_SENDER_BINDINGS:
-        # End users, or other relays, may attach here.
+    for binding in settings.ANNOUNCER_SENDER_BINDINGS:
+        # Announcers offer up the data via PUB/SUB.
         sender.bind(binding)
 
     def relay_worker(message):
@@ -42,7 +41,7 @@ def start():
         print message
         sender.send(message)
 
-    logger.info("Relay is now listening for order data.")
+    logger.info("Announcer is now listening for order data.")
 
     while True:
         gevent.spawn(relay_worker, receiver.recv())
