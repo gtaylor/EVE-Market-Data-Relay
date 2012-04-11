@@ -6,6 +6,9 @@
 
 .. _virtualenv: http://pypi.python.org/pypi/virtualenv
 .. _virtualenvwrapper: http://www.doughellmann.com/projects/virtualenvwrapper/
+.. _ZeroMQ: http://www.zeromq.org/
+.. _gevent: http://www.gevent.org/
+.. _bottle: http://bottlepy.org/docs/dev/
 
 .. _git: http://git-scm.com/
 .. _Supervisor: http://supervisord.org/

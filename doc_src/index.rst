@@ -5,7 +5,7 @@
 EVE Market Data Relay (EMDR)
 ============================
 
-EVE Market Data Relay is  a super-scalable, super-reliable way to accept a large
+EVE Market Data Relay is  a super-scalable, super-available way to accept a large
 amount of user-submitted market data (via uploaders), and re-broadcast said
 data in near real-time to a large number of subscribers.
 
@@ -36,6 +36,7 @@ Documentation
 
    overview
    using
+   access
 
 EMDR Developer Documentation
 ----------------------------

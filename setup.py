@@ -22,6 +22,7 @@ packages = [
 ]
 
 scripts = [
+    'bin/emdr-announcer',
     'bin/emdr-broker',
     'bin/emdr-processor',
     'bin/emdr-relay',
