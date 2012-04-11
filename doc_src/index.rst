@@ -26,6 +26,7 @@ These links may also be useful to you.
 
 * Source repository: https://github.com/gtaylor/EVE-Market-Data-Relay
 * Issue tracker: https://github.com/gtaylor/EVE-Market-Data-Relay/issues
+* Mailing list: https://groups.google.com/forum/#!forum/eve-emdr
 
 
 Documentation
