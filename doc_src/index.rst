@@ -36,6 +36,7 @@ Documentation
    :maxdepth: 2
 
    overview
+   uploading
    using
    access
 
