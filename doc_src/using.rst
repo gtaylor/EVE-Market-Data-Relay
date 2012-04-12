@@ -29,6 +29,7 @@ your fancy::
     #
     #  Example Python EMDR client.
     #
+    import zlib
     import zmq
     import simplejson
 
@@ -43,7 +44,7 @@ your fancy::
 
         while True:
             # Receive raw market JSON strings.
-            market_json = subscriber.recv()
+            market_json = zlib.decompress(subscriber.recv())
             # Un-serialize the JSON data to a Python dict.
             market_data = simplejson.loads(market_json)
             # Dump the market data to stdout. Or, you know, do more fun
@@ -76,10 +77,12 @@ PHP accesses EMDR via ZeroMQ's `php-zmq`_ PHP bindings::
     $subscriber->setSockOpt(ZMQ::SOCKOPT_SUBSCRIBE, "");
 
     while (true) {
-    	$string = $subscriber->recv();
-    	// I can't remember how JSON parsing worked with PHP, but you'd
-    	// parse $string here and be left with an easy-to-use named array..
-    	printf($string)
+        // Receive raw market JSON strings.
+    	$market_json = gzuncompress($subscriber->recv());
+    	// Un-serialize the JSON data to a named array.
+    	$market_data = json_decode($market_json);
+    	// Dump the market data to stdout. Or, you know, do more fun things here.
+    	printf($market_data);
     }
 
 .. _php-zmq: http://www.zeromq.org/bindings:php
@@ -105,9 +108,15 @@ Ruby accesses EMDR via ZeroMQ's zmq_ Ruby bindings::
 
     loop do
       subscriber.recv_string(string = '')
-      # I have no idea how JSON parsing works with Ruby, but you'd parse
-      # this string as JSON, and be off to the races.
+      # I'm not sure how zlib works with Ruby, but you'll need to
+      # Zlib.decompress(), which will leave you with a JSON string. You
+      # can then decode the JSON to leave yourself with a Ruby dict, or
+      # whatever they're called. If you don't at least decompress this with
+      # Zlib, you're going to see lots of gibberish.
       puts string
     end
+
+.. note:: If anyone would like to contribute the correct code for this
+    Ruby example, please post on our `issue tracker`_.
 
 .. _zmq: http://www.zeromq.org/bindings:ruby
