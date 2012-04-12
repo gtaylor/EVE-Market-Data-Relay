@@ -21,7 +21,7 @@ from bottle import run, request, post, default_app
 
 from emdr.daemons.gateway import order_pusher
 
-@post('/api/market-order/upload/eve_marketeer/')
+@post('/upload/eve_marketeer/')
 def upload_eve_marketeer():
     """
     This view accepts uploads in EVE Marketeer or EVE Marketdata format. These
@@ -57,7 +57,7 @@ def upload_eve_marketeer():
     # Goofy, but apparently expected by EVE Market Data Uploader.
     return '1'
 
-@post('/api/market-order/upload/unified/')
+@post('/upload/unified/')
 def upload_eve_marketeer():
     """
     This view accepts uploads in Unified Uploader format. These

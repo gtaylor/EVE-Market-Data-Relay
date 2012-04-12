@@ -17,7 +17,7 @@ can do that.
 * Hit 'Add'.
 * Enter 'EMDR' for the name.
 * Leave data type as EVE Marketeer & Marketdata.
-* Set the URL to: http://gateway.eve-emdr.com/api/market-order/upload/eve_marketeer/
+* Set the URL to: http://gateway.eve-emdr.com/upload/eve_marketeer/
 * Enter 46 for upload key.
 * Hit Save.
 * You're all set. Get uploading!
