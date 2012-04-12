@@ -5,6 +5,10 @@
 Using data from the EMDR network
 ================================
 
+All data coming out of EMDR is in `Unified Uploader Interchange Format`_,
+which is a JSON-based standard for market orders and history. See the
+`spec <Unified Uploader Interchange Format>`_ for more details.
+
 Below are a few examples of how to connect to the data feed. If you see
 anything wrong with the examples below, please let us know on the
 `issue tracker`_. The original author of this documentation is only familiar
@@ -12,6 +16,8 @@ with Python.
 
 .. warning:: Right now, the hostnames you see below are not in action. They
     will become active once we complete our first deployment.
+
+.. _Unified Uploader Interchange Format: http://dev.eve-central.com/unifieduploader/start
 
 Python
 ------
