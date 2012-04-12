@@ -4,6 +4,7 @@ pushes raw market data out to the worker processes, without blocking the
 gateway WSGI app.
 """
 import logging
+import zlib
 import simplejson
 from gevent.queue import Queue
 from gevent_zeromq import zmq
@@ -39,9 +40,9 @@ def worker():
             logger.error('Unable to serialize a job dict. Discarding.')
             continue
 
-        # Push a JSON representation of the job dict to a processor for
-        # a further look.
-        sender.send(job_json)
+        # Push a zlib compressed JSON representation of the job dict to a
+        # processor for a further look.
+        sender.send(zlib.compress(job_json))
         logger.info('Pushed orders.')
 
 

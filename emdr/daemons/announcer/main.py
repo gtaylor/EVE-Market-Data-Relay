@@ -38,7 +38,6 @@ def start():
 
         :param str message: A JSON string to re-broadcast.
         """
-        print message
         sender.send(message)
 
     logger.info("Announcer is now listening for order data.")

@@ -39,7 +39,8 @@ def start():
 
         :param str message: A JSON string to re-broadcast.
         """
-        print message
+        import zlib
+        print zlib.decompress(message)
         sender.send(message)
 
     logger.info("Relay is now listening for order data.")

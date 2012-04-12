@@ -2,6 +2,7 @@
 The worker function in this module performs the order processing.
 """
 import logging
+import zlib
 import simplejson
 from emdr.core import serialization
 
@@ -16,7 +17,7 @@ def parse_order(job_json):
     :rtype: SerializableOrderList
     :returns: A serializable list of MarketOrder objects.
     """
-    job_dict = simplejson.loads(job_json)
+    job_dict = simplejson.loads(zlib.decompress(job_json))
 
     # The format attrib on the job dict determines which parser to use.
     order_format = job_dict.get('format', 'unknown')
@@ -53,4 +54,5 @@ def worker(job_json, sender):
     order_list = parse_order(job_json)
     print order_list
     if order_list:
-        sender.send(serialization.unified.encode_to_json(order_list))
+        json_str = serialization.unified.encode_to_json(order_list)
+        sender.send(zlib.compress(json_str))
