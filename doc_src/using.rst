@@ -61,7 +61,9 @@ your fancy::
 PHP
 ---
 
-PHP accesses EMDR via ZeroMQ's `php-zmq`_ PHP bindings::
+PHP accesses EMDR via ZeroMQ's `php-zmq`_ PHP bindings:
+
+.. code-block:: php
 
     <?php
     /*
@@ -90,7 +92,9 @@ PHP accesses EMDR via ZeroMQ's `php-zmq`_ PHP bindings::
 Ruby
 ----
 
-Ruby accesses EMDR via ZeroMQ's zmq_ Ruby bindings::
+Ruby accesses EMDR via ZeroMQ's zmq_ Ruby bindings:
+
+.. code-block:: ruby
 
     #
     # Synchronized subscriber
