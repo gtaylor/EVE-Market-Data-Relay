@@ -30,7 +30,15 @@ class MarketOrderList(object):
             self.order_generator = order_generator
 
     def add_order(self, order):
-        key = '%s_%s' % (order.is_bid, order.region_id)
+        """
+        Adds a MarketOrder instance to the list of market orders contained
+        within this order list. Does some behind-the-scenes magic to get it
+        all ready for serialization.
+
+        :param MarketOrder order: The order to add to this order list.
+        """
+        # This key is used to group the orders based on region.
+        key = '%s' % order.region_id
         if not self._orders.has_key(key):
             self._orders[key] = []
 
@@ -145,4 +153,93 @@ class MarketOrder(object):
             order_issue_date = self.order_issue_date,
             order_duration = self.order_duration,
             order_range = self.order_range,
+        )
+
+class MarketHistory(object):
+    """
+    A class for storing market order history for serialization.
+    """
+    result_type = "history"
+    # Unified market data format revision.
+    version = "0.1alpha"
+
+    def __init__(self, upload_keys=None, history_generator=None,
+                 *args, **kwargs):
+        # Will hold an organized store of history items.
+        self._history = {}
+
+        if not upload_keys:
+            self.upload_keys = [
+                {'name': 'eve-market-data-relay', 'key': 'default'},
+            ]
+        else:
+            self.upload_keys = upload_keys
+
+        if not history_generator:
+            self.history_generator = {'name': 'Unknown', 'version': 'Unknown'}
+        else:
+            self.history_generator = history_generator
+
+    def add_entry(self, entry):
+        """
+        Adds a MarketHistoryEntry instance to the list of market history entries
+        contained within this instance. Does some behind-the-scenes magic to
+        get it all ready for serialization.
+
+        :param MarketHistoryEntry entry: The history entry to add to
+            instance.
+        """
+        # This key is used to group the entries based on region and type.
+        key = '%s_%s' % (entry.region_id, entry.type_id)
+        if not self._history.has_key(key):
+            self._history[key] = []
+
+        self._history[key].append(entry)
+
+
+class MarketHistoryEntry(object):
+    """
+    Represents a single point of market history data.
+    """
+    def __init__(self, type_id, region_id, historical_date, num_orders,
+                 low_price, high_price, average_price, total_quantity):
+        self.type_id = int(type_id)
+        if region_id:
+            self.region_id = int(region_id)
+        else:
+            # Client lacked the data for result rows.
+            self.region_id = None
+        if not isinstance(historical_date, datetime.datetime):
+            raise TypeError('historical_date should be a datetime.')
+        self.historical_date = historical_date
+        self.num_orders = int(num_orders)
+        self.low_price = float(low_price)
+        self.high_price = float(high_price)
+        self.average_price = float(average_price)
+        self.total_quantity = int(total_quantity)
+
+    def __repr__(self):
+        """
+        Basic string representation of the history entry.
+        """
+        template = Template(
+            "<Market History Entry: \n"
+            " type_id: $type_id\n"
+            " region_id: $region_id\n"
+            " historical_date: $historical_date\n"
+            " num_orders: $num_orders\n"
+            " low_price: $low_price\n"
+            " high_price: $high_price\n"
+            " average_price: $average_price\n"
+            " total_quantity: $total_quantity\n"
+        )
+        return template.substitute(
+            type_id = self.type_id,
+            region_id = self.region_id,
+            historical_date = self.historical_date,
+            num_orders = self.num_orders,
+            low_price = self.low_price,
+            high_price = self.high_price,
+            average_price = self.average_price,
+            total_quantity = self.total_quantity,
         )
