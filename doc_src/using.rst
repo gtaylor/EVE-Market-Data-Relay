@@ -102,6 +102,8 @@ Ruby accesses EMDR via ZeroMQ's zmq_ Ruby bindings:
 
     require 'rubygems'
     require 'ffi-rzmq'
+    require 'json'
+    require 'zlib'
 
     context = ZMQ::Context.new
     subscriber = context.socket(ZMQ::SUB)
@@ -111,16 +113,14 @@ Ruby accesses EMDR via ZeroMQ's zmq_ Ruby bindings:
     subscriber.setsockopt(ZMQ::SUBSCRIBE,"")
 
     loop do
+      // Receive raw market JSON strings.
       subscriber.recv_string(string = '')
-      # I'm not sure how zlib works with Ruby, but you'll need to
-      # Zlib.decompress(), which will leave you with a JSON string. You
-      # can then decode the JSON to leave yourself with a Ruby dict, or
-      # whatever they're called. If you don't at least decompress this with
-      # Zlib, you're going to see lots of gibberish.
-      puts string
+      // Un-compress the stream.
+      market_json = Zlib::Inflate.new(Zlib::MAX_WBITS).inflate(string)
+      // Un-serialize the JSON data.
+      market_data = JSON.parse(market_json)
+      // Dump the market data to stdout. Or, you know, do more fun things here.
+      puts market_data
     end
-
-.. note:: If anyone would like to contribute the correct code for this
-    Ruby example, please post on our `issue tracker`_.
 
 .. _zmq: http://www.zeromq.org/bindings:ruby
