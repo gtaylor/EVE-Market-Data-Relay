@@ -6,7 +6,7 @@ import datetime
 import simplejson
 import dateutil.parser
 from emdr.core.market_data import MarketOrder
-from emdr.core.market_data import SerializableOrderList
+from emdr.core.market_data import MarketOrderList
 
 logger = logging.getLogger(__name__)
 
@@ -68,18 +68,18 @@ def parse_iso8601_str(iso_str):
 def parse_from_json(json_str):
     """
     Given a Unified Uploader message, parse the contents and return a
-    SerializableOrderList.
+    MarketOrderList.
 
     :param str json_str: A Unified Uploader message as a JSON string.
-    :rtype: SerializableOrderList
-    :returns: An instance of SerializableOrderList, containing the orders
+    :rtype: MarketOrderList
+    :returns: An instance of MarketOrderList, containing the orders
         within.
     """
     json_dict = simplejson.loads(json_str)
 
     order_columns = json_dict['columns']
 
-    order_list = SerializableOrderList(
+    order_list = MarketOrderList(
         upload_keys=json_dict['uploadKeys'],
         order_generator=json_dict['generator'],
     )
@@ -107,7 +107,7 @@ def encode_to_json(order_list):
     """
     Encodes this list of MarketOrder instances to a JSON string.
 
-    :param SerializableOrderList order_list: The order list to serialize.
+    :param MarketOrderList order_list: The order list to serialize.
     :rtype: str
     """
     rowsets = []

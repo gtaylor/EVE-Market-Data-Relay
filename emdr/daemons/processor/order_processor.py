@@ -14,7 +14,7 @@ def parse_order(job_json):
     Unified Uploader format.
 
     :param str job_json: A raw JSON job dict string to parse.
-    :rtype: SerializableOrderList
+    :rtype: MarketOrderList
     :returns: A serializable list of MarketOrder objects.
     """
     job_dict = simplejson.loads(zlib.decompress(job_json))
@@ -42,7 +42,7 @@ def parse_order(job_json):
 
 def worker(job_json, sender):
     """
-    Parses the job dict into a SerializableOrderList of MarketOrder instances.
+    Parses the job dict into a MarketOrderList of MarketOrder instances.
     This gets dumped to JSON and sent on to the relays for sending to the
     subscribers.
 

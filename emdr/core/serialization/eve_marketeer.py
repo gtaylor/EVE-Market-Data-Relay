@@ -5,7 +5,7 @@ import csv
 import logging
 import datetime
 from StringIO import StringIO
-from emdr.core.market_data import SerializableOrderList, MarketOrder
+from emdr.core.market_data import MarketOrderList, MarketOrder
 from emdr.core.serialization.exceptions import InvalidMarketOrderDataError
 
 logger = logging.getLogger(__name__)
@@ -13,13 +13,13 @@ logger = logging.getLogger(__name__)
 def parse_from_payload(payload):
     """
     Given a job dict payload, parse the contents and return an
-    SerializableOrderList instance, which contains
+    :py:class:`src.core.market_data.MarketOrderList` instance, which contains
     :py:class:`src.core.market_data.MarketOrder` instances, each of which
     represents a market order.
 
     :param dict payload: A job dict.
-    :rtype: SerializableOrderList
-    :returns: A SerializableOrderList instance that contains MarketOrder instances.
+    :rtype: MarketOrderList
+    :returns: A MarketOrderList instance that contains MarketOrder instances.
     """
     log = payload['log']
     upload_type = payload['upload_type']
@@ -29,7 +29,7 @@ def parse_from_payload(payload):
 
     # Orders are lumped into this list sub-class, which can be serialized
     # to JSON.
-    order_list = SerializableOrderList(
+    order_list = MarketOrderList(
         order_generator=order_generator
     )
 

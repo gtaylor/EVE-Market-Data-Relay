@@ -4,10 +4,10 @@ Data structures for representing market data.
 import datetime
 from string import Template
 
-class SerializableOrderList(object):
+class MarketOrderList(object):
     """
-    A list of MarketOrder objects, with some convenience methods for
-    serialization.
+    A list of MarketOrder objects, with some added features for assisting
+    with serializing to the Unified Uploader Interchange format.
     """
     result_type = "orders"
     # Unified market data format revision.
@@ -41,7 +41,7 @@ class SerializableOrderList(object):
         Basic string representation of the order.
         """
         template = Template(
-            "<SerializableOrderList: \n"
+            "<MarketOrderList: \n"
             " upload_keys: $upload_keys\n"
             " order_generator: $order_generator\n"
         )

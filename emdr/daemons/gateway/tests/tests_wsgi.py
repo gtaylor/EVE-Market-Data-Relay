@@ -3,7 +3,7 @@ Tests for the full wsgi.py module, and all of its submodules.
 """
 import unittest
 import datetime
-from emdr.core.market_data import MarketOrder, SerializableOrderList
+from emdr.core.market_data import MarketOrder, MarketOrderList
 
 class GatewayWSGITests(unittest.TestCase):
     """
@@ -25,5 +25,5 @@ class GatewayWSGITests(unittest.TestCase):
             order_duration=90,
             order_range=5,
         )
-        self.order_list = SerializableOrderList()
+        self.order_list = MarketOrderList()
         self.order_list.add_order(self.order1)

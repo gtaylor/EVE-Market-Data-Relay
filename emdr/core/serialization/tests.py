@@ -1,13 +1,13 @@
 import unittest
 import datetime
-from emdr.core.market_data import MarketOrder, SerializableOrderList
+from emdr.core.market_data import MarketOrder, MarketOrderList
 from emdr.core.serialization import unified
 from emdr.core.serialization import eve_marketeer
 
 class BaseSerializationCase(unittest.TestCase):
 
     def setUp(self):
-        self.order_list = SerializableOrderList()
+        self.order_list = MarketOrderList()
         self.order1 = MarketOrder(
             order_id=2413387906,
             is_bid=True,
