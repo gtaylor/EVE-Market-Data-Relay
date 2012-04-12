@@ -4,7 +4,8 @@ The worker function in this module performs the order processing.
 import logging
 import zlib
 import simplejson
-from emdr.core import serialization
+from emdr.core.serialization.unified import orders as unified_order
+from emdr.core.serialization.eve_marketeer import orders as eve_marketeer_order
 
 logger = logging.getLogger(__name__)
 
@@ -31,9 +32,9 @@ def parse_order(job_json):
         return
 
     if order_format == 'unified':
-        order_list = serialization.unified.parse_from_json(payload['body'])
+        order_list = unified_order.parse_from_json(payload['body'])
     elif order_format == 'eve_marketeer':
-        order_list = serialization.eve_marketeer.parse_from_payload(payload)
+        order_list = eve_marketeer_order.parse_from_payload(payload)
     else:
         logger.error('Unknown order format encountered. Discarding.')
         return
@@ -54,5 +55,5 @@ def worker(job_json, sender):
     order_list = parse_order(job_json)
     print order_list
     if order_list:
-        json_str = serialization.unified.encode_to_json(order_list)
+        json_str = unified_order.encode_to_json(order_list)
         sender.send(zlib.compress(json_str))

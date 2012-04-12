@@ -1,8 +1,7 @@
 import unittest
 import datetime
 from emdr.core.market_data import MarketOrder, MarketOrderList
-from emdr.core.serialization import unified
-from emdr.core.serialization import eve_marketeer
+from emdr.core.serialization.unified import orders as unified_order
 
 class BaseSerializationCase(unittest.TestCase):
 
@@ -50,13 +49,13 @@ class UnifiedSerializationTests(BaseSerializationCase):
 
     def test_serialization(self):
         # Encode the sample order list.
-        encoded_orderlist = unified.encode_to_json(self.order_list)
+        encoded_orderlist = unified_order.encode_to_json(self.order_list)
         # Should return a string JSON representation.
         self.assertIsInstance(encoded_orderlist, basestring)
         # De-code the JSON to instantiate a list of MarketOrder instances that
         # should be identical to self.orderlist.
-        decoded_list = unified.parse_from_json(encoded_orderlist)
-        re_encoded_list = unified.encode_to_json(decoded_list)
+        decoded_list = unified_order.parse_from_json(encoded_orderlist)
+        re_encoded_list = unified_order.encode_to_json(decoded_list)
         # Re-encode the decoded orderlist. Match the two encoded strings. They
         # should still be the same.
         self.assertEqual(
