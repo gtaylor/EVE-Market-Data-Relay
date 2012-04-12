@@ -5,7 +5,7 @@ import logging
 import zlib
 import simplejson
 from emdr.core.serialization import unified
-from emdr.core.serialization.eve_marketeer import orders as eve_marketeer_order
+from emdr.core.serialization import eve_marketeer
 
 logger = logging.getLogger(__name__)
 
@@ -34,7 +34,7 @@ def parse_message(job_json):
     if message_format == 'unified':
         message = unified.parse_from_json(payload['body'])
     elif message_format == 'eve_marketeer':
-        message = eve_marketeer_order.parse_from_payload(payload)
+        message = eve_marketeer.parse_from_payload(payload)
     else:
         logger.error('Unknown message format encountered. Discarding.')
         return

@@ -66,6 +66,9 @@ def parse_from_payload(payload):
         else:
             raise InvalidMarketOrderDataError("Invalid order type.")
 
+        # Sometimes these come in as floats, but they need to be ints.
+        volume_remaining = int(float(volume_remaining))
+
         order_issue_date = datetime.datetime.strptime(
             order_issue_date, "%Y-%m-%d %H:%M:%S")
         data_generated_at = datetime.datetime.now()

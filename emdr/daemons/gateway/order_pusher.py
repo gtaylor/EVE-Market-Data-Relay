@@ -43,6 +43,6 @@ def worker():
         # Push a zlib compressed JSON representation of the job dict to a
         # processor for a further look.
         sender.send(zlib.compress(job_json))
-        logger.info('Pushed orders.')
+        logger.info('Pushed message.')
 
 
