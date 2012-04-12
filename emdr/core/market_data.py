@@ -180,6 +180,25 @@ class MarketHistory(object):
         else:
             self.history_generator = history_generator
 
+    def __repr__(self):
+        """
+        Basic string representation of the history.
+        """
+        template = Template(
+            "<MarketHistory: \n"
+            " upload_keys: $upload_keys\n"
+            " order_generator: $order_generator\n"
+        )
+        list_repr = template.substitute(
+            upload_keys = self.upload_keys,
+            order_generator = self.history_generator,
+        )
+        for history_entry_list in self._history.values():
+            for entry in history_entry_list:
+                list_repr += repr(entry)
+
+        return list_repr
+
     def add_entry(self, entry):
         """
         Adds a MarketHistoryEntry instance to the list of market history entries
@@ -202,7 +221,8 @@ class MarketHistoryEntry(object):
     Represents a single point of market history data.
     """
     def __init__(self, type_id, region_id, historical_date, num_orders,
-                 low_price, high_price, average_price, total_quantity):
+                 low_price, high_price, average_price, total_quantity,
+                 generated_at):
         self.type_id = int(type_id)
         if region_id:
             self.region_id = int(region_id)
@@ -210,13 +230,16 @@ class MarketHistoryEntry(object):
             # Client lacked the data for result rows.
             self.region_id = None
         if not isinstance(historical_date, datetime.datetime):
-            raise TypeError('historical_date should be a datetime.')
+            raise TypeError('historical_date should be a datetime, not %s.' % type(historical_date))
         self.historical_date = historical_date
         self.num_orders = int(num_orders)
         self.low_price = float(low_price)
         self.high_price = float(high_price)
         self.average_price = float(average_price)
         self.total_quantity = int(total_quantity)
+        if not isinstance(generated_at, datetime.datetime):
+            raise TypeError('generated_at should be a datetime.')
+        self.generated_at = generated_at
 
     def __repr__(self):
         """
@@ -232,6 +255,7 @@ class MarketHistoryEntry(object):
             " high_price: $high_price\n"
             " average_price: $average_price\n"
             " total_quantity: $total_quantity\n"
+            " generated_at: $generated_at\n"
         )
         return template.substitute(
             type_id = self.type_id,
@@ -242,4 +266,5 @@ class MarketHistoryEntry(object):
             high_price = self.high_price,
             average_price = self.average_price,
             total_quantity = self.total_quantity,
+            generated_at = self.generated_at,
         )

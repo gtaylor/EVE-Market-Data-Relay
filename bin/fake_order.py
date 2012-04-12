@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-A fake upload script, used to manually test the whole stack.
+A fake order upload script, used to manually test the whole stack.
 """
 import simplejson
 import requests

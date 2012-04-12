@@ -1,10 +1,10 @@
 """
-Parser for the Unified uploader format.
+Parser for the Unified uploader format orders.
 """
 import logging
 import datetime
 import simplejson
-import dateutil.parser
+from emdr.core.serialization.unified.unified_utils import parse_iso8601_str, _columns_to_kwargs
 from emdr.core.market_data import MarketOrder
 from emdr.core.market_data import MarketOrderList
 
@@ -35,37 +35,7 @@ SPEC_TO_KWARG_CONVERSION = {
     'solarSystemID': 'solar_system_id',
 }
 
-def _columns_to_kwargs(columns, row):
-    """
-    Given a list of column names, and a list of values (a row), return a dict
-    of kwargs that may be used to instantiate a MarketOrder object.
-
-    :param list columns: A list of column names.
-    :param list row: A list of values.
-    """
-    kwdict = {}
-
-    counter = 0
-    for column in columns:
-        # Map the column name to the correct MarketOrder kwarg.
-        kwarg_name = SPEC_TO_KWARG_CONVERSION[column]
-        # Set the kwarg to the correct value from the row.
-        kwdict[kwarg_name] = row[counter]
-        counter += 1
-
-    return kwdict
-
-def parse_iso8601_str(iso_str):
-    """
-    Given an ISO 8601 string, parse it and spit out a datetime.datetime
-    instances.
-
-    :param str iso_str: An ISO 8601 date string.
-    :rtype: datetime.datetime
-    """
-    return dateutil.parser.parse(iso_str)
-
-def parse_from_json(json_str):
+def parse_from_dict(json_dict):
     """
     Given a Unified Uploader message, parse the contents and return a
     MarketOrderList.
@@ -75,8 +45,6 @@ def parse_from_json(json_str):
     :returns: An instance of MarketOrderList, containing the orders
         within.
     """
-    json_dict = simplejson.loads(json_str)
-
     order_columns = json_dict['columns']
 
     order_list = MarketOrderList(
@@ -90,7 +58,8 @@ def parse_from_json(json_str):
         type_id = rowset['typeID']
 
         for row in rowset['rows']:
-            order_kwargs = _columns_to_kwargs(order_columns, row)
+            order_kwargs = _columns_to_kwargs(
+                SPEC_TO_KWARG_CONVERSION, order_columns, row)
             order_kwargs.update({
                 'region_id': region_id,
                 'type_id': type_id,
@@ -134,7 +103,7 @@ def encode_to_json(order_list):
 
         #noinspection PyUnresolvedReferences
         rowsets.append(dict(
-            generatedAt = orders[0].order_issue_date.replace(microsecond=0).isoformat(),
+            generatedAt = datetime.datetime.now().replace(microsecond=0).isoformat(),
             regionID = orders[0].region_id,
             typeID = orders[0].type_id,
             rows = rows,
