@@ -10,15 +10,23 @@ required = [
     'simplejson',
     'gevent',
     'gevent-zeromq',
+    'requests',
     'python-dateutil<2.0',
 ]
 
 packages = [
     'emdr',
     'emdr.conf',
-    'emdr.core', 'emdr.core.serialization',
-    'emdr.daemons', 'emdr.daemons.broker', 'emdr.daemons.gateway',
-    'emdr.daemons.processor', 'emdr.daemons.relay'
+    'emdr.core',
+    'emdr.core.serialization',
+    'emdr.core.serialization.eve_marketeer'
+    'emdr.core.serialization.unified'
+    'emdr.daemons',
+    'emdr.daemons.announcer'
+    'emdr.daemons.broker',
+    'emdr.daemons.gateway',
+    'emdr.daemons.processor',
+    'emdr.daemons.relay'
 ]
 
 scripts = [
@@ -26,6 +34,7 @@ scripts = [
     'bin/emdr-broker',
     'bin/emdr-processor',
     'bin/emdr-relay',
+    'bin/ec-feeder',
 ]
 
 setup(
