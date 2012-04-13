@@ -5,9 +5,6 @@
 Uploading Market data to EMDR
 =============================
 
-.. warning:: These instructions are the eventual steps needed, but we have
-    not deployed EMDR yet, so this will not actually work yet.
-
 For those gracious souls willing to point their uploaders at EMDR, here how you
 can do that.
 
@@ -17,7 +14,7 @@ can do that.
 * Hit 'Add'.
 * Enter 'EMDR' for the name.
 * Leave data type as EVE Marketeer & Marketdata.
-* Set the URL to: http://gateway.eve-emdr.com/upload/eve_marketeer/
+* Set the URL to: http://master.eve-emdr.com/upload/eve_marketeer/
 * Enter 46 for upload key.
 * Hit Save.
 * You're all set. Get uploading!
