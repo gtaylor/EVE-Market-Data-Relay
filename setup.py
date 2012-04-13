@@ -19,8 +19,8 @@ packages = [
     'emdr.conf',
     'emdr.core',
     'emdr.core.serialization',
-    'emdr.core.serialization.eve_marketeer'
-    'emdr.core.serialization.unified'
+    'emdr.core.serialization.eve_marketeer',
+    'emdr.core.serialization.unified',
     'emdr.daemons',
     'emdr.daemons.announcer'
     'emdr.daemons.broker',
