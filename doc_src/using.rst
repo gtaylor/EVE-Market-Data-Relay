@@ -38,7 +38,7 @@ your fancy::
         subscriber = context.socket(zmq.SUB)
 
         # Connect to the first publicly available relay.
-        subscriber.connect('tcp://relay1.eve-emdr.com:5561')
+        subscriber.connect('tcp://relay-linode-atl-1.eve-emdr.com:8050')
         # Disable filtering.
         subscriber.setsockopt(zmq.SUBSCRIBE, "")
 
@@ -74,7 +74,7 @@ PHP accesses EMDR via ZeroMQ's `php-zmq`_ PHP bindings:
     $subscriber = $context->getSocket(ZMQ::SOCKET_SUB);
 
     // Connect to the first publicly available relay.
-    $subscriber->connect("tcp://relay1.eve-emdr.com:5561");
+    $subscriber->connect("tcp://relay-linode-atl-1.eve-emdr.com:8050");
     // Disable filtering.
     $subscriber->setSockOpt(ZMQ::SOCKOPT_SUBSCRIBE, "");
 
@@ -109,7 +109,7 @@ Ruby accesses EMDR via ZeroMQ's zmq_ Ruby bindings:
     subscriber = context.socket(ZMQ::SUB)
 
     // Connect to the first publicly available relay.
-    subscriber.connect("tcp://relay1.eve-emdr.com:5561")
+    subscriber.connect("tcp://relay-linode-atl-1.eve-emdr.com:8050")
     subscriber.setsockopt(ZMQ::SUBSCRIBE,"")
 
     loop do
