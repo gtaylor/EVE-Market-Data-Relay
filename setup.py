@@ -8,6 +8,7 @@ import emdr
 required = [
     'bottle',
     'simplejson',
+    'pyzmq',
     'gevent',
     'gevent-zeromq',
     'requests',
