@@ -42,7 +42,8 @@ def worker():
 
         # Push a zlib compressed JSON representation of the job dict to a
         # processor for a further look.
-        sender.send(zlib.compress(job_json))
-        logger.info('Pushed message.')
+        compressed_msg = zlib.compress(job_json)
+        sender.send(compressed_msg)
+        logger.info('Pushed message of length %s' % len(compressed_msg))
 
 

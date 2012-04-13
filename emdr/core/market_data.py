@@ -68,9 +68,9 @@ class MarketOrder(object):
     Represents a market buy or sell order.
     """
     def __init__(self, order_id, is_bid, region_id, solar_system_id,
-                 station_id, type_id,
-                 price, volume_entered, volume_remaining, minimum_volume,
-                 order_issue_date, order_duration, order_range, generated_at):
+                 station_id, type_id, price, volume_entered, volume_remaining,
+                 minimum_volume, order_issue_date, order_duration, order_range,
+                 generated_at):
         """
         :param int order_id: The unique order ID for this order.
         :param bool is_bid: If ``True``, this is a bid (buy order). If ``False``,

@@ -1,0 +1,149 @@
+#!/usr/bin/env python
+"""
+This module contains a simple SMTP server that is used to receive EVE Central's
+SMTP feed. The data is parsed, converted to a Unified Uploader Interchange
+format, then sent to EMDR.
+
+This is only useful if you are running your own isolated network. The flagship
+EMDR network already has this covered.
+"""
+import argparse
+import asyncore
+import smtpd
+import datetime
+from StringIO import StringIO
+
+import requests
+from emdr.core.market_data import MarketOrder, MarketOrderList
+from emdr.core.serialization.unified import encode_to_json
+
+parser = argparse.ArgumentParser(
+    description="Runs an SMTP server which EVE Central's SMTP feed may be " \
+                "pointed at. Mail messages are re-packaged and sent to EMDR.",
+)
+
+parser.add_argument(
+    '--send', action='store', dest='target_url',
+    default="http://localhost:8080/upload/unified/",
+    help="Sets the HTTP location to send the orders to. Overrides the " \
+         "default of http://localhost:8080/upload/unified/")
+
+parser.add_argument(
+    '--chunksize', action='store', dest='chunk_size', type=int,
+    default=500,
+    help="Sets the number of orders to group in each POST request.")
+
+parsed = parser.parse_args()
+
+print("=" * 80)
+print("Starting ec-feeder")
+print("  * Sending data to %s " % parsed.target_url)
+print("  * Chunk size: %d" % parsed.chunk_size)
+print("=" * 80)
+
+class EVECentralFeedSMTPServer(smtpd.SMTPServer):
+    """
+    A super simple SMTP server that can receive and hand off EVE Central
+    data emails.
+    """
+    def process_message(self, peer, mailfrom, rcpttos, data):
+        #print 'Receiving message from:', peer
+        #print 'Message addressed from:', mailfrom
+        #print 'Message addressed to  :', rcpttos
+        #print 'Message length        :', len(data)
+
+        # This is not efficient at all, but I couldn't get the email module's
+        # parsing features to work with EVE Central's emails. Copy the buffer
+        # into a StringIO object, where we can just readlines() it.
+        msg = StringIO(data)
+        msg.seek(0)
+
+        # This chunks the data up and sends it to EMDR in pieces.
+        self.divide_and_relay(msg)
+
+        return
+
+    def divide_and_relay(self, msg):
+        """
+        This method splits the email message up into lines, parses the ones
+        containing market data, and sends them off to EMDR in chunks.
+
+        :param StringIO msg: A StringIO, or file-like, to divide and relay.
+        """
+        # This is a data structure that contains market orders. It will later
+        # be serialized and sent to EMDR.
+        current_order_list = MarketOrderList()
+        # Counter used for making sure only a certain number of orders end up
+        # in each MarketOrderList that we send.
+        counter = 0
+        for line in msg.readlines():
+            # Poor man's parsing of the CSV email. The only ones we're
+            # interested with have 14 columns, and the first character isn't
+            # 'p', which is the case for header row.
+            if line.count(',') == 14 and line[0] != 'p':
+                current_order_list.add_order(self.process_line(line))
+                counter += 1
+
+                if counter > parsed.chunk_size:
+                    # We've reached our designated chunk size. Serialize
+                    # and send the orders to EMDR.
+                    self.send_order_list_to_emdr(current_order_list)
+                    # Start over with an empty order list to re-fill.
+                    current_order_list = MarketOrderList()
+                    counter = 0
+
+    def process_line(self, line):
+        """
+        Parses a line from the EVE Central email that we know contains market
+        data.
+
+        :param str line: A line from the EVE Central feed to parse.
+        :rtype: MarketOrder
+        :returns: A correctly formatted MarketOrder instance, that may be
+            added to a MarketOrderList for sending.
+        """
+        price, volume_remaining, type_id, order_range, order_id, volume_entered,\
+        minimum_volume, is_bid, order_issue_date, order_duration, station_id,\
+        region_id, solar_system_id, jumps, source = line.split(',')
+
+        # This always appears to be a float for some reason, but needs to
+        # be an int.
+        volume_remaining = int(float(volume_remaining))
+
+        #2012-02-21 13:10:52
+        order_issue_date = datetime.datetime.strptime(
+            order_issue_date,
+            '%Y-%m-%d %H:%M:%S'
+        )
+        is_bid = is_bid == 'True'
+        generated_at = datetime.datetime.now()
+
+        return MarketOrder(
+            order_id, is_bid, region_id, solar_system_id, station_id, type_id,
+            price, volume_entered, volume_remaining, minimum_volume,
+            order_issue_date, order_duration, order_range, generated_at
+        )
+
+    def send_order_list_to_emdr(self, order_list):
+        """
+        Given an order list, encode it to JSON and send it to EMDR.
+
+        :param MarketOrderList order_list: The order list to send.
+        """
+        json_str = encode_to_json(order_list)
+
+        headers = {'User-Agent': 'EC-Feeder'}
+        requests.post(
+            parsed.target_url, data=json_str, headers=headers
+        )
+
+server = EVECentralFeedSMTPServer(('0.0.0.0', 25), None)
+#msg = StringIO(open('email.txt', 'r').read())
+#msg.seek(0)
+#server.divide_and_relay(msg)
+
+try:
+    asyncore.loop()
+except KeyboardInterrupt:
+    # Die silently.
+    pass

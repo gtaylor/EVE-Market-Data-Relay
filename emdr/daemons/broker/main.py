@@ -30,7 +30,6 @@ def start():
         sender.bind(binding)
 
     def broker_worker(message):
-        logger.info("Doling out a task to worker.")
         sender.send(message)
 
     logger.info("Broker startup complete, waiting for orders...")
