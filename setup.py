@@ -22,11 +22,11 @@ packages = [
     'emdr.core.serialization.eve_marketeer',
     'emdr.core.serialization.unified',
     'emdr.daemons',
-    'emdr.daemons.announcer'
+    'emdr.daemons.announcer',
     'emdr.daemons.broker',
     'emdr.daemons.gateway',
     'emdr.daemons.processor',
-    'emdr.daemons.relay'
+    'emdr.daemons.relay',
 ]
 
 scripts = [
