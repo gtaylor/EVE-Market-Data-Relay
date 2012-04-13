@@ -14,8 +14,8 @@ anything wrong with the examples below, please let us know on the
 `issue tracker`_. The original author of this documentation is only familiar
 with Python.
 
-.. warning:: Right now, the hostnames you see below are not in action. They
-    will become active once we complete our first deployment.
+.. warning:: The hostnames you see below may change. We are currently in
+    testing, so anything you see now is considered non-final.
 
 .. _Unified Uploader Interchange Format: http://dev.eve-central.com/unifieduploader/start
 
