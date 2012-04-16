@@ -2,20 +2,33 @@
 
 .. include:: global.txt
 
-Using data from the EMDR network
-================================
+Connecting to the EMDR network
+==============================
+
+In order to connect to the EVE Market Data Relay feed, you'll need to use
+the ZeroMQ_ bindings for the language of your choice. This involves installing
+ZeroMQ_, then installing the bindings. See your language's section below for
+a link to its bindings.
+
+Once you have ZeroMQ_ plus bindings installed, you'll need to choose a
+Relay to connect to. See :doc:`access` for a list, and any potential special
+case instructions for each relay. After that, you'll be set to connect and
+begin receiving data.
+
+Data Format
+-----------
 
 All data coming out of EMDR is in `Unified Uploader Interchange Format`_,
 which is a JSON-based standard for market orders and history. See the
 `spec <Unified Uploader Interchange Format>`_ for more details.
 
+Examples for various languages
+------------------------------
+
 Below are a few examples of how to connect to the data feed. If you see
 anything wrong with the examples below, please let us know on the
 `issue tracker`_. The original author of this documentation is only familiar
 with Python.
-
-.. warning:: The hostnames you see below may change. We are currently in
-    testing, so anything you see now is considered non-final.
 
 .. _Unified Uploader Interchange Format: http://dev.eve-central.com/unifieduploader/start
 
