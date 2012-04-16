@@ -33,8 +33,10 @@ packages = [
 scripts = [
     'bin/emdr-announcer',
     'bin/emdr-broker',
+    'bin/emdr-gateway',
     'bin/emdr-processor',
     'bin/emdr-relay',
+    'bin/emdr-snooper',
     'bin/ec-feeder',
 ]
 

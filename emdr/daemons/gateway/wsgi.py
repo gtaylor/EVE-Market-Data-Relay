@@ -12,7 +12,7 @@ import logging
 from logging.config import dictConfig
 from emdr.conf import default_settings as settings
 dictConfig(settings.LOGGING)
-logger = logging.getLogger('src.daemons.gateway.wsgi')
+logger = logging.getLogger('emdr.daemons.gateway.wsgi')
 
 import gevent
 from gevent import monkey; gevent.monkey.patch_all()
@@ -53,6 +53,7 @@ def upload_eve_marketeer():
     # The job dict gets shoved into a gevent queue, where it awaits sending
     # to the processors via the src.daemons.gateway.order_pusher module.
     order_pusher.order_upload_queue.put(job_dict)
+    logger.info("Accepted upload from %s" % request.remote_addr)
 
     # Goofy, but apparently expected by EVE Market Data Uploader.
     return '1'
@@ -73,23 +74,7 @@ def upload_eve_marketeer():
     # The job dict gets shoved into a gevent queue, where it awaits sending
     # to the processors via the src.daemons.gateway.order_pusher module.
     order_pusher.order_upload_queue.put(job_dict)
+    logger.info("Accepted upload from %s" % request.remote_addr)
 
     # Goofy, but apparently expected by EVE Market Data Uploader.
     return '1'
-
-# Fire up gevent workers that send raw market order data to processor processes
-# in the background without blocking the WSGI app.
-for worker_num in range(settings.NUM_GATEWAY_SENDER_WORKERS):
-    logger.info("Spawning Gateway->Processor PUSH worker.")
-    gevent.spawn(order_pusher.worker)
-
-if __name__ == '__main__':
-    # Start the built-in Bottle server for development, for now.
-    run(
-        host='localhost',
-        port=8080,
-        server='gevent',
-    )
-else:
-    # gunicorn will eventually use this in production.
-    application = default_app()

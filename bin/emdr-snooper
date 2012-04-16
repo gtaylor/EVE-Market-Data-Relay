@@ -1,0 +1,39 @@
+#!/usr/bin/env python
+"""
+CLI util used to attach to ZMQ sockets to listen to whatever is coming down.
+Currently hard-wired to SUB.
+"""
+import argparse
+import zlib
+import zmq
+import simplejson
+from pprint import pprint
+
+parser = argparse.ArgumentParser(
+    description="Connects to a PUB ZMQ socket and prints whatever is coming" \
+                "out. ",
+)
+parser.add_argument('receiver', nargs=1, help="The ZMQ socket to connect to.")
+
+parsed = parser.parse_args()
+
+receiver_uri = parsed.receiver[0]
+
+context = zmq.Context()
+subscriber = context.socket(zmq.SUB)
+
+# Connect to the first publicly available relay.
+subscriber.connect(receiver_uri)
+# Disable filtering.
+subscriber.setsockopt(zmq.SUBSCRIBE, "")
+
+print("Connected to %s" % receiver_uri)
+
+while True:
+    # Receive raw market JSON strings.
+    market_json = zlib.decompress(subscriber.recv())
+    # Un-serialize the JSON data to a Python dict.
+    market_data = simplejson.loads(market_json)
+    # Dump the market data to stdout. Or, you know, do more fun
+    # things here.
+    pprint(market_data)

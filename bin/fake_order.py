@@ -44,7 +44,7 @@ data = simplejson.loads(data)
 data = simplejson.dumps(data)
 
 r = requests.post(
-    'http://localhost:8080/emdr/upload/unified/',
+    'http://localhost:8080/upload/unified/',
     data=data,
 )
 print "RESPONSE"

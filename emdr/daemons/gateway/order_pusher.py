@@ -6,6 +6,7 @@ gateway WSGI app.
 import logging
 import zlib
 import simplejson
+import gevent
 from gevent.queue import Queue
 from gevent_zeromq import zmq
 from emdr.conf import default_settings as settings
@@ -21,7 +22,9 @@ sender = context.socket(zmq.PUSH)
 # Get the list of transports to bind from settings. This allows us to listen
 # for processor connections from multiple places (UNIX sockets + TCP sockets).
 # By default, we only listen for UNIX domain sockets.
+logger.info("Order data will be sent to:")
 for binding in settings.GATEWAY_SENDER_BINDINGS:
+    logger.info("  * %s" % binding)
     sender.connect(binding)
 
 def worker():
@@ -46,4 +49,8 @@ def worker():
         sender.send(compressed_msg)
         logger.info('Pushed message of length %s' % len(compressed_msg))
 
-
+# Fire up gevent workers that send raw market order data to processor processes
+# in the background without blocking the WSGI app.
+logger.info("Spawning %d PUSH workers." % settings.NUM_GATEWAY_SENDER_WORKERS)
+for worker_num in range(settings.NUM_GATEWAY_SENDER_WORKERS):
+    gevent.spawn(worker)

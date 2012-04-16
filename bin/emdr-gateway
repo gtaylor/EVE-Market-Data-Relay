@@ -1,0 +1,32 @@
+#!/usr/bin/env python
+"""
+WSGI gateway application. Runs using bottle+gevent.
+"""
+import argparse
+from bottle import run
+from emdr.conf import default_settings
+
+parser = argparse.ArgumentParser(
+    description="The gateway accepts uploads from player uploader clients " \
+                "over HTTP. Market data is then sent to the broker.",
+)
+parser.add_argument(
+    '--sender', action='append', dest='senders',
+    help="Overrides default gateway sender bindings. This determines where " \
+         "the gateway sends its messages, typically a broker.")
+
+parsed = parser.parse_args()
+
+if parsed.senders:
+    print("* Overriding default gateway sender bindings.")
+    default_settings.GATEWAY_SENDER_BINDINGS = parsed.senders
+
+#noinspection PyUnresolvedReferences
+from emdr.daemons.gateway import wsgi
+
+# Fire up a bottle+gevent process.
+run(
+    host='localhost',
+    port=8080,
+    server='gevent',
+)
