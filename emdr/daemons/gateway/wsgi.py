@@ -12,7 +12,7 @@ import logging
 from logging.config import dictConfig
 from emdr.conf import default_settings as settings
 dictConfig(settings.LOGGING)
-logger = logging.getLogger('emdr.daemons.gateway.wsgi')
+logger = logging.getLogger(__name__)
 
 import gevent
 from gevent import monkey; gevent.monkey.patch_all()
