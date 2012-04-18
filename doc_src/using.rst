@@ -137,3 +137,92 @@ Ruby accesses EMDR via ZeroMQ's zmq_ Ruby bindings:
     end
 
 .. _zmq: http://www.zeromq.org/bindings:ruby
+
+C#
+--
+
+C# accesses EMDR via ZeroMQ's clrzmq_ binding:
+
+.. code-block:: c#
+
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.IO.Compression;
+    using System.Linq;
+    using System.Text;
+    using System.Web.Script.Serialization; // Needs reference to 'System.Web.Extensions.dll'
+    using ZMQ; // Needs reference to 'clrzmq.dll' and adding 'libzmq.dll' to project
+               // 'clrzmq' can be found at: https://github.com/zeromq/clrzmq/downloads
+
+    namespace EMDR_Client
+    {
+        public class Program
+        {
+            private static void Main()
+            {
+                using (var context = new Context())
+                {
+                    using (var subscriber = context.Socket(SocketType.SUB))
+                    {
+                        //Connect to the first publicly available relay.
+                        subscriber.Connect("tcp://relay-linode-atl-1.eve-emdr.com:8050");
+
+                        // Disable filtering.
+                        subscriber.SetSockOpt(SocketOpt.SUBSCRIBE, Encoding.UTF8.GetBytes(""));
+
+                        // Alternatively 'Subscribe' can be used
+                        //subscriber.Subscribe("", Encoding.UTF8);
+
+                        while (true)
+                        {
+                            try
+                            {
+                                // Receive compressed raw market data.
+                                var receivedData = subscriber.Recv();
+
+                                // The following code lines remove the need of 'zlib' usage;
+                                // 'zlib' actually uses the same algorith as 'DeflateStream'.
+                                // To make the data compatible for 'DeflateStream', we only have to remove
+                                // the four last bytes which are the adler32 checksum and
+                                // the two first bytes which are the 'zlib' header.
+                                byte[] decompressed;
+                                byte[] choppedRawData = new byte[(receivedData.Length - 4)];
+                                Array.Copy(receivedData, choppedRawData, choppedRawData.Length);
+                                choppedRawData = choppedRawData.Skip(2).ToArray();
+
+                                // Decompress the raw market data.
+                                using (MemoryStream inStream = new MemoryStream(choppedRawData))
+                                using (MemoryStream outStream = new MemoryStream())
+                                {
+                                    DeflateStream outZStream = new DeflateStream(inStream, CompressionMode.Decompress);
+                                    outZStream.CopyTo(outStream);
+                                    decompressed = outStream.ToArray();
+                                }
+
+                                // Transform data into JSON strings.
+                                string marketJson = Encoding.UTF8.GetString(decompressed);
+
+                                // Un-serialize the JSON data to a dictionary.
+                                var serializer = new JavaScriptSerializer();
+                                var dictionary = serializer.Deserialize<Dictionary<string, object>>(marketJson);
+
+                                // Dump the market data to console or, you know, do more fun things here.
+                                foreach (KeyValuePair<string, object> pair in dictionary)
+                                {
+                                    Console.WriteLine("{0}: {1}", pair.Key, pair.Value);
+                                }
+                                Console.WriteLine();
+                            }
+                            catch (ZMQ.Exception ex)
+                            {
+                                Console.WriteLine("ZMQ Exception occurred : {0}", ex.Message);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+.. _clrzmq: https://github.com/zeromq/clrzmq/downloads
