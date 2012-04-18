@@ -230,7 +230,7 @@ C# accesses EMDR via ZeroMQ's clrzmq_ binding:
 Visual Basic
 ------------
 
-C# accesses EMDR via ZeroMQ's clrzmq_ binding:
+Visual Basic accesses EMDR via ZeroMQ's clrzmq_ binding:
 
 .. code-block:: vb.net
 
