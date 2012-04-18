@@ -226,3 +226,77 @@ C# accesses EMDR via ZeroMQ's clrzmq_ binding:
     }
 
 .. _clrzmq: https://github.com/zeromq/clrzmq/downloads
+
+Visual Basic
+------------
+
+C# accesses EMDR via ZeroMQ's clrzmq_ binding:
+
+.. code-block:: vb.net
+
+    Imports System.Text
+    Imports System.IO
+    Imports System.IO.Compression
+    Imports System.Web.Script.Serialization ' Needs reference to 'System.Web.Extensions.dll'
+    Imports ZMQ ' Needs reference to 'clrzmq.dll' and adding 'libzmq.dll' to project
+                ' 'clrzmq' can be found at: https://github.com/zeromq/clrzmq/downloads
+
+    Module MainModule
+
+        Sub Main()
+            Using context = New Context()
+                Using subscriber = context.Socket(SocketType.SUB)
+
+                    'Connect to the first publicly available relay.
+                    subscriber.Connect("tcp://relay-linode-atl-1.eve-emdr.com:8050")
+
+                    ' Disable filtering.
+                    subscriber.SetSockOpt(SocketOpt.SUBSCRIBE, Encoding.UTF8.GetBytes(""))
+
+                    ' Alternatively 'Subscribe' can be used.
+                    'subscriber.Subscribe("", Encoding.UTF8)
+
+                    While True
+                        Try
+                            ' Receive compressed raw market data.
+                            Dim receivedData() = subscriber.Recv()
+
+                            ' The following code lines remove the need of 'zlib' usage;
+                            ' 'zlib' actually uses the same algorith as 'DeflateStream'.
+                            ' To make the data compatible for 'DeflateStream', we only have to remove
+                            ' the four last bytes which are the adler32 checksum and
+                            ' the two first bytes which are the 'zlib' header.
+                            Dim decompressed() As Byte
+                            Dim choppedRawData(receivedData.Length - 4) As Byte
+                            Array.Copy(receivedData, choppedRawData, choppedRawData.Length)
+                            choppedRawData = choppedRawData.Skip(2).ToArray()
+
+                            ' Decompress the raw market data.
+                            Using inStream = New MemoryStream(choppedRawData)
+                                Using outStream = New MemoryStream()
+                                    Dim outZStream = New DeflateStream(inStream, CompressionMode.Decompress)
+                                    outZStream.CopyTo(outStream)
+                                    decompressed = outStream.ToArray
+                                End Using
+                            End Using
+
+                            ' Transform data into JSON strings.
+                            Dim marketJson = Encoding.UTF8.GetString(decompressed)
+
+                            ' Un-serialize the JSON data to a dictionary.
+                            Dim serializer = New JavaScriptSerializer()
+                            Dim dictionary = serializer.Deserialize(Of Dictionary(Of String, Object))(marketJson)
+
+                            ' Dump the market data to console or, you know, do more fun things here.
+                            For Each pair In dictionary
+                                Console.WriteLine("{0}: {1}", pair.Key, pair.Value)
+                            Next
+                            Console.WriteLine()
+                        Catch ex As Exception
+                            Console.WriteLine("ZMQ Exception occurred : {0}", ex.Message)
+                        End Try
+                    End While
+                End Using
+            End Using
+        End Sub
+    End Module
