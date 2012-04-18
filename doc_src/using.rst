@@ -36,14 +36,15 @@ Python
 ^^^^^^
 
 The following example uses the pyzmq_ module (available off of PyPi)
-and simplejson_. You can substitute the stdlib's json_ module, if that suits
-your fancy::
+and simplejson_. For a more complete list of examples, see the
+`Python examples`_ dir on github.::
 
-    #
-    #  Example Python EMDR client.
-    #
+    """
+    Example Python EMDR client.
+    """
     import zlib
     import zmq
+    # You can substitute the stdlib's json module, if that suits your fancy
     import simplejson
 
     def main():
@@ -70,6 +71,7 @@ your fancy::
 .. _pyzmq: http://pypi.python.org/pypi/pyzmq/
 .. _simplejson: http://pypi.python.org/pypi/simplejson/
 .. _json: http://docs.python.org/library/json.html
+.. _Python examples: https://github.com/gtaylor/EVE-Market-Data-Relay/tree/master/examples/python
 
 PHP
 ^^^
