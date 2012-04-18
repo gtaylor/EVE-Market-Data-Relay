@@ -33,7 +33,7 @@ with Python.
 .. _Unified Uploader Interchange Format: http://dev.eve-central.com/unifieduploader/start
 
 Python
-------
+^^^^^^
 
 The following example uses the pyzmq_ module (available off of PyPi)
 and simplejson_. You can substitute the stdlib's json_ module, if that suits
@@ -72,7 +72,7 @@ your fancy::
 .. _json: http://docs.python.org/library/json.html
 
 PHP
----
+^^^
 
 PHP accesses EMDR via ZeroMQ's `php-zmq`_ PHP bindings:
 
@@ -103,7 +103,7 @@ PHP accesses EMDR via ZeroMQ's `php-zmq`_ PHP bindings:
 .. _php-zmq: http://www.zeromq.org/bindings:php
 
 Ruby
-----
+^^^^
 
 Ruby accesses EMDR via ZeroMQ's zmq_ Ruby bindings:
 
@@ -139,7 +139,7 @@ Ruby accesses EMDR via ZeroMQ's zmq_ Ruby bindings:
 .. _zmq: http://www.zeromq.org/bindings:ruby
 
 C#
---
+^^
 
 C# accesses EMDR via ZeroMQ's clrzmq_ binding:
 
@@ -228,9 +228,9 @@ C# accesses EMDR via ZeroMQ's clrzmq_ binding:
 .. _clrzmq: https://github.com/zeromq/clrzmq/downloads
 
 Visual Basic
-------------
+^^^^^^^^^^^^
 
-Visual Basic accesses EMDR via ZeroMQ's clrzmq_ binding:
+Visual Basic, like C#, accesses EMDR via ZeroMQ's clrzmq_ binding:
 
 .. code-block:: vb.net
 

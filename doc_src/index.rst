@@ -29,16 +29,31 @@ These links may also be useful to you.
 * Mailing list: https://groups.google.com/forum/#!forum/eve-emdr
 
 
-Documentation
--------------
+General Topics
+--------------
+
+The following topics are higher-level overviews, and general documentation.
+If you are just curious, or wondering how to upload data to EMDR, this section
+is all you need.
 
 .. toctree::
    :maxdepth: 2
 
    overview
    uploading
+
+Consumer Documentation
+----------------------
+
+The following topics are useful to those wishing to connect to and use
+EMDR's data feed.
+
+.. toctree::
+   :maxdepth: 3
+
    access
    using
+   design_considerations
 
 EMDR Developer Documentation
 ----------------------------
