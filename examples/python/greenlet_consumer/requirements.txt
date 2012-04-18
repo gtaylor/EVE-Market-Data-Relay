@@ -1,0 +1,4 @@
+simplejson
+gevent
+gevent-zeromq
+pyzmq
