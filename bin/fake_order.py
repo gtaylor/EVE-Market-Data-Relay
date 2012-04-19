@@ -4,6 +4,7 @@ A fake order upload script, used to manually test the whole stack.
 """
 import simplejson
 import requests
+import zlib
 
 data = """
 {
@@ -41,11 +42,15 @@ data = """
 }
 """
 data = simplejson.loads(data)
-data = simplejson.dumps(data)
+data = zlib.compress(simplejson.dumps(data))
+headers = {
+    'Content-Encoding': 'gzip',
+}
 
 r = requests.post(
-    'http://localhost:8080/upload/unified/',
+    'http://eve-emdr.local/upload/unified/',
+    #'http://localhost:8080/upload/unified/',
     data=data,
+    headers=headers,
 )
-print "RESPONSE"
-print r.text
+print "Sent fake order."
