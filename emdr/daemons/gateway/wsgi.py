@@ -10,6 +10,7 @@ to the relay for re-broadcasting to consumers.
 # Logging has to be configured first before we do anything.
 import logging
 from logging.config import dictConfig
+import zlib
 from emdr.conf import default_settings as settings
 dictConfig(settings.LOGGING)
 logger = logging.getLogger(__name__)
@@ -21,6 +22,28 @@ from bottle import run, request, post, default_app
 
 from emdr.daemons.gateway import order_pusher
 
+def get_remote_address():
+    """
+    Determines the address of the uploading client. First checks the for
+    proxy-forwarded headers, then falls back to request.remote_addr.
+
+    :rtype: str
+    """
+    return request.headers.get('X-Forwarded-For', request.remote_addr)
+
+def get_decompressed_message():
+    """
+    For upload formats that support it, detect gzip Content-Encoding headers
+    and de-compress on the fly.
+
+    :rtype: str
+    :returns: The de-compressed request body.
+    """
+    if request.headers.get('Content-Encoding', '') == 'gzip':
+        return zlib.decompress(request.body.read())
+    else:
+        return request.body.read()
+
 @post('/upload/eve_marketeer/')
 def upload_eve_marketeer():
     """
@@ -30,8 +53,6 @@ def upload_eve_marketeer():
     # Job dicts are a way to package/wrap uploaded data in a way that lets
     # the processor nodes know what format the upload is in. The payload attrib
     # contains the format-specific stuff.
-    #print "TEST", request.forms.keys()
-    #print "TEST", request.forms.items()
     job_dict = {
         'format': 'eve_marketeer',
         'payload': {
@@ -53,7 +74,7 @@ def upload_eve_marketeer():
     # The job dict gets shoved into a gevent queue, where it awaits sending
     # to the processors via the src.daemons.gateway.order_pusher module.
     order_pusher.order_upload_queue.put(job_dict)
-    logger.info("Accepted upload from %s" % request.remote_addr)
+    logger.info("Accepted upload from %s" % get_remote_address())
 
     # Goofy, but apparently expected by EVE Market Data Uploader.
     return '1'
@@ -67,14 +88,14 @@ def upload_eve_marketeer():
     job_dict = {
         'format': 'unified',
         'payload': {
-            'body': request.body.read(),
+            'body': get_decompressed_message(),
         }
     }
 
     # The job dict gets shoved into a gevent queue, where it awaits sending
     # to the processors via the src.daemons.gateway.order_pusher module.
     order_pusher.order_upload_queue.put(job_dict)
-    logger.info("Accepted upload from %s" % request.remote_addr)
+    logger.info("Accepted upload from %s" % get_remote_address())
 
     # Goofy, but apparently expected by EVE Market Data Uploader.
     return '1'
