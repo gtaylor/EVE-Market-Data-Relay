@@ -5,6 +5,7 @@ feeding jobs to the processors.
 """
 import argparse
 from emdr.conf import default_settings
+from emdr.core.command_utils import set_logger_level, print_cmd_footer, print_cmd_header
 
 parser = argparse.ArgumentParser(
     description="The broker connects to a gateway, retrieves un-processed" \
@@ -18,16 +19,27 @@ parser.add_argument(
     '--listen', action='append', dest='listeners',
     help="Override default broker sender bindings. This determines how " \
          "processor workers will connect to the broker to retrieve new jobs.")
+parser.add_argument(
+    '--loglevel', action='store', dest='loglevel',
+    help="Overrides default logger level (DEBUG, INFO, WARNING, ERROR) (default: %s)" % default_settings.LOGGING['loggers']['']['level'])
 
 parsed = parser.parse_args()
 
+print_cmd_header('emdr-broker')
+
 if parsed.gateways:
-    print("* Overriding default broker receiver bindings.")
     default_settings.BROKER_RECEIVER_BINDINGS = parsed.gateways
+    print("* Overriding default broker receiver bindings: %s" % parsed.gateways)
 if parsed.listeners:
-    print("* Overriding default broker sender bindings.")
     default_settings.BROKER_SENDER_BINDINGS = parsed.listeners
+    print("* Overriding default broker sender bindings: %s" % parsed.listeners)
+
+if parsed.loglevel:
+    set_logger_level(parsed.loglevel)
 
 from emdr.daemons.broker import main
+
+print_cmd_footer()
+
 # Fire up the broker.
 main.start()

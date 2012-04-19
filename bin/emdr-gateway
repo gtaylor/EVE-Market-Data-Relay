@@ -5,7 +5,7 @@ WSGI gateway application. Runs using bottle+gevent.
 import argparse
 from bottle import run
 from emdr.conf import default_settings
-from emdr.core.command_utils import set_logger_level
+from emdr.core.command_utils import set_logger_level, print_cmd_header, print_cmd_footer
 
 parser = argparse.ArgumentParser(
     description="The gateway accepts uploads from player uploader clients " \
@@ -24,8 +24,7 @@ parser.add_argument(
 
 parsed = parser.parse_args()
 
-print("=" * 80)
-print("## Starting emdr-gateway ##\r\n")
+print_cmd_header('emdr-gateway')
 
 if parsed.senders:
     default_settings.GATEWAY_SENDER_BINDINGS = parsed.senders
@@ -41,7 +40,7 @@ if parsed.loglevel:
 #noinspection PyUnresolvedReferences
 from emdr.daemons.gateway import wsgi
 
-print("=" * 80)
+print_cmd_footer()
 
 # Fire up a bottle+gevent process.
 run(

@@ -16,3 +16,20 @@ def set_logger_level(loglevel):
         sys.exit(1)
     default_settings.LOGGING['loggers']['']['level'] = loglevel
     print("* Setting logging level to %s." % loglevel)
+
+def print_cmd_header(cmd_name):
+    """
+    Prints a header for display during startup.
+
+    :param str cmd_name: The name of the command's bin file.
+    """
+    print("=" * 80)
+    header_str = "## %s ##" % cmd_name
+    print(header_str.center(80))
+    print("-" * 80)
+
+def print_cmd_footer():
+    """
+    Matching footer to go at the end of the start-up sequence.
+    """
+    print("=" * 80)
