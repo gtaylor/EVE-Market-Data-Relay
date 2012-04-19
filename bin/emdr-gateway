@@ -5,6 +5,7 @@ WSGI gateway application. Runs using bottle+gevent.
 import argparse
 from bottle import run
 from emdr.conf import default_settings
+from emdr.core.command_utils import set_logger_level
 
 parser = argparse.ArgumentParser(
     description="The gateway accepts uploads from player uploader clients " \
@@ -14,15 +15,33 @@ parser.add_argument(
     '--sender', action='append', dest='senders',
     help="Overrides default gateway sender bindings. This determines where " \
          "the gateway sends its messages, typically a broker.")
+parser.add_argument(
+    '--workers', action='store', dest='workers',
+    help="Overrides default sender worker count (default: %d)" % default_settings.NUM_GATEWAY_SENDER_WORKERS)
+parser.add_argument(
+    '--loglevel', action='store', dest='loglevel',
+    help="Overrides default logger level (DEBUG, INFO, WARNING, ERROR) (default: %s)" % default_settings.LOGGING['loggers']['']['level'])
 
 parsed = parser.parse_args()
 
+print("=" * 80)
+print("## Starting emdr-gateway ##\r\n")
+
 if parsed.senders:
-    print("* Overriding default gateway sender bindings.")
     default_settings.GATEWAY_SENDER_BINDINGS = parsed.senders
+    print("* Overriding default gateway sender bindings: %s" % parsed.senders)
+
+if parsed.workers:
+    default_settings.NUM_GATEWAY_SENDER_WORKERS = int(parsed.workers)
+    print("* Overriding default gateway sender worker count: %s" % default_settings.NUM_GATEWAY_SENDER_WORKERS)
+
+if parsed.loglevel:
+    set_logger_level(parsed.loglevel)
 
 #noinspection PyUnresolvedReferences
 from emdr.daemons.gateway import wsgi
+
+print("=" * 80)
 
 # Fire up a bottle+gevent process.
 run(

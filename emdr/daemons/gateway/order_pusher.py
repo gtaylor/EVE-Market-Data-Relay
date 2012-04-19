@@ -22,9 +22,9 @@ sender = context.socket(zmq.PUSH)
 # Get the list of transports to bind from settings. This allows us to listen
 # for processor connections from multiple places (UNIX sockets + TCP sockets).
 # By default, we only listen for UNIX domain sockets.
-logger.info("Order data will be sent to:")
+print("* Order data will be sent to:")
 for binding in settings.GATEWAY_SENDER_BINDINGS:
-    logger.info("  * %s" % binding)
+    print("   - %s" % binding)
     sender.connect(binding)
 
 def worker():
@@ -51,6 +51,6 @@ def worker():
 
 # Fire up gevent workers that send raw market order data to processor processes
 # in the background without blocking the WSGI app.
-logger.info("Spawning %d PUSH workers." % settings.NUM_GATEWAY_SENDER_WORKERS)
+print("* Spawning %d PUSH greenlet workers." % settings.NUM_GATEWAY_SENDER_WORKERS)
 for worker_num in range(settings.NUM_GATEWAY_SENDER_WORKERS):
     gevent.spawn(worker)
