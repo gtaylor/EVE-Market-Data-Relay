@@ -45,17 +45,18 @@ def parse_from_payload(payload):
 
     # Parse the market log buffer as a CSV.
     for row in csv.reader(log_buf, delimiter=','):
-        order_id,\
-        order_type,\
-        solar_system_id,\
-        station_id,\
-        price,\
-        volume_entered,\
-        volume_remaining,\
-        minimum_volume,\
-        order_issue_date,\
-        order_duration,\
-        order_range = row
+        print row
+        order_id = row[0]
+        order_type = row[1]
+        solar_system_id = row[2]
+        station_id = row[3]
+        price = row[4]
+        volume_entered = row[5]
+        volume_remaining = row[6]
+        minimum_volume = row[7]
+        order_issue_date = row[8]
+        order_duration = row[9]
+        order_range = row[10]
 
         # Now we cast each bit of data as a poor man's validator.
         order_id = int(order_id)
