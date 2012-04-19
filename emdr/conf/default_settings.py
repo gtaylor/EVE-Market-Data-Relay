@@ -7,7 +7,7 @@ This module contains the default settings that stand unless overridden.
 #
 
 # Specifies the number of greenlets to use for sending data to the workers.
-NUM_GATEWAY_SENDER_WORKERS = 3
+NUM_GATEWAY_SENDER_WORKERS = 100
 # A list of transports for the gateway to accept connections from. The default
 # just allows local socket connections, though you could easily allow local
 # UNIX sockets PLUS TCP sockets.
@@ -26,7 +26,7 @@ BROKER_SENDER_BINDINGS = ["ipc:///tmp/broker-sender.sock"]
 #
 
 # Specifies the number of greenlets to use for processing raw data from the gateway.
-NUM_PROCESSOR_WORKERS = 2
+NUM_PROCESSOR_WORKERS = 50
 # A list of transports for the processor daemon to connect to. The default
 # only connects to the local gateway bound to a UNIX domain socket. You could,
 # however, add additional gateways to the list, remote or local.
