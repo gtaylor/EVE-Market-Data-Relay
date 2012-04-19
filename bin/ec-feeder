@@ -63,6 +63,21 @@ class EVECentralFeedSMTPServer(smtpd.SMTPServer):
 
         return
 
+    def _get_empty_market_order_list(self):
+        """
+        Returns a correctly instantiated MarketOrderList instance, to be
+        filled with orders.
+
+        :rtype: MarketOrderList
+        """
+        return MarketOrderList(upload_keys=[
+                {'origin': 'EVE Central'},
+            ],
+            order_generator={
+                'name': 'EMDR EVE Central SMTP Feeder', 'version': '0.1'
+            },
+        )
+
     def divide_and_relay(self, msg):
         """
         This method splits the email message up into lines, parses the ones
@@ -72,7 +87,8 @@ class EVECentralFeedSMTPServer(smtpd.SMTPServer):
         """
         # This is a data structure that contains market orders. It will later
         # be serialized and sent to EMDR.
-        current_order_list = MarketOrderList()
+        current_order_list = self._get_empty_market_order_list()
+
         # Counter used for making sure only a certain number of orders end up
         # in each MarketOrderList that we send.
         counter = 0
@@ -89,7 +105,7 @@ class EVECentralFeedSMTPServer(smtpd.SMTPServer):
                     # and send the orders to EMDR.
                     self.send_order_list_to_emdr(current_order_list)
                     # Start over with an empty order list to re-fill.
-                    current_order_list = MarketOrderList()
+                    current_order_list = self._get_empty_market_order_list()
                     counter = 0
 
     def process_line(self, line):

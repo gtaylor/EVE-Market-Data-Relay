@@ -38,7 +38,7 @@ class MarketOrderList(object):
         :param MarketOrder order: The order to add to this order list.
         """
         # This key is used to group the orders based on region.
-        key = '%s' % order.region_id
+        key = '%s_%s' % (order.is_bid, order.region_id)
         if not self._orders.has_key(key):
             self._orders[key] = []
 
