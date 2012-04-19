@@ -25,6 +25,7 @@ def parse_from_payload(payload):
     upload_type = payload['upload_type']
     type_id = payload['type_id']
     region_id = payload['region_id']
+    generated_at = payload['generated_at']
     order_generator = {'name': payload['developer_key'], 'version': payload['version']}
 
     # Orders are lumped into this list sub-class, which can be serialized
@@ -71,7 +72,8 @@ def parse_from_payload(payload):
 
         order_issue_date = datetime.datetime.strptime(
             order_issue_date, "%Y-%m-%d %H:%M:%S")
-        data_generated_at = datetime.datetime.now()
+        data_generated_at = datetime.datetime.strptime(
+            generated_at, "%Y-%m-%d %H:%M:%S")
 
         # Finally, instantiate and pop out a MarketOrder instance, which will
         # be re-serialized in our standard format and sent to SQS for the
