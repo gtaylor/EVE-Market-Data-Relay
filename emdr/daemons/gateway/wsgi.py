@@ -88,6 +88,8 @@ def upload_eve_marketeer():
     job_dict = {
         'format': 'unified',
         'payload': {
+            # The HTTP request's body can be gzip'd, so de-compress and return
+            # it if the gzip Content-Encoding is detected.
             'body': get_decompressed_message(),
         }
     }
