@@ -53,6 +53,13 @@ def upload_eve_marketeer():
     # Job dicts are a way to package/wrap uploaded data in a way that lets
     # the processor nodes know what format the upload is in. The payload attrib
     # contains the format-specific stuff.
+    if request.forms.log.startswith('none'):
+        # Unified Uploader uploads an empty entry when a given item isn't
+        # available in the player's filtered area. This typically happens when
+        # market scanners point them there. We'll just not our hend and go
+        # along for now.
+        return '1'
+
     job_dict = {
         'format': 'eve_marketeer',
         'payload': {
@@ -80,7 +87,7 @@ def upload_eve_marketeer():
     return '1'
 
 @post('/upload/unified/')
-def upload_eve_marketeer():
+def upload_unified():
     """
     This view accepts uploads in Unified Uploader format. These
     typically arrive via the EVE Unified Uploader client.

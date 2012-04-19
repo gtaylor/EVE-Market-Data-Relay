@@ -45,7 +45,8 @@ def parse_from_payload(payload):
 
     # Parse the market log buffer as a CSV.
     for row in csv.reader(log_buf, delimiter=','):
-        print row
+        # This is pretty verbose, but we'll do it for the sake of there being
+        # no question which column is barfing out (if we run into that).
         order_id = row[0]
         order_type = row[1]
         solar_system_id = row[2]
