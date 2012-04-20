@@ -26,12 +26,20 @@ def parse_from_payload(payload):
     type_id = payload['type_id']
     region_id = payload['region_id']
     generated_at = payload['generated_at']
-    order_generator = {'name': payload['developer_key'], 'version': payload['version']}
+    order_generator = {
+        'name': payload['developer_key'],
+        'version': payload['version']
+    }
+    upload_keys = {
+        'name': 'EMDR',
+        'key': payload['upload_key']
+    }
 
     # Orders are lumped into this list sub-class, which can be serialized
     # to JSON.
     order_list = MarketOrderList(
-        order_generator=order_generator
+        order_generator=order_generator,
+        upload_keys=upload_keys,
     )
 
     # Stuff the string here so the csv reader module can pull from it.

@@ -40,7 +40,7 @@ def parse_from_dict(json_dict):
     Given a Unified Uploader message, parse the contents and return a
     MarketOrderList.
 
-    :param str json_str: A Unified Uploader message as a JSON string.
+    :param dict json_dict: A Unified Uploader message as a JSON dict.
     :rtype: MarketOrderList
     :returns: An instance of MarketOrderList, containing the orders
         within.
@@ -101,7 +101,6 @@ def encode_to_json(order_list):
                 order.solar_system_id,
             ])
 
-        #noinspection PyUnresolvedReferences
         rowsets.append(dict(
             generatedAt = orders[0].generated_at.replace(microsecond=0).isoformat(),
             regionID = orders[0].region_id,
@@ -121,4 +120,4 @@ def encode_to_json(order_list):
         'rowsets': rowsets,
     }
 
-    return simplejson.dumps(json_dict, indent=4 * ' ')
+    return simplejson.dumps(json_dict)

@@ -71,7 +71,8 @@ class EVECentralFeedSMTPServer(smtpd.SMTPServer):
         :rtype: MarketOrderList
         """
         return MarketOrderList(upload_keys=[
-                {'name': 'EVE Central', 'key': 'EMDR'},
+                {'name': 'EVE Central', 'key': 'RELAYED'},
+                {'name': 'EMDR', 'key': 'RECEIVED'},
             ],
             order_generator={
                 'name': 'EMDR EVE Central SMTP Feeder', 'version': '0.1'
@@ -132,7 +133,9 @@ class EVECentralFeedSMTPServer(smtpd.SMTPServer):
             '%Y-%m-%d %H:%M:%S'
         )
         is_bid = is_bid == 'True'
-        generated_at = datetime.datetime.now()
+        # TODO: Pull this from the date header. For now, we'll approximate
+        # that it takes 60 seconds to generate and deliver the email to us.
+        generated_at = datetime.datetime.now() - datetime.timedelta(minutes=1)
 
         return MarketOrder(
             order_id, is_bid, region_id, solar_system_id, station_id, type_id,

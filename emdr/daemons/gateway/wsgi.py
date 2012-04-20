@@ -75,6 +75,8 @@ def upload_eve_marketeer():
             'version': request.forms.version,
             # 2012-03-11 01:24:33
             'generated_at': request.forms.generated_at,
+            # Upload key, arbitrary
+            'upload_key': request.forms.upload_key,
         }
     }
 

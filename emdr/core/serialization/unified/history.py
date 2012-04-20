@@ -42,7 +42,7 @@ def parse_from_dict(json_dict):
 
     history = MarketHistory(
         upload_keys=json_dict['uploadKeys'],
-        order_generator=json_dict['generator'],
+        history_generator=json_dict['generator'],
     )
 
     for rowset in json_dict['rowsets']:
@@ -90,9 +90,8 @@ def encode_to_json(history_list):
                 entry.average_price,
             ])
 
-        #noinspection PyUnresolvedReferences
         rowsets.append(dict(
-            generatedAt = datetime.datetime.now().replace(microsecond=0).isoformat(),
+            generatedAt = history_entries[0].generated_at.replace(microsecond=0).isoformat(),
             regionID = history_entries[0].region_id,
             typeID = history_entries[0].type_id,
             rows = rows,
@@ -110,4 +109,4 @@ def encode_to_json(history_list):
         'rowsets': rowsets,
     }
 
-    return simplejson.dumps(json_dict, indent=4 * ' ')
+    return simplejson.dumps(json_dict)

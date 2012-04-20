@@ -30,16 +30,15 @@ parser.add_argument(
 
 parsed = parser.parse_args()
 
-# Holds dicts of orders that we need to fetch data for.
-order_query_queue = Queue()
-# Holds dicts of history entries that we need to fetch data for.
-history_query_queue = Queue()
-
-
 print("=" * 80)
 print("Starting emd-feeder")
 print("  * Sending data to %s " % parsed.target_url)
 print("=" * 80)
+
+# Changes some defaults for HTTP requests.
+REQUESTS_CONFIG = {
+    'max_retries': 5,
+}
 
 def populate_queue(queue_type):
     """
@@ -56,7 +55,8 @@ def populate_queue(queue_type):
     }
     response = requests.get(
         'http://api.eve-marketdata.com/api/recent_uploads2.json',
-        params=payload
+        params=payload,
+        config=REQUESTS_CONFIG,
     )
     response_dict = simplejson.loads(response.text)
 
@@ -69,9 +69,9 @@ def populate_queue(queue_type):
     # Shove each row into a queue for gevent workers to get further data on.
     for row in rowset['row']:
         if queue_type == 'o':
-            order_query_queue.put(row)
+            ORDERS_TO_QUERY.put(row)
         else:
-            history_query_queue.put(row)
+            HISTORY_TO_QUERY.put(row)
 
 def get_empty_market_order_list():
     """
@@ -80,8 +80,10 @@ def get_empty_market_order_list():
 
     :rtype: MarketOrderList
     """
-    return MarketOrderList(upload_keys=[
-            {'name': 'EVE Market Data', 'key': 'EMDR'},
+    return MarketOrderList(
+        upload_keys=[
+            {'name': 'EVE Market Data', 'key': 'RELAYED'},
+            {'name': 'EMDR', 'key': 'RECEIVED'},
         ],
         order_generator={
             'name': 'EMDR EVE Market Data API Feeder', 'version': '0.1'
@@ -95,8 +97,10 @@ def get_empty_market_history_list():
 
     :rtype: MarketHistory
     """
-    return MarketHistory(upload_keys=[
-            {'name': 'EVE Market Data', 'key': 'EMDR'},
+    return MarketHistory(
+        upload_keys=[
+            {'name': 'EVE Market Data', 'key': 'RELAYED'},
+            {'name': 'EMDR', 'key': 'RECEIVED'},
         ],
         history_generator={
             'name': 'EMDR EVE Market Data API Feeder', 'version': '0.1'
@@ -133,6 +137,8 @@ def query_item_orders(row):
 
     :param dict row: A row of basic order data to flesh out.
     """
+    global ORDER_LIST
+
     payload = {
         'char_name': 'EMDR',
         'type_ids': row['typeID'],
@@ -141,11 +147,10 @@ def query_item_orders(row):
     }
     response = requests.get(
         'http://api.eve-marketdata.com/api/item_orders2.json',
-        params=payload
+        params=payload,
+        config=REQUESTS_CONFIG,
     )
     response_dict = simplejson.loads(response.text)
-
-    order_list = get_empty_market_order_list()
 
     for order_row in response_dict['emd']['result']:
         order_row = order_row['row']
@@ -157,7 +162,7 @@ def query_item_orders(row):
         duration_tdelt = expires_date - issue_date
         duration = duration_tdelt.days
 
-        order_list.add_order(MarketOrder(
+        ORDER_LIST.add_order(MarketOrder(
             order_id=order_row['orderID'],
             is_bid=order_row['buysell'] == 'b',
             region_id=order_row['regionID'],
@@ -174,14 +179,15 @@ def query_item_orders(row):
             generated_at=created_date,
         ))
 
-    gevent.spawn(send_order_list_to_emdr, order_list)
 
 def query_item_history(row):
     """
-    Given a dict from history_query_queue, query for more data.
+    Given a dict from HISTORY_TO_QUERY, query for more data.
 
     :param dict row: A row of basic history data to flesh out.
     """
+    global HISTORY_LIST
+
     payload = {
         'char_name': 'EMDR',
         'type_ids': row['typeID'],
@@ -189,11 +195,10 @@ def query_item_history(row):
     }
     response = requests.get(
         'http://api.eve-marketdata.com/api/item_history2.json',
-        params=payload
+        params=payload,
+        config=REQUESTS_CONFIG,
     )
     response_dict = simplejson.loads(response.text)
-
-    history_list = get_empty_market_history_list()
 
     for hist_row in response_dict['emd']['result']:
         hist_row = hist_row['row']
@@ -202,19 +207,17 @@ def query_item_history(row):
             hist_row['date'], "%Y-%m-%d",
         )
 
-        history_list.add_entry(MarketHistoryEntry(
+        HISTORY_LIST.add_entry(MarketHistoryEntry(
             type_id=hist_row['typeID'],
             region_id=hist_row['regionID'],
             historical_date=hist_date,
-            num_orders=hist_row['quantity'],
+            num_orders=hist_row['orders'],
             low_price=hist_row['lowPrice'],
             high_price=hist_row['highPrice'],
             average_price=hist_row['avgPrice'],
             total_quantity=hist_row['volume'],
             generated_at=datetime.datetime.now(),
         ))
-
-    gevent.spawn(send_order_list_to_emdr, history_list)
 
 def queue_watcher(watched_queue):
     """
@@ -232,12 +235,36 @@ def queue_watcher(watched_queue):
         # Prevent EMDR from getting hammered too bad.
         gevent.sleep(0.2)
 
+# Holds dicts of orders that we need to fetch data for.
+ORDERS_TO_QUERY = Queue()
+# Holds dicts of history entries that we need to fetch data for.
+HISTORY_TO_QUERY = Queue()
+
+# These two are global MarketOrderList and MarketHistory instances, for storing
+# order and history entries. These are best though as staging areas, and are
+# serialized and sent to EMDR every ~60 seconds, then re-set.
+ORDER_LIST = get_empty_market_order_list()
+HISTORY_LIST = get_empty_market_history_list()
+
 # Greenlets monitor the queues for items to query.
-gevent.spawn(queue_watcher, order_query_queue)
-#gevent.spawn(queue_watcher, history_query_queue)
+gevent.spawn(queue_watcher, ORDERS_TO_QUERY)
+gevent.spawn(queue_watcher, HISTORY_TO_QUERY)
 
 while True:
+    # Populate ORDER_LIST from the EMDR recent orders API.
     gevent.spawn(populate_queue, 'o')
-    # EMD's history API's quantity field is borked.
-    #gevent.spawn(populate_queue, 'h')
+    # Populate HISTORY_LIST from the EMDR recent history API.
+    gevent.spawn(populate_queue, 'h')
+
+    # Wait for the API results to get back. Also allow enough time to elapse
+    # for the list of recently uploaded data to cycle on to the next minute.
     gevent.sleep(60)
+
+    # Only send the global lists if they have something in them.
+    if ORDER_LIST._orders:
+        # Sends our currently staged list of orders.
+        send_order_list_to_emdr(ORDER_LIST)
+        ORDER_LIST = get_empty_market_order_list()
+    if HISTORY_LIST._history:
+        send_order_list_to_emdr(HISTORY_LIST)
+        HISTORY_LIST = get_empty_market_history_list()

@@ -25,15 +25,21 @@ def parse_from_payload(payload):
     upload_type = payload['upload_type']
     type_id = payload['type_id']
     region_id = payload['region_id']
+    generated_at = payload['generated_at']
     order_generator = {
         'name': payload['developer_key'],
         'version': payload['version']
+    }
+    upload_keys = {
+        'name': 'EMDR',
+        'key': payload['upload_key']
     }
 
     # Orders are lumped into this list sub-class, which can be serialized
     # to JSON.
     history = MarketHistory(
-        order_generator=order_generator
+        history_generator=order_generator,
+        upload_keys=upload_keys,
     )
 
     # Stuff the string here so the csv reader module can pull from it.
@@ -57,7 +63,8 @@ def parse_from_payload(payload):
         # Now we cast each bit of data as a poor man's validator.
         historical_date = datetime.datetime.strptime(
             historical_date, "%Y-%m-%d")
-        data_generated_at = datetime.datetime.now()
+        data_generated_at = datetime.datetime.strptime(
+            generated_at, "%Y-%m-%d %H:%M:%S")
 
         # Finally, instantiate and pop out a MarketOrder instance, which will
         # be re-serialized in our standard format and sent to SQS for the

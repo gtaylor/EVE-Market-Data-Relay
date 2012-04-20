@@ -56,5 +56,7 @@ def worker(job_json, sender):
 
     if order_list:
         json_str = unified.encode_to_json(order_list)
+        #loaded = simplejson.loads(json_str)
+        #print simplejson.dumps(loaded, indent=4)
         sender.send(zlib.compress(json_str))
         logger.info('Message processed and relayed.')
