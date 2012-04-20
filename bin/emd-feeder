@@ -81,7 +81,7 @@ def get_empty_market_order_list():
     :rtype: MarketOrderList
     """
     return MarketOrderList(upload_keys=[
-            {'origin': 'EVE Market Data'},
+            {'name': 'EVE Market Data', 'key': 'EMDR'},
         ],
         order_generator={
             'name': 'EMDR EVE Market Data API Feeder', 'version': '0.1'

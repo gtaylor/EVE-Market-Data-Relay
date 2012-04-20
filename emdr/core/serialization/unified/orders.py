@@ -103,7 +103,7 @@ def encode_to_json(order_list):
 
         #noinspection PyUnresolvedReferences
         rowsets.append(dict(
-            generatedAt = datetime.datetime.now().replace(microsecond=0).isoformat(),
+            generatedAt = orders[0].generated_at.replace(microsecond=0).isoformat(),
             regionID = orders[0].region_id,
             typeID = orders[0].type_id,
             rows = rows,

@@ -19,7 +19,7 @@ class MarketOrderList(object):
 
         if not upload_keys:
             self.upload_keys = [
-                {'name': 'eve-market-data-relay', 'key': 'default'},
+                {'name': 'EMDR', 'key': 'default'},
             ]
         else:
             self.upload_keys = upload_keys

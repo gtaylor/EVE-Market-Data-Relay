@@ -71,7 +71,7 @@ class EVECentralFeedSMTPServer(smtpd.SMTPServer):
         :rtype: MarketOrderList
         """
         return MarketOrderList(upload_keys=[
-                {'origin': 'EVE Central'},
+                {'name': 'EVE Central', 'key': 'EMDR'},
             ],
             order_generator={
                 'name': 'EMDR EVE Central SMTP Feeder', 'version': '0.1'
