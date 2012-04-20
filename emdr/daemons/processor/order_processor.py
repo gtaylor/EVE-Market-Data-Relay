@@ -4,6 +4,7 @@ The worker function in this module performs the order and history processing.
 import logging
 import zlib
 import simplejson
+from simplejson.decoder import JSONDecodeError
 from emdr.core.serialization import unified
 from emdr.core.serialization import eve_marketeer
 
@@ -32,7 +33,12 @@ def parse_message(job_json):
         return
 
     if message_format == 'unified':
-        message = unified.parse_from_json(payload['body'])
+        try:
+            message = unified.parse_from_json(payload['body'])
+        except JSONDecodeError:
+            # Probably an uploader uploading to the wrong endpoint.
+            logger.error('JSON decoding error encountered. Discarding.')
+            return
     elif message_format == 'eve_marketeer':
         message = eve_marketeer.parse_from_payload(payload)
     else:

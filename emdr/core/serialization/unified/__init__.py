@@ -1,5 +1,4 @@
 import simplejson
-from simplejson.decoder import JSONDecodeError
 from emdr.core.market_data import MarketHistory
 from emdr.core.market_data import MarketOrderList
 from emdr.core.serialization.unified import history, orders
@@ -12,11 +11,7 @@ def parse_from_json(json_str):
     :param str json_str: A Unified Uploader message as a JSON string.
     :rtype: MarketOrderList or MarketHistory
     """
-    try:
-        job_dict = simplejson.loads(json_str)
-    except JSONDecodeError:
-        print "PARSE ERROR"
-        print json_str
+    job_dict = simplejson.loads(json_str)
 
     if job_dict['resultType'] == 'orders':
         return orders.parse_from_dict(job_dict)
