@@ -4,12 +4,17 @@ Pulls from EVE Marketdata's "recently updated" API feed to see what data we need
 to be updating. Workers then pull the data from EMD's API.
 """
 import argparse
+import datetime
 import gevent
 import requests
 import simplejson
 from gevent.queue import Queue
 from gevent import monkey; gevent.monkey.patch_all()
+#noinspection PyUnresolvedReferences
 from gevent_zeromq import zmq
+
+from emdr.core.market_data import MarketOrder, MarketOrderList, MarketHistory, MarketHistoryEntry
+from emdr.core.serialization.unified import encode_to_json
 
 parser = argparse.ArgumentParser(
     description="Pulls from EVE Marketdata's 'recently updated' API feed to see " \
@@ -23,23 +28,27 @@ parser.add_argument(
     help="Sets the HTTP location to send the orders to. Overrides the "\
          "default of http://localhost:8080/upload/unified/")
 
-parser.add_argument(
-    '--chunksize', action='store', dest='chunk_size', type=int,
-    default=500,
-    help="Sets the number of orders to group in each POST request.")
-
 parsed = parser.parse_args()
 
-order_upload_queue = Queue()
-history_upload_queue = Queue()
+# Holds dicts of orders that we need to fetch data for.
+order_query_queue = Queue()
+# Holds dicts of history entries that we need to fetch data for.
+history_query_queue = Queue()
+
 
 print("=" * 80)
 print("Starting emd-feeder")
 print("  * Sending data to %s " % parsed.target_url)
-print("  * Chunk size: %d" % parsed.chunk_size)
 print("=" * 80)
 
 def populate_queue(queue_type):
+    """
+    This ends up being a greenlet that retrieves the recent uploads for the
+    order type (order or history), and shoves them into gevent queues to
+    be queried for further details.
+
+    :param str queue_type: One of either 'o' (orders) or 'h' (history).
+    """
     payload = {
         'char_name': 'EMDR',
         'upload_type': queue_type,
@@ -57,14 +66,178 @@ def populate_queue(queue_type):
         # No rows to siphon.
         return
 
+    # Shove each row into a queue for gevent workers to get further data on.
     for row in rowset['row']:
-        print row
         if queue_type == 'o':
-            order_upload_queue.put(row)
+            order_query_queue.put(row)
         else:
-            history_upload_queue.put(row)
+            history_query_queue.put(row)
+
+def get_empty_market_order_list():
+    """
+    Returns a correctly instantiated MarketOrderList instance, to be
+    filled with orders.
+
+    :rtype: MarketOrderList
+    """
+    return MarketOrderList(upload_keys=[
+            {'origin': 'EVE Market Data'},
+        ],
+        order_generator={
+            'name': 'EMDR EVE Market Data API Feeder', 'version': '0.1'
+        },
+    )
+
+def get_empty_market_history_list():
+    """
+    Returns a correctly instantiated MarketHistory instance, to be
+    filled with orders.
+
+    :rtype: MarketHistory
+    """
+    return MarketHistory(upload_keys=[
+            {'origin': 'EVE Market Data'},
+        ],
+        history_generator={
+            'name': 'EMDR EVE Market Data API Feeder', 'version': '0.1'
+        },
+    )
+
+def send_order_list_to_emdr(order_list):
+    """
+    Given an order or history list, encode it to JSON and send it to EMDR.
+
+    :param order_list: The order or history list to send.
+    """
+    json_str = encode_to_json(order_list)
+
+    headers = {'User-Agent': 'EMD-Feeder'}
+    requests.post(
+        parsed.target_url, data=json_str, headers=headers
+    )
+
+def parse_dtime_str(date_str):
+    """
+    Parses a standard (EMD) datetime string.
+
+    :param str date_str: An EMD datetime string.
+    :rtype: datetime.datetime
+    """
+    return datetime.datetime.strptime(
+        date_str, "%Y-%m-%d %H:%M:%S"
+    )
+
+def query_item_orders(row):
+    """
+    Given a dict from order_history_queue, query for more data.
+
+    :param dict row: A row of basic order data to flesh out.
+    """
+    payload = {
+        'char_name': 'EMDR',
+        'type_ids': row['typeID'],
+        'region_ids': row['regionID'],
+        'buysell': 'a',
+    }
+    response = requests.get(
+        'http://api.eve-marketdata.com/api/item_orders2.json',
+        params=payload
+    )
+    response_dict = simplejson.loads(response.text)
+
+    order_list = get_empty_market_order_list()
+
+    for order_row in response_dict['emd']['result']:
+        order_row = order_row['row']
+
+        issue_date = parse_dtime_str(order_row['issued'])
+        created_date = parse_dtime_str(order_row['created'])
+        expires_date = parse_dtime_str(order_row['expires'])
+
+        duration_tdelt = expires_date - issue_date
+        duration = duration_tdelt.days
+
+        order_list.add_order(MarketOrder(
+            order_id=order_row['orderID'],
+            is_bid=order_row['buysell'] == 'b',
+            region_id=order_row['regionID'],
+            solar_system_id=order_row['solarsystemID'],
+            station_id=order_row['stationID'],
+            type_id=order_row['typeID'],
+            price=order_row['price'],
+            volume_entered=order_row['volEntered'],
+            volume_remaining=order_row['volRemaining'],
+            minimum_volume=order_row['minVolume'],
+            order_issue_date=issue_date,
+            order_duration=duration,
+            order_range=order_row['range'],
+            generated_at=created_date,
+        ))
+
+    gevent.spawn(send_order_list_to_emdr, order_list)
+
+def query_item_history(row):
+    """
+    Given a dict from history_query_queue, query for more data.
+
+    :param dict row: A row of basic history data to flesh out.
+    """
+    payload = {
+        'char_name': 'EMDR',
+        'type_ids': row['typeID'],
+        'region_ids': row['regionID'],
+    }
+    response = requests.get(
+        'http://api.eve-marketdata.com/api/item_history2.json',
+        params=payload
+    )
+    response_dict = simplejson.loads(response.text)
+
+    history_list = get_empty_market_history_list()
+
+    for hist_row in response_dict['emd']['result']:
+        hist_row = hist_row['row']
+
+        hist_date = datetime.datetime.strptime(
+            hist_row['date'], "%Y-%m-%d",
+        )
+
+        history_list.add_entry(MarketHistoryEntry(
+            type_id=hist_row['typeID'],
+            region_id=hist_row['regionID'],
+            historical_date=hist_date,
+            num_orders=hist_row['quantity'],
+            low_price=hist_row['lowPrice'],
+            high_price=hist_row['highPrice'],
+            average_price=hist_row['avgPrice'],
+            total_quantity=hist_row['volume'],
+            generated_at=datetime.datetime.now(),
+        ))
+
+    gevent.spawn(send_order_list_to_emdr, history_list)
+
+def queue_watcher(watched_queue):
+    """
+    Used as a green way to watch the two queues. When an entry is found in
+    the queue, fire off an API request using another greenlet.
+
+    :param gevent.queue.Queue watched_queue: The queue to watch.
+    """
+    while True:
+        row = watched_queue.get()
+        if row['upload_type'] == 'o':
+            gevent.spawn(query_item_orders, row)
+        elif row['upload_type'] == 'h':
+            gevent.spawn(query_item_history, row)
+        # Prevent EMDR from getting hammered too bad.
+        gevent.sleep(0.2)
+
+# Greenlets monitor the queues for items to query.
+gevent.spawn(queue_watcher, order_query_queue)
+#gevent.spawn(queue_watcher, history_query_queue)
 
 while True:
-    populate_queue('o')
-    populate_queue('h')
-    gevent.sleep(5)
+    gevent.spawn(populate_queue, 'o')
+    # EMD's history API's quantity field is borked.
+    #gevent.spawn(populate_queue, 'h')
+    gevent.sleep(60)
