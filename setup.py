@@ -38,6 +38,7 @@ scripts = [
     'bin/emdr-relay',
     'bin/emdr-snooper',
     'bin/ec-feeder',
+    'bin/emd-feeder',
 ]
 
 setup(
