@@ -96,7 +96,7 @@ def get_empty_market_history_list():
     :rtype: MarketHistory
     """
     return MarketHistory(upload_keys=[
-            {'origin': 'EVE Market Data'},
+            {'name': 'EVE Market Data', 'key': 'EMDR'},
         ],
         history_generator={
             'name': 'EMDR EVE Market Data API Feeder', 'version': '0.1'
