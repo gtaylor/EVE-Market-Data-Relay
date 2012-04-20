@@ -1,0 +1,70 @@
+#!/usr/bin/env python
+"""
+Pulls from EVE Marketdata's "recently updated" API feed to see what data we need
+to be updating. Workers then pull the data from EMD's API.
+"""
+import argparse
+import gevent
+import requests
+import simplejson
+from gevent.queue import Queue
+from gevent import monkey; gevent.monkey.patch_all()
+from gevent_zeromq import zmq
+
+parser = argparse.ArgumentParser(
+    description="Pulls from EVE Marketdata's 'recently updated' API feed to see " \
+                "what data we need to be updating. Workers then pull the data " \
+                "from EMD's API.",
+)
+
+parser.add_argument(
+    '--send', action='store', dest='target_url',
+    default="http://localhost:8080/upload/unified/",
+    help="Sets the HTTP location to send the orders to. Overrides the "\
+         "default of http://localhost:8080/upload/unified/")
+
+parser.add_argument(
+    '--chunksize', action='store', dest='chunk_size', type=int,
+    default=500,
+    help="Sets the number of orders to group in each POST request.")
+
+parsed = parser.parse_args()
+
+order_upload_queue = Queue()
+history_upload_queue = Queue()
+
+print("=" * 80)
+print("Starting emd-feeder")
+print("  * Sending data to %s " % parsed.target_url)
+print("  * Chunk size: %d" % parsed.chunk_size)
+print("=" * 80)
+
+def populate_queue(queue_type):
+    payload = {
+        'char_name': 'EMDR',
+        'upload_type': queue_type,
+        'minutes': '1',
+    }
+    response = requests.get(
+        'http://api.eve-marketdata.com/api/recent_uploads2.json',
+        params=payload
+    )
+    response_dict = simplejson.loads(response.text)
+
+    rowset = response_dict['emd']['result']['rowset']
+
+    if not rowset.has_key('row'):
+        # No rows to siphon.
+        return
+
+    for row in rowset['row']:
+        print row
+        if queue_type == 'o':
+            order_upload_queue.put(row)
+        else:
+            history_upload_queue.put(row)
+
+while True:
+    populate_queue('o')
+    populate_queue('h')
+    gevent.sleep(5)
