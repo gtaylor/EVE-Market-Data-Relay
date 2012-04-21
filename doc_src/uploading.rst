@@ -39,7 +39,7 @@ clients fall under this designation:
 * Contribtastic
 * EVE Marketeer Uploader
 
-Simply point your client at: http://master.eve-emdr.com/upload/
+Simply point your client at: http://upload.eve-emdr.com/upload/
 
 The message format will be auto-detected and parsed accordingly.
 
