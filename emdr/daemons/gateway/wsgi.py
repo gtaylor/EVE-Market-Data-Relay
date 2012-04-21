@@ -62,6 +62,7 @@ def upload_eve_marketeer():
 
     job_dict = {
         'format': 'eve_marketeer',
+        'remote_address': get_remote_address(),
         'payload': {
             # 'orders' or 'history'
             'upload_type': request.forms.upload_type,
@@ -96,6 +97,7 @@ def upload_unified():
     """
     job_dict = {
         'format': 'unified',
+        'remote_address': get_remote_address(),
         'payload': {
             # The HTTP request's body can be gzip'd, so de-compress and return
             # it if the gzip Content-Encoding is detected.

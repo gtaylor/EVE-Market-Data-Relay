@@ -21,6 +21,8 @@ def parse_message(job_json):
     """
     job_dict = simplejson.loads(zlib.decompress(job_json))
 
+    # The remote address who sent the message. This can be spoofed.
+    remote_ip = job_dict['remote_address']
     # The format attrib on the job dict determines which parser to use.
     message_format = job_dict.get('format', 'unknown')
 
@@ -29,7 +31,7 @@ def parse_message(job_json):
         # the data passed to the gateway.
         payload = job_dict['payload']
     except KeyError:
-        logger.error('Job dict has no payload key. Discarding.')
+        logger.error('Job from %s dict has no payload key. Discarding.' % remote_ip)
         return
 
     if message_format == 'unified':
@@ -37,13 +39,15 @@ def parse_message(job_json):
             message = unified.parse_from_json(payload['body'])
         except JSONDecodeError:
             # Probably an uploader uploading to the wrong endpoint.
-            logger.error('JSON decoding error encountered. Discarding.')
+            logger.error('JSON decoding error encountered in message from %s. Discarding.' % remote_ip)
             return
     elif message_format == 'eve_marketeer':
         message = eve_marketeer.parse_from_payload(payload)
     else:
-        logger.error('Unknown message format encountered. Discarding.')
+        logger.error('Unknown message format encountered in message from %s. Discarding.' % remote_ip)
         return
+
+    logger.info('Message from %s processed and relayed.' % remote_ip)
 
     return message
 
@@ -65,4 +69,3 @@ def worker(job_json, sender):
         #loaded = simplejson.loads(json_str)
         #print simplejson.dumps(loaded, indent=4)
         sender.send(zlib.compress(json_str))
-        logger.info('Message processed and relayed.')
