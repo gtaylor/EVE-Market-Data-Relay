@@ -20,7 +20,7 @@ can do that.
 * Hit 'Add'.
 * Enter 'EMDR' for the name.
 * Leave data type as EVE Marketeer & Marketdata.
-* Set the URL to: http://master.eve-emdr.com/upload/
+* Set the URL to: http://upload.eve-emdr.com/upload/
 * Enter EMDR for upload key.
 * Hit Save.
 * You're all set. Get uploading!
