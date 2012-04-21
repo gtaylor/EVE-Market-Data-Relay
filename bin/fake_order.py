@@ -49,7 +49,7 @@ headers = {
 
 r = requests.post(
     #'http://master.eve-emdr.com/upload/unified/',
-    'http://localhost:8080/upload/unified/',
+    'http://localhost:8080/upload/',
     data=data,
     headers=headers,
 )

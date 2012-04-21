@@ -20,8 +20,8 @@ can do that.
 * Hit 'Add'.
 * Enter 'EMDR' for the name.
 * Leave data type as EVE Marketeer & Marketdata.
-* Set the URL to: http://master.eve-emdr.com/upload/eve_marketeer/
-* Enter 46 for upload key.
+* Set the URL to: http://master.eve-emdr.com/upload/
+* Enter EMDR for upload key.
 * Hit Save.
 * You're all set. Get uploading!
 
@@ -29,19 +29,19 @@ You can then use any market service's auto-uploader pages.
 
 .. _EVE Marketeer Uploader: http://www.evemarketeer.com/uploader
 
-Uploaders with Unified Uploader Support
----------------------------------------
+Other Clients
+-------------
 
-If your uploader is listed below, it supports Unified Upload Format, and can
-upload in a more direct manner (for us):
+Any client that supports either Unified Uploader Interchange format, or
+EVE Marketeer/EVE Market Data format will also work just fine. The following
+clients fall under this designation:
 
-* Contribtastic for Mac
+* Contribtastic
+* EVE Marketeer Uploader
 
-Use the following URL for uploading:
+Simply point your client at: http://master.eve-emdr.com/upload/
 
-* http://master.eve-emdr.com/upload/unified/
-
-We'll expand the list of uploaders as more support this format.
+The message format will be auto-detected and parsed accordingly.
 
 Syndicating your Market Site's upload data to EMDR
 --------------------------------------------------
@@ -67,8 +67,9 @@ Almost all traffic will probably be the former, at this point. You'd need
 to simply preserve the POST keys and send them our way.
 
 .. warning:: If you go this route, be careful about also consuming the EMDR
-    feed. If your uploader endpoint is saving the uploads, you'll get duplicate
-    data from EMDR, since you fed it with said data.
+    feed. If your uploader endpoint is saving the uploads, you may find yourself
+    in an infinite upload loop. You probably want to look at the "Running
+    a Gateway" section.
 
 Running a Gateway
 ^^^^^^^^^^^^^^^^^

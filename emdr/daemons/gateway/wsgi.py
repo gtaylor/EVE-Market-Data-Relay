@@ -50,7 +50,7 @@ def upload_eve_marketeer():
     This view accepts uploads in EVE Marketeer or EVE Marketdata format. These
     typically arrive via the EVE Unified Uploader client.
     """
-    # Job dicts are a way to package/wrap uploaded data in a way that lets
+    # Message dicts are a way to package/wrap uploaded data in a way that lets
     # the processor nodes know what format the upload is in. The payload attrib
     # contains the format-specific stuff.
     if request.forms.log.startswith('none'):
@@ -60,7 +60,7 @@ def upload_eve_marketeer():
         # along for now.
         return '1'
 
-    job_dict = {
+    message_dict = {
         'format': 'eve_marketeer',
         'remote_address': get_remote_address(),
         'payload': {
@@ -81,9 +81,9 @@ def upload_eve_marketeer():
         }
     }
 
-    # The job dict gets shoved into a gevent queue, where it awaits sending
+    # The message dict gets shoved into a gevent queue, where it awaits sending
     # to the processors via the src.daemons.gateway.order_pusher module.
-    order_pusher.order_upload_queue.put(job_dict)
+    order_pusher.order_upload_queue.put(message_dict)
     logger.info("Accepted upload from %s" % get_remote_address())
 
     # Goofy, but apparently expected by EVE Market Data Uploader.
@@ -95,7 +95,7 @@ def upload_unified():
     This view accepts uploads in Unified Uploader format. These
     typically arrive via the EVE Unified Uploader client.
     """
-    job_dict = {
+    message_dict = {
         'format': 'unified',
         'remote_address': get_remote_address(),
         'payload': {
@@ -105,10 +105,24 @@ def upload_unified():
         }
     }
 
-    # The job dict gets shoved into a gevent queue, where it awaits sending
+    # The message dict gets shoved into a gevent queue, where it awaits sending
     # to the processors via the src.daemons.gateway.order_pusher module.
-    order_pusher.order_upload_queue.put(job_dict)
+    order_pusher.order_upload_queue.put(message_dict)
     logger.info("Accepted upload from %s" % get_remote_address())
 
     # Goofy, but apparently expected by EVE Market Data Uploader.
     return '1'
+
+@post('/upload/')
+def upload():
+    """
+    Convenience URL that determines what format the upload is coming in,
+    then routes to the correct logic for said format.
+    """
+    if request.forms.upload_key and request.forms.developer_key:
+        # EVE Marketeer has these two form values.
+        return upload_eve_marketeer()
+    else:
+        # Since Unified format is a straight POST with a body, we'll naively
+        # assume anything else is the Unified format.
+        return upload_unified()

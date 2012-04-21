@@ -7,62 +7,75 @@ import simplejson
 from simplejson.decoder import JSONDecodeError
 from emdr.core.serialization import unified
 from emdr.core.serialization import eve_marketeer
+from emdr.core.serialization.exceptions import MessageParserError, InvalidMarketOrderDataError
 
 logger = logging.getLogger(__name__)
 
-def parse_message(job_json):
+def parse_message(message_json):
     """
     Routes the order or history message to the correct parser, returns the
-    parsed order or history in Unified Uploader format.
+    parsed order or history in Unified Uploader format. If an error is
+    encountered, don't return anything.
 
-    :param str job_json: A raw JSON job dict string to parse.
-    :rtype: MarketOrderList or MarketHistory
+    :param str message_json: A raw JSON message dict string to parse.
+    :rtype: MarketOrderList or MarketHistory, or None
     :returns: A serializable MarketOrderList or MarketHistory instance.
     """
-    job_dict = simplejson.loads(zlib.decompress(job_json))
+    message_dict = simplejson.loads(zlib.decompress(message_json))
 
     # The remote address who sent the message. This can be spoofed.
-    remote_ip = job_dict['remote_address']
-    # The format attrib on the job dict determines which parser to use.
-    message_format = job_dict.get('format', 'unknown')
+    remote_ip = message_dict['remote_address']
+    # The format attrib on the message dict determines which parser to use.
+    message_format = message_dict.get('format', 'unknown')
 
     try:
         # A payload must exist, regardless of the format. The payload contains
         # the data passed to the gateway.
-        payload = job_dict['payload']
+        payload = message_dict['payload']
     except KeyError:
-        logger.error('Job from %s dict has no payload key. Discarding.' % remote_ip)
+        logger.error('Message dict from %s has no payload key.' % remote_ip)
         return
 
-    if message_format == 'unified':
-        try:
+    try:
+        if message_format == 'unified':
             message = unified.parse_from_json(payload['body'])
-        except JSONDecodeError:
-            # Probably an uploader uploading to the wrong endpoint.
-            logger.error('JSON decoding error encountered in message from %s. Discarding.' % remote_ip)
+        elif message_format == 'eve_marketeer':
+            message = eve_marketeer.parse_from_payload(payload)
+        else:
+            # We don't support whatever format this is.
+            logger.error('Unknown message format encountered in message from %s.' % remote_ip)
             return
-    elif message_format == 'eve_marketeer':
-        message = eve_marketeer.parse_from_payload(payload)
-    else:
-        logger.error('Unknown message format encountered in message from %s. Discarding.' % remote_ip)
+    except (MessageParserError, JSONDecodeError):
+        # Can't parse the message. It's mal-formed beyond any use.
+        logger.error('Parsing error encountered in message (%s) from %s.' % (
+            message_format, remote_ip
+        ))
+        return
+    except InvalidMarketOrderDataError:
+        # Message was parsed successfully, but one of the values was bogus.
+        logger.error('Invalid or mal-formed message (%s) from %s.' % (
+            message_format, remote_ip
+        ))
         return
 
-    logger.info('Message from %s processed and relayed.' % remote_ip)
+    logger.info('%s (%s) from %s processed.' % (
+        message.__class__.__name__,
+        message_format,
+        remote_ip
+    ))
 
     return message
 
-def worker(job_json, sender):
+def worker(message_json, sender):
     """
-    Parses the job dict into a MarketOrderList or MarketHistory instance.
+    Parses the message dict into a MarketOrderList or MarketHistory instance.
     This gets dumped to JSON and sent on to the relays for sending to the
     subscribers.
 
-    :param str job_json: The job dict from the broker/gateway.
+    :param str message_json: The message dict from the broker/gateway.
     :param zmq.socket: The socket to send orders to the relays with.
     """
-    order_list = parse_message(job_json)
-
-    # Eventually, we'll do some sanity checking here.
+    order_list = parse_message(message_json)
 
     if order_list:
         json_str = unified.encode_to_json(order_list)

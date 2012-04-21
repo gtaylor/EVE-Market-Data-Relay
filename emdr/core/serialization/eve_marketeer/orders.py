@@ -6,7 +6,7 @@ import logging
 import datetime
 from StringIO import StringIO
 from emdr.core.market_data import MarketOrderList, MarketOrder
-from emdr.core.serialization.exceptions import InvalidMarketOrderDataError
+from emdr.core.serialization.exceptions import InvalidMarketOrderDataError, MessageParserError
 
 logger = logging.getLogger(__name__)
 
@@ -48,8 +48,7 @@ def parse_from_payload(payload):
 
     if upload_type != 'orders':
         # This isn't an orders upload, we want no part in it.
-        logger.error("Upload type other than 'orders' found. Yuck.")
-        return
+        raise MessageParserError("Upload type other than 'orders' found.")
 
     # Parse the market log buffer as a CSV.
     for row in csv.reader(log_buf, delimiter=','):

@@ -6,7 +6,7 @@ import logging
 import datetime
 from StringIO import StringIO
 from emdr.core.market_data import MarketHistory, MarketHistoryEntry
-from emdr.core.serialization.exceptions import InvalidMarketOrderDataError
+from emdr.core.serialization.exceptions import MessageParserError
 
 logger = logging.getLogger(__name__)
 
@@ -48,8 +48,7 @@ def parse_from_payload(payload):
 
     if upload_type != 'history':
         # This isn't a history upload, we want no part in it.
-        logger.error("Upload type other than 'history' found. Yuck.")
-        return
+        raise MessageParserError("Upload type other than 'history' found.")
 
     # Parse the market log buffer as a CSV.
     for row in csv.reader(log_buf, delimiter=','):

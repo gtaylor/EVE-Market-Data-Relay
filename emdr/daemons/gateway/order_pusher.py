@@ -47,7 +47,6 @@ def worker():
         # processor for a further look.
         compressed_msg = zlib.compress(job_json)
         sender.send(compressed_msg)
-        logger.info('Pushed message of length %s' % len(compressed_msg))
 
 # Fire up gevent workers that send raw market order data to processor processes
 # in the background without blocking the WSGI app.
