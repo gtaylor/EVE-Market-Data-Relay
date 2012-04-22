@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Processors connect to Announcers via PUSH, and the Announcer distributes
+Gateways connect to Announcers via PUB, and the Announcer distributes
 the message to those below it via PUB.
 """
 import argparse
@@ -12,12 +12,12 @@ parser = argparse.ArgumentParser(
                 "applications, and/or Relays.",
 )
 parser.add_argument(
-    '--listen', action='append', dest='listeners',
+    '--listener', action='append', dest='listeners',
     help="Overrides default announcer receiver bindings. This determines how " \
-         "the processors connects to this relay to PUSH messages.")
+         "the Gateways connect to this Announcer to PUB messages.")
 parser.add_argument(
-    '--send', action='append', dest='senders',
-    help="Override default announcer sender bindings. This determines how " \
+    '--sender', action='append', dest='senders',
+    help="Override default Announcer sender bindings. This determines how " \
          "relays or developer applications can connect to this announcer.")
 
 parsed = parser.parse_args()

@@ -3,10 +3,10 @@ Parser for the EVE Marketeer and EVE Market Data uploader format.
 """
 import csv
 import logging
-import datetime
 from StringIO import StringIO
 from emdr.core.market_data import MarketOrderList, MarketOrder
-from emdr.core.serialization.exceptions import InvalidMarketOrderDataError, MessageParserError
+from emdr.core.serialization.common_utils import parse_datetime
+from emdr.core.serialization.exceptions import InvalidMarketOrderDataError
 
 logger = logging.getLogger(__name__)
 
@@ -22,7 +22,6 @@ def parse_from_payload(payload):
     :returns: A MarketOrderList instance that contains MarketOrder instances.
     """
     log = payload['log']
-    upload_type = payload['upload_type']
     type_id = payload['type_id']
     region_id = payload['region_id']
     generated_at = payload['generated_at']
@@ -45,10 +44,6 @@ def parse_from_payload(payload):
     # Stuff the string here so the csv reader module can pull from it.
     # TODO: Look at getting the csv reader to read the string directly.
     log_buf = StringIO(log)
-
-    if upload_type != 'orders':
-        # This isn't an orders upload, we want no part in it.
-        raise MessageParserError("Upload type other than 'orders' found.")
 
     # Parse the market log buffer as a CSV.
     for row in csv.reader(log_buf, delimiter=','):
@@ -74,19 +69,16 @@ def parse_from_payload(payload):
         elif order_type == "b":
             is_bid = True
         else:
-            raise InvalidMarketOrderDataError("Invalid order type.")
+            raise InvalidMarketOrderDataError(
+                "Invalid order type (must be 's' or 'b'): %s" % order_type)
 
         # Sometimes these come in as floats, but they need to be ints.
         volume_remaining = int(float(volume_remaining))
 
-        order_issue_date = datetime.datetime.strptime(
-            order_issue_date, "%Y-%m-%d %H:%M:%S")
-        data_generated_at = datetime.datetime.strptime(
-            generated_at, "%Y-%m-%d %H:%M:%S")
+        order_issue_date = parse_datetime(order_issue_date)
+        data_generated_at = parse_datetime(generated_at)
 
-        # Finally, instantiate and pop out a MarketOrder instance, which will
-        # be re-serialized in our standard format and sent to SQS for the
-        # workers to pull and save.
+        # Finally, instantiate and pop out a MarketOrder instance.
         order_list.add_order(MarketOrder(
             order_id, is_bid, region_id, solar_system_id, station_id,
             type_id, price, volume_entered, volume_remaining, minimum_volume,

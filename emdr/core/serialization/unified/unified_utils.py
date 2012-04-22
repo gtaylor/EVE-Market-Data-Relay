@@ -2,17 +2,7 @@
 Assorted utility functions for order and history serializing and
 de-serializing.
 """
-import dateutil.parser
-
-def parse_iso8601_str(iso_str):
-    """
-    Given an ISO 8601 string, parse it and spit out a datetime.datetime
-    instances.
-
-    :param str iso_str: An ISO 8601 date string.
-    :rtype: datetime.datetime
-    """
-    return dateutil.parser.parse(iso_str)
+from emdr.core.serialization.common_utils import UTC_TZINFO
 
 def _columns_to_kwargs(conversion_table, columns, row):
     """
@@ -36,3 +26,16 @@ def _columns_to_kwargs(conversion_table, columns, row):
         counter += 1
 
     return kwdict
+
+def gen_iso_datetime_str(dtime):
+    """
+    Convenience function for dumping a properly formatted ISO datetime
+    string. Unified format requires an explicit timezone offset, and no
+    microseconds, so take care of both of those.
+
+    :param datetime.datetime dtime: The datetime to generate the ISO datetime
+        string from.
+    :rtype: str
+    :returns: An ISO/Unified Uploader formatted datetime string.
+    """
+    return dtime.replace(microsecond=0, tzinfo=UTC_TZINFO).isoformat()

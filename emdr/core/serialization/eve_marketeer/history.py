@@ -3,26 +3,25 @@ Parser for the EVE Marketeer and EVE Market Data uploader format.
 """
 import csv
 import logging
-import datetime
 from StringIO import StringIO
-from emdr.core.market_data import MarketHistory, MarketHistoryEntry
-from emdr.core.serialization.exceptions import MessageParserError
+from emdr.core.market_data import MarketHistoryList, MarketHistoryEntry
+from emdr.core.serialization.common_utils import parse_datetime
 
 logger = logging.getLogger(__name__)
 
 def parse_from_payload(payload):
     """
     Given a job dict payload, parse the contents and return an
-    :py:class:`src.core.market_data.MarketHistory` instance, which contains
+    :py:class:`src.core.market_data.MarketHistoryList` instance, which contains
     :py:class:`src.core.market_data.MarketHistoryEntry` instances, each of which
     represents a set of market history stats.
 
     :param dict payload: A job dict.
-    :rtype: MarketHistory
-    :returns: A MarketHistory instance that contains MarketHistoryEntry instances.
+    :rtype: MarketHistoryList
+    :returns: A MarketHistoryList instance that contains
+        MarketHistoryEntry instances.
     """
     log = payload['log']
-    upload_type = payload['upload_type']
     type_id = payload['type_id']
     region_id = payload['region_id']
     generated_at = payload['generated_at']
@@ -37,7 +36,7 @@ def parse_from_payload(payload):
 
     # Orders are lumped into this list sub-class, which can be serialized
     # to JSON.
-    history = MarketHistory(
+    history = MarketHistoryList(
         history_generator=order_generator,
         upload_keys=upload_keys,
     )
@@ -45,10 +44,6 @@ def parse_from_payload(payload):
     # Stuff the string here so the csv reader module can pull from it.
     # TODO: Look at getting the csv reader to read the string directly.
     log_buf = StringIO(log)
-
-    if upload_type != 'history':
-        # This isn't a history upload, we want no part in it.
-        raise MessageParserError("Upload type other than 'history' found.")
 
     # Parse the market log buffer as a CSV.
     for row in csv.reader(log_buf, delimiter=','):
@@ -59,15 +54,11 @@ def parse_from_payload(payload):
         total_quantity,\
         num_orders = row
 
-        # Now we cast each bit of data as a poor man's validator.
-        historical_date = datetime.datetime.strptime(
-            historical_date, "%Y-%m-%d")
-        data_generated_at = datetime.datetime.strptime(
-            generated_at, "%Y-%m-%d %H:%M:%S")
+        # The incoming data is just a date, so this ends up being hour/minute 0.
+        historical_date = parse_datetime(historical_date)
+        data_generated_at = parse_datetime(generated_at)
 
-        # Finally, instantiate and pop out a MarketOrder instance, which will
-        # be re-serialized in our standard format and sent to SQS for the
-        # workers to pull and save.
+        # Finally, instantiate and pop out a MarketHistoryEntry instance.
         history.add_entry(MarketHistoryEntry(
             type_id, region_id, historical_date, num_orders, low_price,
             high_price, average_price, total_quantity,

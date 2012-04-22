@@ -1,7 +1,7 @@
 """
-Announcers are the first daemons to get their mittens on the "finished"
-unified format messages. From here, they PUB the messages out to anyone
-SUBscribing. This could be Relays, or end-users.
+Gateways connect to Announcer daemons, sending zlib compressed JSON
+representations of market data. From here, the Announcer PUBs the messages
+out to anyone SUBscribing. This could be Relays, or end-users.
 """
 # Logging has to be configured first before we do anything.
 import logging
@@ -20,15 +20,16 @@ def start():
     """
     context = zmq.Context()
 
-    receiver = context.socket(zmq.PULL)
+    receiver = context.socket(zmq.SUB)
+    receiver.setsockopt(zmq.SUBSCRIBE, '')
     for binding in settings.ANNOUNCER_RECEIVER_BINDINGS:
         logger.info("Accepting connections from %s" % binding)
-        # Processors connect to announcer to PUSH messages.
+        # Gateways connect to the Announcer to PUB messages.
         receiver.bind(binding)
 
     sender = context.socket(zmq.PUB)
     for binding in settings.ANNOUNCER_SENDER_BINDINGS:
-        # Announcers offer up the data via PUB/SUB.
+        # Announcers offer up the data via PUB.
         sender.bind(binding)
 
     def relay_worker(message):

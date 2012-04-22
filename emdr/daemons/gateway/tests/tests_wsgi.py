@@ -21,9 +21,10 @@ class GatewayWSGITests(unittest.TestCase):
             volume_entered=10,
             volume_remaining=4,
             minimum_volume=1,
-            order_issue_date=datetime.datetime.now(),
+            order_issue_date=datetime.datetime.utcnow(),
             order_duration=90,
             order_range=5,
+            generated_at=datetime.datetime.utcnow(),
         )
         self.order_list = MarketOrderList()
         self.order_list.add_order(self.order1)

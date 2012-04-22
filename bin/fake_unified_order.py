@@ -42,7 +42,7 @@ data = """
 }
 """
 data = simplejson.loads(data)
-data = zlib.compress(simplejson.dumps(data))
+data = zlib.compress(simplejson.dumps(data))#[2:-4]
 headers = {
     'Content-Encoding': 'gzip',
 }
@@ -53,4 +53,4 @@ r = requests.post(
     data=data,
     headers=headers,
 )
-print "Sent fake order."
+print r.status_code, r.text

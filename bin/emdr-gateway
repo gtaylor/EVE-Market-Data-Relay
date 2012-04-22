@@ -14,7 +14,7 @@ parser = argparse.ArgumentParser(
 parser.add_argument(
     '--sender', action='append', dest='senders',
     help="Overrides default gateway sender bindings. This determines where " \
-         "the gateway sends its messages, typically a broker.")
+         "the gateway sends its messages, typically an Announcer.")
 parser.add_argument(
     '--workers', action='store', dest='workers',
     help="Overrides default sender worker count (default: %d)" % default_settings.NUM_GATEWAY_SENDER_WORKERS)
@@ -43,8 +43,4 @@ from emdr.daemons.gateway import wsgi
 print_cmd_footer()
 
 # Fire up a bottle+gevent process.
-run(
-    host='localhost',
-    port=8080,
-    server='gevent',
-)
+run(host='localhost', server='gevent')

@@ -13,7 +13,7 @@ from gevent import monkey; gevent.monkey.patch_all()
 #noinspection PyUnresolvedReferences
 from gevent_zeromq import zmq
 
-from emdr.core.market_data import MarketOrder, MarketOrderList, MarketHistory, MarketHistoryEntry
+from emdr.core.market_data import MarketOrder, MarketOrderList, MarketHistoryList, MarketHistoryEntry
 from emdr.core.serialization.unified import encode_to_json
 
 parser = argparse.ArgumentParser(
@@ -95,9 +95,9 @@ def get_empty_market_history_list():
     Returns a correctly instantiated MarketHistory instance, to be
     filled with orders.
 
-    :rtype: MarketHistory
+    :rtype: MarketHistoryList
     """
-    return MarketHistory(
+    return MarketHistoryList(
         upload_keys=[
             {'name': 'EVE Market Data', 'key': 'RELAYED'},
             {'name': 'EMDR', 'key': 'RECEIVED'},

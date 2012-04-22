@@ -1,6 +1,6 @@
 import unittest
 import datetime
-from emdr.core.market_data import MarketOrder, MarketOrderList, MarketHistory, MarketHistoryEntry
+from emdr.core.market_data import MarketOrder, MarketOrderList, MarketHistoryList, MarketHistoryEntry
 from emdr.core.serialization import unified
 
 class BaseSerializationCase(unittest.TestCase):
@@ -18,10 +18,10 @@ class BaseSerializationCase(unittest.TestCase):
             volume_entered=10,
             volume_remaining=4,
             minimum_volume=1,
-            order_issue_date=datetime.datetime.now(),
+            order_issue_date=datetime.datetime.utcnow(),
             order_duration=90,
             order_range=5,
-            generated_at=datetime.datetime.now()
+            generated_at=datetime.datetime.utcnow()
         )
         self.order_list.add_order(self.order1)
         self.order2 = MarketOrder(
@@ -35,36 +35,36 @@ class BaseSerializationCase(unittest.TestCase):
             volume_entered=10,
             volume_remaining=500,
             minimum_volume=1,
-            order_issue_date=datetime.datetime.now(),
+            order_issue_date=datetime.datetime.utcnow(),
             order_duration=90,
             order_range=5,
-            generated_at=datetime.datetime.now()
+            generated_at=datetime.datetime.utcnow()
         )
         self.order_list.add_order(self.order2)
 
-        self.history = MarketHistory()
+        self.history = MarketHistoryList()
         self.history1 = MarketHistoryEntry(
             type_id=2413387906,
             region_id=10000068,
-            historical_date=datetime.datetime.now(),
+            historical_date=datetime.datetime.utcnow(),
             num_orders=5,
             low_price=5.0,
             high_price=10.5,
             average_price=7.0,
             total_quantity=200,
-            generated_at=datetime.datetime.now(),
+            generated_at=datetime.datetime.utcnow(),
         )
         self.history.add_entry(self.history1)
         self.history2 = MarketHistoryEntry(
             type_id=1413387203,
             region_id=10000067,
-            historical_date=datetime.datetime.now(),
+            historical_date=datetime.datetime.utcnow(),
             num_orders=50,
             low_price=50.0,
             high_price=100.5,
             average_price=70.0,
             total_quantity=2000,
-            generated_at=datetime.datetime.now(),
+            generated_at=datetime.datetime.utcnow(),
         )
         self.history.add_entry(self.history2)
 
@@ -95,10 +95,10 @@ class UnifiedSerializationTests(BaseSerializationCase):
         encoded_history = unified.encode_to_json(self.history)
         # Should return a string JSON representation.
         self.assertIsInstance(encoded_history, basestring)
-        # De-code the JSON to instantiate a MarketHistory instances that
+        # De-code the JSON to instantiate a MarketHistoryList instances that
         # should be identical to self.orderlist.
         decoded_list = unified.parse_from_json(encoded_history)
-        self.assertIsInstance(decoded_list, MarketHistory)
+        self.assertIsInstance(decoded_list, MarketHistoryList)
         re_encoded_history = unified.encode_to_json(decoded_list)
         # Re-encode the decoded history. Match the two encoded strings. They
         # should still be the same.

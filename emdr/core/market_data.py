@@ -155,7 +155,7 @@ class MarketOrder(object):
             order_range = self.order_range,
         )
 
-class MarketHistory(object):
+class MarketHistoryList(object):
     """
     A class for storing market order history for serialization.
     """
@@ -185,7 +185,7 @@ class MarketHistory(object):
         Basic string representation of the history.
         """
         template = Template(
-            "<MarketHistory: \n"
+            "<MarketHistoryList: \n"
             " upload_keys: $upload_keys\n"
             " order_generator: $order_generator\n"
         )

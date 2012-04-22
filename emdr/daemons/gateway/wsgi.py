@@ -3,15 +3,15 @@ This WSGI application accepts market data uploads from various uploader clients.
 The various URLs below are structured to pass off the parsing based on what
 format the data is in.
 
-The order data is re-packaged, then sent off to the processor nodes,
-where the data is parsed, some light validation is performed, then passed off
-to the relay for re-broadcasting to consumers.
+Once parsed, the data is shoved out to the Announcers via the
+gateway.order_pusher module.
 """
 # Logging has to be configured first before we do anything.
 import logging
 from logging.config import dictConfig
 import zlib
 from emdr.conf import default_settings as settings
+
 dictConfig(settings.LOGGING)
 logger = logging.getLogger(__name__)
 
@@ -21,6 +21,10 @@ from gevent import monkey; gevent.monkey.patch_all()
 from bottle import run, request, response, post, default_app
 
 from emdr.daemons.gateway import order_pusher
+from emdr.daemons.gateway.exceptions import MalformedUploadError
+from emdr.core.serialization.exceptions import InvalidMarketOrderDataError
+from emdr.core.serialization import unified
+from emdr.core.serialization import eve_marketeer
 
 def get_remote_address():
     """
@@ -40,10 +44,46 @@ def get_decompressed_message():
     :returns: The de-compressed request body.
     """
     if request.headers.get('Content-Encoding', '') == 'gzip':
-        # Negative wbits supresses adler32 checksumming.
-        return zlib.decompress(request.body.read(), -15)
+        try:
+            # Try decompression with the adler checksum.
+            return zlib.decompress(request.body.read())
+        except zlib.error:
+            # Negative wbits supresses adler32 checksumming.
+            return zlib.decompress(request.body.read(), -15)
     else:
         return request.body.read()
+
+def parse_and_error_handle(parser, data, upload_format):
+    """
+    Standardized parsing and error handling for parsing. Returns the final
+    HTTP body to send back to the uploader after parsing, or error messages.
+
+    :param callable parser: The parser function to use to parse ``data``.
+    :param object data: An dict or str of parser-specific data to parse
+        using the callable specified in ``parser``.
+    :param str upload_format: Upload format identifier for the logs.
+    :rtype: str
+    :returns: The HTTP body to return.
+    """
+    try:
+        parsed_message = parser(data)
+    except (InvalidMarketOrderDataError, MalformedUploadError) as exc:
+        # Something bad happened. We know this will return at least a
+        # semi-useful error message, so do so.
+        response.status = 400
+        logger.error(exc.message)
+        return exc.message
+
+    # Stuffs the parsed MarketOrderList or MarketHistoryList into a gevent
+    # queue for the workers to pick up, JSON'ify, compress, and send to
+    # the announcers.
+    order_pusher.order_upload_queue.put(parsed_message)
+
+    logger.info("Accepted %s upload from %s" % (
+        upload_format, get_remote_address()
+    ))
+    # Goofy, but apparently expected by EVE Market Data Uploader.
+    return '1'
 
 @post('/upload/eve_marketeer/')
 def upload_eve_marketeer():
@@ -51,16 +91,17 @@ def upload_eve_marketeer():
     This view accepts uploads in EVE Marketeer or EVE Marketdata format. These
     typically arrive via the EVE Unified Uploader client.
     """
-    # Message dicts are a way to package/wrap uploaded data in a way that lets
-    # the processor nodes know what format the upload is in. The payload attrib
-    # contains the format-specific stuff.
     if request.forms.log.startswith('none'):
-        # Unified Uploader uploads an empty entry when a given item isn't
+        logger.error('Rejecting empty EMK order or history list.')
+        # EVE Marketeer Uploader uploads an empty entry when a given item isn't
         # available in the player's filtered area. This typically happens when
-        # market scanners point them there. We'll just not our hend and go
+        # market scanners point them there. We'll just not our head and go
         # along for now.
         return '1'
 
+    # Message dicts are a way to package/wrap uploaded data in a way that lets
+    # the processor nodes know what format the upload is in. The payload attrib
+    # contains the format-specific stuff.
     message_dict = {
         'format': 'eve_marketeer',
         'remote_address': get_remote_address(),
@@ -82,21 +123,9 @@ def upload_eve_marketeer():
         }
     }
 
-    # Some very basic sanity checking.
-    for key, value in message_dict['payload'].items():
-        if not value:
-            response.status = 400
-            logger.error('In EMK POST from %s, missing key: %s' % (
-                get_remote_address(), key))
-            return 'No value specified for key: %s' % key
-
-    # The message dict gets shoved into a gevent queue, where it awaits sending
-    # to the processors via the src.daemons.gateway.order_pusher module.
-    order_pusher.order_upload_queue.put(message_dict)
-    logger.info("Accepted EMK upload from %s" % get_remote_address())
-
-    # Goofy, but apparently expected by EVE Market Data Uploader.
-    return '1'
+    return parse_and_error_handle(
+        eve_marketeer.parse_from_payload, message_dict['payload'], 'EMK'
+    )
 
 @post('/upload/unified/')
 def upload_unified():
@@ -104,23 +133,21 @@ def upload_unified():
     This view accepts uploads in Unified Uploader format. These
     typically arrive via the EVE Unified Uploader client.
     """
-    message_dict = {
-        'format': 'unified',
-        'remote_address': get_remote_address(),
-        'payload': {
-            # The HTTP request's body can be gzip'd, so de-compress and return
-            # it if the gzip Content-Encoding is detected.
-            'body': get_decompressed_message(),
-        }
-    }
+    try:
+        # Body may or may not be compressed.
+        message_body = get_decompressed_message()
+    except zlib.error as exc:
+        # Some languages and libs do a crap job zlib compressing stuff. Provide
+        # at least some kind of feedback for them to try to get pointed in
+        # the correct direction.
+        response.status = 400
+        # I'm curious how common this is, keep an eye out.
+        logger.error("gzip error with %s: %s" % (get_remote_address(), exc.message))
+        return exc.message
 
-    # The message dict gets shoved into a gevent queue, where it awaits sending
-    # to the processors via the src.daemons.gateway.order_pusher module.
-    order_pusher.order_upload_queue.put(message_dict)
-    logger.info("Accepted Unified upload from %s" % get_remote_address())
-
-    # Goofy, but apparently expected by EVE Market Data Uploader.
-    return 'OK'
+    return parse_and_error_handle(
+        unified.parse_from_json, message_body, 'Unified'
+    )
 
 @post('/upload/')
 def upload():
@@ -133,5 +160,7 @@ def upload():
         return upload_eve_marketeer()
     else:
         # Since Unified format is a straight POST with a body, we'll naively
-        # assume anything else is the Unified format.
+        # assume anything else is the Unified format. Note that improperly
+        # formed uploads that have no POST keys will be caught by this, and
+        # a JSON error will be shown. This may confuse some users.
         return upload_unified()

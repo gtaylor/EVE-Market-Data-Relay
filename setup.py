@@ -24,17 +24,13 @@ packages = [
     'emdr.core.serialization.unified',
     'emdr.daemons',
     'emdr.daemons.announcer',
-    'emdr.daemons.broker',
     'emdr.daemons.gateway',
-    'emdr.daemons.processor',
     'emdr.daemons.relay',
 ]
 
 scripts = [
     'bin/emdr-announcer',
-    'bin/emdr-broker',
     'bin/emdr-gateway',
-    'bin/emdr-processor',
     'bin/emdr-relay',
     'bin/emdr-snooper',
     'bin/ec-feeder',

@@ -12,32 +12,12 @@ NUM_GATEWAY_SENDER_WORKERS = 100
 # just allows local socket connections, though you could easily allow local
 # UNIX sockets PLUS TCP sockets.
 # See: http://api.zeromq.org/2-1:zmq-bind
-GATEWAY_SENDER_BINDINGS = ["ipc:///tmp/broker-receiver.sock"]
-
-#
-## Broker Daemon Settings
-#
-
-BROKER_RECEIVER_BINDINGS = ["ipc:///tmp/broker-receiver.sock"]
-BROKER_SENDER_BINDINGS = ["ipc:///tmp/broker-sender.sock"]
-
-#
-## Processor Daemon Settings
-#
-
-# Specifies the number of greenlets to use for processing raw data from the gateway.
-NUM_PROCESSOR_WORKERS = 50
-# A list of transports for the processor daemon to connect to. The default
-# only connects to the local gateway bound to a UNIX domain socket. You could,
-# however, add additional gateways to the list, remote or local.
-# See: http://api.zeromq.org/2-1:zmq-connect
-PROCESSOR_RECEIVER_BINDINGS = ["ipc:///tmp/broker-sender.sock"]
-PROCESSOR_SENDER_BINDINGS = ["ipc:///tmp/announcer-receiver.sock"]
+GATEWAY_SENDER_BINDINGS = ["ipc:///tmp/gateway-sender.sock"]
 
 #
 ## Announcer Daemon Settings
 #
-ANNOUNCER_RECEIVER_BINDINGS = ["ipc:///tmp/announcer-receiver.sock"]
+ANNOUNCER_RECEIVER_BINDINGS = ["ipc:///tmp/gateway-sender.sock"]
 ANNOUNCER_SENDER_BINDINGS = ["ipc:///tmp/announcer-sender.sock"]
 
 #

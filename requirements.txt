@@ -1,7 +1,7 @@
 bottle
 simplejson
 gevent
-gevent-zeromq
+gevent_zeromq
 nose
 requests
 python-dateutil<2.0

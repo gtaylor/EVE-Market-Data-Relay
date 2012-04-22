@@ -4,14 +4,11 @@ Parser for the Unified uploader format market history.
 import logging
 import datetime
 import simplejson
-import pytz
-from emdr.core.market_data import MarketHistory, MarketHistoryEntry
-from emdr.core.serialization.unified.unified_utils import _columns_to_kwargs
-from emdr.core.serialization.unified.unified_utils import parse_iso8601_str
+from emdr.core.market_data import MarketHistoryList, MarketHistoryEntry
+from emdr.core.serialization.common_utils import parse_datetime
+from emdr.core.serialization.unified.unified_utils import _columns_to_kwargs, gen_iso_datetime_str
 
 logger = logging.getLogger(__name__)
-
-utc_tzinfo = pytz.timezone("UTC")
 
 # This is the standard list of columns to return data in for encoding.
 STANDARD_ENCODED_COLUMNS = [
@@ -34,7 +31,7 @@ SPEC_TO_KWARG_CONVERSION = {
 def parse_from_dict(json_dict):
     """
     Given a Unified Uploader message, parse the contents and return a
-    MarketHistory instance.
+    MarketHistoryList instance.
 
     :param dict json_dict: A Unified Uploader message as a dict.
     :rtype: MarketOrderList
@@ -43,20 +40,20 @@ def parse_from_dict(json_dict):
     """
     history_columns = json_dict['columns']
 
-    history = MarketHistory(
+    history = MarketHistoryList(
         upload_keys=json_dict['uploadKeys'],
         history_generator=json_dict['generator'],
     )
 
     for rowset in json_dict['rowsets']:
-        generated_at = parse_iso8601_str(rowset['generatedAt'])
+        generated_at = parse_datetime(rowset['generatedAt'])
         region_id = rowset['regionID']
         type_id = rowset['typeID']
 
         for row in rowset['rows']:
             history_kwargs = _columns_to_kwargs(
                 SPEC_TO_KWARG_CONVERSION, history_columns, row)
-            historical_date = parse_iso8601_str(history_kwargs['historical_date'])
+            historical_date = parse_datetime(history_kwargs['historical_date'])
 
             history_kwargs.update({
                 'type_id': type_id,
@@ -71,16 +68,16 @@ def parse_from_dict(json_dict):
 
 def encode_to_json(history_list):
     """
-    Encodes this MarketHistory instance to a JSON string.
+    Encodes this MarketHistoryList instance to a JSON string.
 
-    :param MarketHistory history_list: The history instance to serialize.
+    :param MarketHistoryList history_list: The history instance to serialize.
     :rtype: str
     """
     rowsets = []
     for key, history_entries in history_list._history.items():
         rows = []
         for entry in history_entries:
-            historical_date = entry.historical_date.replace(microsecond=0, tzinfo=utc_tzinfo).isoformat()
+            historical_date = gen_iso_datetime_str(entry.historical_date)
 
             # The order in which these values are added is crucial. It must
             # match STANDARD_ENCODED_COLUMNS.
@@ -94,7 +91,7 @@ def encode_to_json(history_list):
             ])
 
         rowsets.append(dict(
-            generatedAt = history_entries[0].generated_at.replace(microsecond=0, tzinfo=utc_tzinfo).isoformat(),
+            generatedAt = gen_iso_datetime_str(history_entries[0].generated_at),
             regionID = history_entries[0].region_id,
             typeID = history_entries[0].type_id,
             rows = rows,
@@ -105,7 +102,7 @@ def encode_to_json(history_list):
         'version': history_list.version,
         'uploadKeys': history_list.upload_keys,
         'generator': history_list.history_generator,
-        'currentTime': datetime.datetime.now().replace(microsecond=0, tzinfo=utc_tzinfo).isoformat(),
+        'currentTime': gen_iso_datetime_str(datetime.datetime.utcnow()),
         # This must match the order of the values in the row assembling portion
         # above this.
         'columns': STANDARD_ENCODED_COLUMNS,
