@@ -4,11 +4,14 @@ Parser for the Unified uploader format market history.
 import logging
 import datetime
 import simplejson
+import pytz
 from emdr.core.market_data import MarketHistory, MarketHistoryEntry
 from emdr.core.serialization.unified.unified_utils import _columns_to_kwargs
 from emdr.core.serialization.unified.unified_utils import parse_iso8601_str
 
 logger = logging.getLogger(__name__)
+
+utc_tzinfo = pytz.timezone("UTC")
 
 # This is the standard list of columns to return data in for encoding.
 STANDARD_ENCODED_COLUMNS = [
@@ -77,7 +80,7 @@ def encode_to_json(history_list):
     for key, history_entries in history_list._history.items():
         rows = []
         for entry in history_entries:
-            historical_date = entry.historical_date.replace(microsecond=0).isoformat()
+            historical_date = entry.historical_date.replace(microsecond=0, tzinfo=utc_tzinfo).isoformat()
 
             # The order in which these values are added is crucial. It must
             # match STANDARD_ENCODED_COLUMNS.
@@ -91,7 +94,7 @@ def encode_to_json(history_list):
             ])
 
         rowsets.append(dict(
-            generatedAt = history_entries[0].generated_at.replace(microsecond=0).isoformat(),
+            generatedAt = history_entries[0].generated_at.replace(microsecond=0, tzinfo=utc_tzinfo).isoformat(),
             regionID = history_entries[0].region_id,
             typeID = history_entries[0].type_id,
             rows = rows,
@@ -102,7 +105,7 @@ def encode_to_json(history_list):
         'version': history_list.version,
         'uploadKeys': history_list.upload_keys,
         'generator': history_list.history_generator,
-        'currentTime': datetime.datetime.now().replace(microsecond=0).isoformat(),
+        'currentTime': datetime.datetime.now().replace(microsecond=0, tzinfo=utc_tzinfo).isoformat(),
         # This must match the order of the values in the row assembling portion
         # above this.
         'columns': STANDARD_ENCODED_COLUMNS,

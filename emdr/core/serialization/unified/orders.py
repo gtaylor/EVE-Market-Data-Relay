@@ -4,11 +4,14 @@ Parser for the Unified uploader format orders.
 import logging
 import datetime
 import simplejson
+import pytz
 from emdr.core.serialization.unified.unified_utils import parse_iso8601_str, _columns_to_kwargs
 from emdr.core.market_data import MarketOrder
 from emdr.core.market_data import MarketOrderList
 
 logger = logging.getLogger(__name__)
+
+utc_tzinfo = pytz.timezone("UTC")
 
 # This is the standard list of columns to return data in for encoding.
 STANDARD_ENCODED_COLUMNS = [
@@ -83,7 +86,7 @@ def encode_to_json(order_list):
     for key, orders in order_list._orders.items():
         rows = []
         for order in orders:
-            issue_date = order.order_issue_date.replace(microsecond=0).isoformat()
+            issue_date = order.order_issue_date.replace(microsecond=0, tzinfo=utc_tzinfo).isoformat()
 
             # The order in which these values are added is crucial. It must
             # match STANDARD_ENCODED_COLUMNS.
@@ -102,7 +105,7 @@ def encode_to_json(order_list):
             ])
 
         rowsets.append(dict(
-            generatedAt = orders[0].generated_at.replace(microsecond=0).isoformat(),
+            generatedAt = orders[0].generated_at.replace(microsecond=0, tzinfo=utc_tzinfo).isoformat(),
             regionID = orders[0].region_id,
             typeID = orders[0].type_id,
             rows = rows,
@@ -113,7 +116,7 @@ def encode_to_json(order_list):
         'version': order_list.version,
         'uploadKeys': order_list.upload_keys,
         'generator': order_list.order_generator,
-        'currentTime': datetime.datetime.now().replace(microsecond=0).isoformat(),
+        'currentTime': datetime.datetime.now().replace(microsecond=0, tzinfo=utc_tzinfo).isoformat(),
         # This must match the order of the values in the row assembling portion
         # above this.
         'columns': STANDARD_ENCODED_COLUMNS,
