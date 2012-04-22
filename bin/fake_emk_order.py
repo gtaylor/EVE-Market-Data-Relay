@@ -17,7 +17,7 @@ data = {
     'region_id': '10000068',
 }
 
-data = {}
+#data = {}
 
 r = requests.post(
     #'http://master.eve-emdr.com/upload/unified/',

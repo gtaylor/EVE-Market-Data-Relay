@@ -79,8 +79,8 @@ def parse_and_error_handle(parser, data, upload_format):
     # the announcers.
     order_pusher.order_upload_queue.put(parsed_message)
 
-    logger.info("Accepted %s upload from %s" % (
-        upload_format, get_remote_address()
+    logger.info("Accepted %s %s upload from %s" % (
+        upload_format, parsed_message.result_type, get_remote_address()
     ))
     # Goofy, but apparently expected by EVE Market Data Uploader.
     return '1'
