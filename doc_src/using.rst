@@ -30,8 +30,6 @@ anything wrong with the examples below, please let us know on the
 `issue tracker`_. The original author of this documentation is only familiar
 with Python.
 
-.. _Unified Uploader Interchange Format: http://dev.eve-central.com/unifieduploader/start
-
 Python
 ^^^^^^
 

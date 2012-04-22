@@ -63,20 +63,31 @@ different end points for different market data formats:
 * EVE Marketeer and EVE Marketdata format: http://master.eve-emdr.com/upload/eve_marketeer/
 * Unified Uploader Interchange Format: http://master.eve-emdr.com/upload/unified/
 
-Almost all traffic will probably be the former, at this point. You'd need
-to simply preserve the POST keys and send them our way.
+Keep an eye out for HTTP 400 (Invalid input) and 500 (Server errors) while
+developing your upload relay. For anything new, we strongly recommend using
+the Unified Uploader format, as that is where the bulk of dev time and attention
+goes to in EMDR.
 
-.. warning:: If you go this route, be careful about also consuming the EMDR
-    feed. If your uploader endpoint is saving the uploads, you may find yourself
-    in an infinite upload loop. You probably want to look at the "Running
-    a Gateway" section.
+**Bonus for Unified Format Uploaders:** EMDR accepts gzipped POST bodies when
+using Unified Uploader Interchange Format. zlib/gzip compress your stream and
+set your ``Content-Encoding: gzip`` header, and help us both save loads of
+bandwidth.
+
+.. warning:: If you choose to re-POST uploads, be careful about also consuming
+    the EMDR feed. If your uploader endpoint is saving the uploads, you may
+    find yourself in an infinite upload loop. You probably want to look at the
+    "Running a Gateway" section.
 
 Running a Gateway
 ^^^^^^^^^^^^^^^^^
 
 Alternatively, you can post an issue on the `mailing list`_ or
 `issue tracker`_ asking about running an HTTP gateway. The gateway would accept
-uploads at your site's normal upload location, and would feed directly to EMDR.
-Your application would then consume the EMDR feed.
+uploads at your site's normal upload location, and would feed to the EMDR
+network's Announcers. Your application would then consume the EMDR feed from
+EMDR's Announcers.
 
-This is probably the safest and easiest of the options.
+While there is slightly more bandwidth usage, **this is probably the safest and
+easiest of the options**. The EMDR stream is compressed, so even then, the
+uptick in bandwidth is pretty small (just the traffic from your Gateway to
+2-3 EMDR root Announcers, then consuming from the same Announcer).

@@ -2,6 +2,8 @@
 .. _issue tracker: https://github.com/gtaylor/EVE-Market-Data-Relay/issues
 .. _mailing list: https://groups.google.com/forum/#!forum/eve-emdr
 
+.. _Unified Uploader Interchange Format: http://dev.eve-central.com/unifieduploader/start
+
 .. _Python: http://python.org
 .. _nose: http://somethingaboutorange.com/mrl/projects/nose/
 

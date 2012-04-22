@@ -48,3 +48,21 @@ data can be a valuable means of cross-checking incoming data, in this case.
 
 Others only store the current price for items, using the generatedAt values
 to determine whether the message contains newer data than they have.
+
+Don't be too trusting
+---------------------
+
+The reality of player-upload-driven market data sites is that we are at the
+mercy of said players as far as the data goes. The vast majority of uploaders
+are going to send good data. However, there is a minority that does not play
+so nicely.
+
+In many cases, multiple players will upload the details for the same orders
+multiple times. This can be used to your advantage, in that you can cross-check
+things as they come in. If one message says Large Shield Extender I is going
+for 5 billion isk in Jita, but another three are saying much lower than that,
+your outlier is probably fraudulent and is best ignored.
+
+You also have the option of cross-referencing the APIs of other sites who
+do not consume EMDR data. While this can defeat some of the purpose of using
+EMDR, the option is there to complement the feed.

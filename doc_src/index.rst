@@ -5,15 +5,16 @@
 EVE Market Data Relay (EMDR)
 ============================
 
-EVE Market Data Relay is  a super-scalable, super-available way to accept a large
+EVE Market Data Relay is  a super-scalable, super-stable way to accept a large
 amount of user-submitted market data (via uploaders), and re-broadcast said
 data in near real-time to a large number of subscribers.
 
-The end result is that those writing market-data driven applications could
-simply subscribe to a "firehose" of market data, and get going, without having
-to hassle with writing uploaders or data submission APIs. Users wouldn't need
-to be asked to install yet another upload, or twiddle the settings on their
-existing one. More about this can be seen in :doc:`overview`.
+The end result is that those writing market-data driven applications can
+simply subscribe to a "firehose" of market data, without having
+to hassle with writing uploaders, data submission APIs, or scraping data from
+other market sites.
+
+For a more complete run-down, see :doc:`overview`.
 
 Learning more
 -------------
@@ -27,7 +28,9 @@ These links may also be useful to you.
 * Source repository: https://github.com/gtaylor/EVE-Market-Data-Relay
 * Issue tracker: https://github.com/gtaylor/EVE-Market-Data-Relay/issues
 * Mailing list: https://groups.google.com/forum/#!forum/eve-emdr
+* Thread on EVE Gate: https://forums.eveonline.com/default.aspx?g=posts&t=95454
 * Real-time data monitoring map: http://map.eve-emdr.com/
+* @gctaylor on Twitter: https://twitter.com/#!/gctaylor
 
 General Topics
 --------------
@@ -51,6 +54,7 @@ EMDR's data feed.
 .. toctree::
    :maxdepth: 3
 
+   data_sources
    access
    using
    design_considerations
