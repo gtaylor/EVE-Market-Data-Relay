@@ -41,7 +41,7 @@ def get_decompressed_message():
     """
     if request.headers.get('Content-Encoding', '') == 'gzip':
         # Negative wbits supresses adler32 checksumming.
-        return zlib.decompress(request.body.read(), wbits=-15)
+        return zlib.decompress(request.body.read(), -15)
     else:
         return request.body.read()
 
