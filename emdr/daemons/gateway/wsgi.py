@@ -40,7 +40,8 @@ def get_decompressed_message():
     :returns: The de-compressed request body.
     """
     if request.headers.get('Content-Encoding', '') == 'gzip':
-        return zlib.decompress(request.body.read())
+        # Negative wbits supresses adler32 checksumming.
+        return zlib.decompress(request.body.read(), wbits=-15)
     else:
         return request.body.read()
 
