@@ -58,11 +58,15 @@ def parse_message(message_json):
         ))
         return
 
-    logger.info('%s (%s) from %s processed.' % (
-        message.__class__.__name__,
-        message_format,
-        remote_ip
-    ))
+    if message:
+        logger.info('%s (%s) from %s processed.' % (
+            message.__class__.__name__,
+            message_format,
+            remote_ip
+        ))
+    else:
+        # Error would have been logged elsewhere.
+        return
 
     return message
 

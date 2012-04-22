@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 import gevent
 from gevent import monkey; gevent.monkey.patch_all()
 #noinspection PyUnresolvedReferences
-from bottle import run, request, post, default_app
+from bottle import run, request, response, post, default_app
 
 from emdr.daemons.gateway import order_pusher
 
@@ -81,10 +81,18 @@ def upload_eve_marketeer():
         }
     }
 
+    # Some very basic sanity checking.
+    for key, value in message_dict['payload'].items():
+        if not value:
+            response.status = 400
+            logger.error('In EMK POST from %s, missing key: %s' % (
+                get_remote_address(), key))
+            return 'No value specified for key: %s' % key
+
     # The message dict gets shoved into a gevent queue, where it awaits sending
     # to the processors via the src.daemons.gateway.order_pusher module.
     order_pusher.order_upload_queue.put(message_dict)
-    logger.info("Accepted upload from %s" % get_remote_address())
+    logger.info("Accepted EMK upload from %s" % get_remote_address())
 
     # Goofy, but apparently expected by EVE Market Data Uploader.
     return '1'
@@ -108,10 +116,10 @@ def upload_unified():
     # The message dict gets shoved into a gevent queue, where it awaits sending
     # to the processors via the src.daemons.gateway.order_pusher module.
     order_pusher.order_upload_queue.put(message_dict)
-    logger.info("Accepted upload from %s" % get_remote_address())
+    logger.info("Accepted Unified upload from %s" % get_remote_address())
 
     # Goofy, but apparently expected by EVE Market Data Uploader.
-    return '1'
+    return 'OK'
 
 @post('/upload/')
 def upload():
