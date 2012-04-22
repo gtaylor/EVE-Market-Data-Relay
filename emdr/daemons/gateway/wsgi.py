@@ -71,7 +71,7 @@ def parse_and_error_handle(parser, data, upload_format):
         # Something bad happened. We know this will return at least a
         # semi-useful error message, so do so.
         response.status = 400
-        logger.error(exc.message)
+        logger.error("Error to %s: %s" % (get_remote_address(), exc.message))
         return exc.message
 
     # Stuffs the parsed MarketOrderList or MarketHistoryList into a gevent
