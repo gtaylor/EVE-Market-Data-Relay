@@ -29,10 +29,10 @@ def parse_from_payload(payload):
         'name': payload['developer_key'],
         'version': payload['version']
     }
-    upload_keys = {
+    upload_keys = [{
         'name': 'EMDR',
         'key': payload['upload_key']
-    }
+    }]
 
     # Orders are lumped into this list sub-class, which can be serialized
     # to JSON.
