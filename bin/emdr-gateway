@@ -18,6 +18,9 @@ parser.add_argument(
 parser.add_argument(
     '--loglevel', action='store', dest='loglevel',
     help="Overrides default logger level (DEBUG, INFO, WARNING, ERROR) (default: %s)" % default_settings.LOGGING['loggers']['']['level'])
+parser.add_argument(
+    '--webport', action='store', dest='web_port',
+    help="Overrides default webserver port (default: %s)" % default_settings.GATEWAY_WEB_PORT)
 
 parsed = parser.parse_args()
 
@@ -29,6 +32,10 @@ if parsed.senders:
 
 if parsed.loglevel:
     set_logger_level(parsed.loglevel)
+    print("* Logging level set to: %s" % parsed.loglevel)
+
+if parsed.web_port:
+    default_settings.GATEWAY_WEB_PORT = parsed.web_port
 
 #noinspection PyUnresolvedReferences
 from emdr.daemons.gateway import wsgi
@@ -36,4 +43,12 @@ from emdr.daemons.gateway import wsgi
 print_cmd_footer()
 
 # Fire up a bottle+gevent process.
-run(host='localhost', server='gevent')
+run(
+    host='localhost',
+    server='gevent',
+    port=default_settings.GATEWAY_WEB_PORT,
+    # Do gevent's standard monkey patching.
+    monkey=True,
+    # Use libevent HTTP server.
+    fast=True
+)

@@ -16,7 +16,6 @@ dictConfig(settings.LOGGING)
 logger = logging.getLogger(__name__)
 
 import gevent
-from gevent import monkey; gevent.monkey.patch_all()
 #noinspection PyUnresolvedReferences
 from bottle import run, request, response, post, default_app
 
