@@ -2,7 +2,7 @@
 """
 A fake order upload script, used to manually test the whole stack.
 """
-import simplejson
+import ujson
 import requests
 import zlib
 
@@ -41,8 +41,8 @@ data = """
   ]
 }
 """
-data = simplejson.loads(data)
-data = zlib.compress(simplejson.dumps(data))#[2:-4]
+data = ujson.loads(data)
+data = zlib.compress(ujson.dumps(data))#[2:-4]
 headers = {
     'Content-Encoding': 'gzip',
 }

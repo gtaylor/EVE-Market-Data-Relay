@@ -7,12 +7,13 @@ import emdr
 
 required = [
     'bottle',
-    'simplejson',
-    'pyzmq',
+    'ujson',
     'gevent',
-    'gevent-zeromq',
+    'gevent_zeromq',
     'requests',
     'python-dateutil<2.0',
+    'pyzmq',
+    'pytz',
 ]
 
 packages = [

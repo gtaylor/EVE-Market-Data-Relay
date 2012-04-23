@@ -7,7 +7,7 @@ import argparse
 import datetime
 import gevent
 import requests
-import simplejson
+import ujson
 from gevent.queue import Queue
 from gevent import monkey; gevent.monkey.patch_all()
 #noinspection PyUnresolvedReferences
@@ -58,7 +58,7 @@ def populate_queue(queue_type):
         params=payload,
         config=REQUESTS_CONFIG,
     )
-    response_dict = simplejson.loads(response.text)
+    response_dict = ujson.loads(response.text)
 
     rowset = response_dict['emd']['result']['rowset']
 
@@ -150,7 +150,7 @@ def query_item_orders(row):
         params=payload,
         config=REQUESTS_CONFIG,
     )
-    response_dict = simplejson.loads(response.text)
+    response_dict = ujson.loads(response.text)
 
     for order_row in response_dict['emd']['result']:
         order_row = order_row['row']
@@ -198,7 +198,7 @@ def query_item_history(row):
         params=payload,
         config=REQUESTS_CONFIG,
     )
-    response_dict = simplejson.loads(response.text)
+    response_dict = ujson.loads(response.text)
 
     for hist_row in response_dict['emd']['result']:
         hist_row = hist_row['row']

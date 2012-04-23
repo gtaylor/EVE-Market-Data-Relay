@@ -1,5 +1,5 @@
 bottle
-simplejson
+ujson
 gevent
 gevent_zeromq
 nose

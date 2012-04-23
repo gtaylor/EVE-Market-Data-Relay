@@ -6,7 +6,7 @@ Currently hard-wired to SUB.
 import argparse
 import zlib
 import zmq
-import simplejson
+import ujson
 from pprint import pprint
 
 parser = argparse.ArgumentParser(
@@ -33,7 +33,7 @@ while True:
     # Receive raw market JSON strings.
     market_json = zlib.decompress(subscriber.recv())
     # Un-serialize the JSON data to a Python dict.
-    market_data = simplejson.loads(market_json)
+    market_data = ujson.loads(market_json)
     # Dump the market data to stdout. Or, you know, do more fun
     # things here.
     pprint(market_data)

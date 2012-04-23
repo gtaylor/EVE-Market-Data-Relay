@@ -2,7 +2,7 @@
 """
 A fake history upload script, used to manually test the whole stack.
 """
-import simplejson
+import ujson
 import requests
 
 data = """
@@ -29,8 +29,8 @@ data = """
   ]
 }
 """
-data = simplejson.loads(data)
-data = simplejson.dumps(data)
+data = ujson.loads(data)
+data = ujson.dumps(data)
 
 r = requests.post(
     'http://localhost:8080/upload/unified/',

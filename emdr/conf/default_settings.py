@@ -6,8 +6,6 @@ This module contains the default settings that stand unless overridden.
 ## Gateway Daemon Settings
 #
 
-# Specifies the number of greenlets to use for sending data to the workers.
-NUM_GATEWAY_SENDER_WORKERS = 100
 # A list of transports for the gateway to accept connections from. The default
 # just allows local socket connections, though you could easily allow local
 # UNIX sockets PLUS TCP sockets.

@@ -3,7 +3,7 @@ Parser for the Unified uploader format market history.
 """
 import logging
 import datetime
-import simplejson
+import ujson
 from emdr.core.market_data import MarketHistoryList, MarketHistoryEntry
 from emdr.core.serialization.common_utils import parse_datetime
 from emdr.core.serialization.unified.unified_utils import _columns_to_kwargs, gen_iso_datetime_str
@@ -109,4 +109,4 @@ def encode_to_json(history_list):
         'rowsets': rowsets,
     }
 
-    return simplejson.dumps(json_dict)
+    return ujson.dumps(json_dict)

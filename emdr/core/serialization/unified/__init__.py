@@ -1,5 +1,4 @@
-import simplejson
-from simplejson.decoder import JSONDecodeError
+import ujson
 from emdr.core.market_data import MarketHistoryList
 from emdr.core.market_data import MarketOrderList
 from emdr.core.serialization.unified import history, orders
@@ -15,9 +14,9 @@ def parse_from_json(json_str):
     :raises: MalformedUploadError when invalid JSON is passed in.
     """
     try:
-        message_dict = simplejson.loads(json_str)
-    except JSONDecodeError as exc:
-        raise MalformedUploadError(exc.message)
+        message_dict = ujson.loads(json_str)
+    except ValueError:
+        raise MalformedUploadError("Mal-formed JSON input.")
 
     upload_type = message_dict['resultType']
     if upload_type == 'orders':
