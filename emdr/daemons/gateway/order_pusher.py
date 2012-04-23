@@ -1,20 +1,14 @@
 """
-This module contains the gevent-based Queue and worker that gradually
-pushes parsed market data (in Unified Uploader Interchange format)
-out to the Announcers over PUB, without blocking the gateway WSGI app.
+Contains the necessary ZeroMQ socket and a helper function to publish
+market data to the Announcer daemons.
 """
 import logging
 import zlib
-import gevent
-from gevent.queue import Queue
 from gevent_zeromq import zmq
 from emdr.core.serialization import unified
 from emdr.conf import default_settings as settings
 
 logger = logging.getLogger(__name__)
-
-# This is the global order queue. The workers all refer to this for the goods.
-order_upload_queue = Queue()
 
 # This socket is used to push market data out to the Announcers over ZeroMQ.
 context = zmq.Context()
@@ -27,29 +21,19 @@ for binding in settings.GATEWAY_SENDER_BINDINGS:
     print("   - %s" % binding)
     sender.connect(binding)
 
-def worker():
+def push_message(parsed_message):
     """
-    Worker process for the market order pusher. Pushes orders to SQS while
-    leaving the WSGI app mostly "un-blocked".
+    Spawned as a greenlet to push parsed messages through ZeroMQ.
     """
-    while True:
-        # This will block until something arrives in the queue.
-        parsed_message = order_upload_queue.get()
+    try:
+        # This will be the representation to send to the Announcers.
+        json_str = unified.encode_to_json(parsed_message)
+    except TypeError:
+        logger.error('Unable to serialize a parsed message.')
+        return
 
-        try:
-            # This will be the representation to send to the processors.
-            json_str = unified.encode_to_json(parsed_message)
-        except TypeError:
-            logger.error('Unable to serialize a parsed message.')
-            continue
+    # Push a zlib compressed JSON representation of the message to
+    # announcers.
+    compressed_msg = zlib.compress(json_str)
+    sender.send(compressed_msg)
 
-        # Push a zlib compressed JSON representation of the message to
-        # announcers.
-        compressed_msg = zlib.compress(json_str)
-        sender.send(compressed_msg)
-
-# Fire up gevent workers that send raw market order data to processor processes
-# in the background without blocking the WSGI app.
-print("* Spawning %d PUSH greenlet workers." % settings.NUM_GATEWAY_SENDER_WORKERS)
-for worker_num in range(settings.NUM_GATEWAY_SENDER_WORKERS):
-    gevent.spawn(worker)

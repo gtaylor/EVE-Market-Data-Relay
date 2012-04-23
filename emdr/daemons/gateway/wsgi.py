@@ -74,10 +74,9 @@ def parse_and_error_handle(parser, data, upload_format):
         logger.error("Error to %s: %s" % (get_remote_address(), exc.message))
         return exc.message
 
-    # Stuffs the parsed MarketOrderList or MarketHistoryList into a gevent
-    # queue for the workers to pick up, JSON'ify, compress, and send to
-    # the announcers.
-    order_pusher.order_upload_queue.put(parsed_message)
+    # Sends the parsed MarketOrderList or MarketHistoryList to the Announcers
+    # as compresesd JSON.
+    gevent.spawn(order_pusher.push_message, parsed_message)
 
     logger.info("Accepted %s %s upload from %s" % (
         upload_format, parsed_message.result_type, get_remote_address()
