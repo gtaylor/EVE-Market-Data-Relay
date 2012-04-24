@@ -36,8 +36,7 @@ Any client that supports either Unified Uploader Interchange format, or
 EVE Marketeer/EVE Market Data format will also work just fine. The following
 clients fall under this designation:
 
-* Contribtastic
-* EVE Marketeer Uploader
+* Contribtastic for Mac
 
 Simply point your client at: http://upload.eve-emdr.com/upload/
 
