@@ -97,7 +97,7 @@ class EVECentralFeedSMTPServer(smtpd.SMTPServer):
             # Poor man's parsing of the CSV email. The only ones we're
             # interested with have 14 columns, and the first character isn't
             # 'p', which is the case for header row.
-            if line.count(',') == 14 and line[0] != 'p':
+            if line.count(',') >= 14 and line[0] != 'p':
                 current_order_list.add_order(self.process_line(line))
                 counter += 1
 
