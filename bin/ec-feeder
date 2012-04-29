@@ -47,7 +47,7 @@ class EVECentralFeedSMTPServer(smtpd.SMTPServer):
     data emails.
     """
     def process_message(self, peer, mailfrom, rcpttos, data):
-        #print 'Receiving message from:', peer
+        print 'Receiving message from:', peer
         #print 'Message addressed from:', mailfrom
         #print 'Message addressed to  :', rcpttos
         #print 'Message length        :', len(data)
@@ -119,9 +119,23 @@ class EVECentralFeedSMTPServer(smtpd.SMTPServer):
         :returns: A correctly formatted MarketOrder instance, that may be
             added to a MarketOrderList for sending.
         """
-        price, volume_remaining, type_id, order_range, order_id, volume_entered,\
-        minimum_volume, is_bid, order_issue_date, order_duration, station_id,\
-        region_id, solar_system_id, jumps, source = line.split(',')
+        columns = line.split(',')
+
+        price = columns[0]
+        volume_remaining = columns[1]
+        type_id = columns[2]
+        order_range = columns[3]
+        order_id = columns[4]
+        volume_entered = columns[5]
+        minimum_volume = columns[6]
+        is_bid = columns[7]
+        order_issue_date = columns[8]
+        order_duration = columns[9]
+        station_id = columns[10]
+        region_id = columns[11]
+        solar_system_id = columns[12]
+        jumps = columns[13]
+        source = columns[14]
 
         # This always appears to be a float for some reason, but needs to
         # be an int.
