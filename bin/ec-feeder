@@ -98,7 +98,15 @@ class EVECentralFeedSMTPServer(smtpd.SMTPServer):
             # interested with have 14 columns, and the first character isn't
             # 'p', which is the case for header row.
             if line.count(',') >= 14 and line[0] != 'p':
-                current_order_list.add_order(self.process_line(line))
+                try:
+                    processed_line = self.process_line(line)
+                except Exception as exc:
+                    # This is horribly naive, but I just don't care enough to
+                    # get more pretty. We can't fail noisily or we'll get
+                    # banned by mailman, though.
+                    print("ERROR: %s" % exc.message)
+                    continue
+                current_order_list.add_order(processed_line)
                 counter += 1
 
                 if counter > parsed.chunk_size:
@@ -108,6 +116,10 @@ class EVECentralFeedSMTPServer(smtpd.SMTPServer):
                     # Start over with an empty order list to re-fill.
                     current_order_list = self._get_empty_market_order_list()
                     counter = 0
+
+        if counter > 0:
+            # Deal with any leftovers that were left over.
+            self.send_order_list_to_emdr(current_order_list)
 
     def process_line(self, line):
         """
