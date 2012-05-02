@@ -20,13 +20,16 @@ parser.add_argument(
 parser.add_argument(
     '--loglevel', action='store', dest='loglevel',
     help="Overrides default logger level (DEBUG, INFO, WARNING, ERROR) (default: %s)" % default_settings.LOGGING['loggers']['']['level'])
+parser.add_argument(
+    '--workers', action='store', dest='workers',
+    help="Overrides default worker count (default: %s)" % default_settings.GATEWAY_ZMQ_NUM_WORKERS)
 
 parsed = parser.parse_args()
 
 print_cmd_header('emdr-gateway')
 
 if parsed.listeners:
-    print("* Overriding default gateway receiver bindings.")
+    print("* Overriding default gateway receiver bindings: %s" % parsed.listeners)
     default_settings.GATEWAY_ZMQ_RECEIVER_BINDINGS = parsed.listeners
 
 if parsed.senders:
@@ -36,6 +39,12 @@ if parsed.senders:
 if parsed.loglevel:
     set_logger_level(parsed.loglevel)
     print("* Logging level set to: %s" % parsed.loglevel)
+
+if parsed.workers:
+    default_settings.GATEWAY_ZMQ_NUM_WORKERS = int(parsed.workers)
+    print("* Worker count set to: %s" % parsed.workers)
+
+print_cmd_footer()
 
 #noinspection PyUnresolvedReferences
 from emdr.daemons.gateway_zmq import main

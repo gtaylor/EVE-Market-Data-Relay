@@ -32,6 +32,7 @@ packages = [
 scripts = [
     'bin/emdr-announcer',
     'bin/emdr-gateway',
+    'bin/emdr-gateway-zmq',
     'bin/emdr-relay',
     'bin/emdr-snooper',
     'bin/ec-feeder',
