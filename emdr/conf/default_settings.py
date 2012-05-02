@@ -8,22 +8,34 @@ This module contains the default settings that stand unless overridden.
 
 # Default port to listen for HTTP uploads on.
 GATEWAY_WEB_PORT = 8080
-# A list of transports for the gateway to accept connections from. The default
-# just allows local socket connections, though you could easily allow local
-# UNIX sockets PLUS TCP sockets.
-# See: http://api.zeromq.org/2-1:zmq-bind
-GATEWAY_SENDER_BINDINGS = ["ipc:///tmp/gateway-sender.sock"]
+# PUB - Connect
+GATEWAY_SENDER_BINDINGS = ["ipc:///tmp/announcer-receiver.sock"]
+
+#
+## ZeroMQ-based Gateway Daemon Settings
+#
+# PULL - Bind
+GATEWAY_ZMQ_RECEIVER_BINDINGS = ["ipc:///tmp/gateway-zmq-receiver.sock"]
+# By default, use the same as the HTTP gateway, for easy testing.
+# PUB - Connect
+GATEWAY_ZMQ_SENDER_BINDINGS = ["ipc:///tmp/announcer-receiver.sock"]
+# The number of worker greenlets to listen for data on.
+GATEWAY_ZMQ_NUM_WORKERS = 5
 
 #
 ## Announcer Daemon Settings
 #
-ANNOUNCER_RECEIVER_BINDINGS = ["ipc:///tmp/gateway-sender.sock"]
+# SUB - Bind
+ANNOUNCER_RECEIVER_BINDINGS = ["ipc:///tmp/announcer-receiver.sock"]
+# PUB - Bind
 ANNOUNCER_SENDER_BINDINGS = ["ipc:///tmp/announcer-sender.sock"]
 
 #
 ## Relay Daemon Settings
 #
+# SUB - Connect
 RELAY_RECEIVER_BINDINGS = ["ipc:///tmp/announcer-sender.sock"]
+# PUB - Bind
 RELAY_SENDER_BINDINGS = ["ipc:///tmp/relay-sender.sock"]
 
 

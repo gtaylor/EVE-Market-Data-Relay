@@ -9,7 +9,6 @@ required = [
     'bottle',
     'ujson',
     'gevent',
-    'gevent_zeromq',
     'requests',
     'python-dateutil<2.0',
     'pyzmq',

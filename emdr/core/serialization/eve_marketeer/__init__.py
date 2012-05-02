@@ -20,10 +20,16 @@ def parse_from_payload(payload):
                 'EMK message missing key: %s' % key)
 
     upload_type = payload['upload_type']
-    if upload_type == 'orders':
-        return orders.parse_from_payload(payload)
-    elif upload_type == 'history':
-        return history.parse_from_payload(payload)
-    else:
-        raise MalformedUploadError(
-            'EMK message has unknown upload_type: %s' % upload_type)
+
+    try:
+        if upload_type == 'orders':
+            return orders.parse_from_payload(payload)
+        elif upload_type == 'history':
+            return history.parse_from_payload(payload)
+        else:
+            raise MalformedUploadError(
+                'EMK message has unknown upload_type: %s' % upload_type)
+    except TypeError as exc:
+        # MarketOrder and HistoryEntry both raise TypeError exceptions if
+        # invalid input is encountered.
+        raise MalformedUploadError(exc.message)

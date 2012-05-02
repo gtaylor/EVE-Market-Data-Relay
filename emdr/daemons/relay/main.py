@@ -11,7 +11,7 @@ logger = logging.getLogger('src.daemons.relay.main')
 
 import gevent
 from gevent import monkey; gevent.monkey.patch_all()
-from gevent_zeromq import zmq
+import zmq.green as zmq
 
 def start():
     """

@@ -10,7 +10,7 @@ import simplejson
 import gevent
 from gevent.pool import Pool
 from gevent import monkey; gevent.monkey.patch_all()
-from gevent_zeromq import zmq
+import zmq.green as zmq
 
 # The maximum number of greenlet workers in the greenlet pool. This is not one
 # per processor, a decent machine can support hundreds or thousands of greenlets.

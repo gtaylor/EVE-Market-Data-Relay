@@ -19,13 +19,19 @@ def parse_from_json(json_str):
         raise MalformedUploadError("Mal-formed JSON input.")
 
     upload_type = message_dict['resultType']
-    if upload_type == 'orders':
-        return orders.parse_from_dict(message_dict)
-    elif upload_type == 'history':
-        return history.parse_from_dict(message_dict)
-    else:
-        raise MalformedUploadError(
-            'Unified message has unknown upload_type: %s' % upload_type)
+
+    try:
+        if upload_type == 'orders':
+            return orders.parse_from_dict(message_dict)
+        elif upload_type == 'history':
+            return history.parse_from_dict(message_dict)
+        else:
+            raise MalformedUploadError(
+                'Unified message has unknown upload_type: %s' % upload_type)
+    except TypeError as exc:
+        # MarketOrder and HistoryEntry both raise TypeError exceptions if
+        # invalid input is encountered.
+        raise MalformedUploadError(exc.message)
 
 def encode_to_json(order_or_history):
     """

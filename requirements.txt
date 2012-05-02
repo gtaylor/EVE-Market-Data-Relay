@@ -1,7 +1,6 @@
 bottle
 ujson
 gevent
-gevent_zeromq
 nose
 requests
 python-dateutil<2.0

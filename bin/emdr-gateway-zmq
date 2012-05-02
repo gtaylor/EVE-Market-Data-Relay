@@ -1,0 +1,42 @@
+#!/usr/bin/env python
+"""
+ZeroMQ gateway application.
+"""
+import argparse
+from emdr.conf import default_settings
+from emdr.core.command_utils import set_logger_level, print_cmd_header, print_cmd_footer
+
+parser = argparse.ArgumentParser(
+    description="This gateway accepts market data over ZeroMQ.",
+)
+parser.add_argument(
+    '--listener', action='append', dest='listeners',
+    help="Overrides default gateway receiver bindings. This determines how "\
+         "the outside sources connect to this gateway to PUSH messages.")
+parser.add_argument(
+    '--sender', action='append', dest='senders',
+    help="Overrides default gateway sender bindings. This determines where " \
+         "the gateway sends its messages, typically an Announcer.")
+parser.add_argument(
+    '--loglevel', action='store', dest='loglevel',
+    help="Overrides default logger level (DEBUG, INFO, WARNING, ERROR) (default: %s)" % default_settings.LOGGING['loggers']['']['level'])
+
+parsed = parser.parse_args()
+
+print_cmd_header('emdr-gateway')
+
+if parsed.listeners:
+    print("* Overriding default gateway receiver bindings.")
+    default_settings.GATEWAY_ZMQ_RECEIVER_BINDINGS = parsed.listeners
+
+if parsed.senders:
+    default_settings.GATEWAY_ZMQ_SENDER_BINDINGS = parsed.senders
+    print("* Overriding default gateway sender bindings: %s" % parsed.senders)
+
+if parsed.loglevel:
+    set_logger_level(parsed.loglevel)
+    print("* Logging level set to: %s" % parsed.loglevel)
+
+#noinspection PyUnresolvedReferences
+from emdr.daemons.gateway_zmq import main
+main.start()

@@ -12,7 +12,7 @@ logger = logging.getLogger('src.daemons.announcer.main')
 
 import gevent
 from gevent import monkey; gevent.monkey.patch_all()
-from gevent_zeromq import zmq
+import zmq.green as zmq
 
 def start():
     """
