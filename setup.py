@@ -14,6 +14,7 @@ required = [
     'python-dateutil<2.0',
     'pyzmq',
     'pytz',
+    'cython',
 ]
 
 packages = [
