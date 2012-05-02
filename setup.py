@@ -26,6 +26,7 @@ packages = [
     'emdr.daemons',
     'emdr.daemons.announcer',
     'emdr.daemons.gateway',
+    'emdr.daemons.gateway_zmq',
     'emdr.daemons.relay',
 ]
 
