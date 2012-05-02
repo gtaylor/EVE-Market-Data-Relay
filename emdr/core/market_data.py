@@ -24,10 +24,16 @@ class MarketOrderList(object):
         else:
             self.upload_keys = upload_keys
 
+            if not isinstance(self.upload_keys, list):
+                raise TypeError('upload_keys must be a list.')
+
         if not order_generator:
             self.order_generator = {'name': 'Unknown', 'version': 'Unknown'}
         else:
             self.order_generator = order_generator
+
+            if not isinstance(order_generator, dict):
+                raise TypeError('order_generator must be a dict.')
 
     def add_order(self, order):
         """
@@ -175,10 +181,16 @@ class MarketHistoryList(object):
         else:
             self.upload_keys = upload_keys
 
+            if not isinstance(self.upload_keys, list):
+                raise TypeError('upload_keys must be a list.')
+
         if not history_generator:
             self.history_generator = {'name': 'Unknown', 'version': 'Unknown'}
         else:
             self.history_generator = history_generator
+
+            if not isinstance(history_generator, dict):
+                raise TypeError('history_generator must be a dict.')
 
     def __repr__(self):
         """
