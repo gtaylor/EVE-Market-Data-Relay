@@ -2,8 +2,9 @@
 """
 ZeroMQ gateway application.
 """
+from logging.config import dictConfig
 import argparse
-from emdr.conf import default_settings
+from emdr.conf import default_settings as settings
 from emdr.core.command_utils import set_logger_level, print_cmd_header, print_cmd_footer
 
 parser = argparse.ArgumentParser(
@@ -19,33 +20,44 @@ parser.add_argument(
          "the gateway sends its messages, typically an Announcer.")
 parser.add_argument(
     '--loglevel', action='store', dest='loglevel',
-    help="Overrides default logger level (DEBUG, INFO, WARNING, ERROR) (default: %s)" % default_settings.LOGGING['loggers']['']['level'])
+    help="Overrides default logger level (DEBUG, INFO, WARNING, ERROR) "
+         "(default: %s)" % settings.LOGGING['loggers']['']['level'])
 parser.add_argument(
     '--workers', action='store', dest='workers',
-    help="Overrides default worker count (default: %s)" % default_settings.GATEWAY_ZMQ_NUM_WORKERS)
+    help="Overrides default worker count "
+         "(default: %s)" % settings.GATEWAY_ZMQ_NUM_WORKERS)
 
 parsed = parser.parse_args()
 
-print_cmd_header('emdr-gateway')
+print_cmd_header('emdr-gateway-zmq')
 
 if parsed.listeners:
-    print("* Overriding default gateway receiver bindings: %s" % parsed.listeners)
-    default_settings.GATEWAY_ZMQ_RECEIVER_BINDINGS = parsed.listeners
-
+    settings.GATEWAY_ZMQ_RECEIVER_BINDINGS = parsed.listeners
 if parsed.senders:
-    default_settings.GATEWAY_ZMQ_SENDER_BINDINGS = parsed.senders
-    print("* Overriding default gateway sender bindings: %s" % parsed.senders)
-
-if parsed.loglevel:
-    set_logger_level(parsed.loglevel)
-    print("* Logging level set to: %s" % parsed.loglevel)
-
+    settings.GATEWAY_ZMQ_SENDER_BINDINGS = parsed.senders
 if parsed.workers:
-    default_settings.GATEWAY_ZMQ_NUM_WORKERS = int(parsed.workers)
-    print("* Worker count set to: %s" % parsed.workers)
+    settings.GATEWAY_ZMQ_NUM_WORKERS = int(parsed.workers)
+
+set_logger_level(parsed.loglevel)
+print("* Logging level: %s" % parsed.loglevel)
+
+print("* Worker count: %s" % settings.GATEWAY_ZMQ_NUM_WORKERS)
+
+print("* Accepting PUB connections on:")
+for binding in settings.GATEWAY_ZMQ_RECEIVER_BINDINGS:
+    print("  - %s" % binding)
+
+print("* Sending market data over PUB to Announcers:")
+for binding in settings.GATEWAY_ZMQ_SENDER_BINDINGS:
+    print("  - %s" % binding)
 
 print_cmd_footer()
 
-#noinspection PyUnresolvedReferences
+dictConfig(settings.LOGGING)
+
 from emdr.daemons.gateway_zmq import main
-main.start()
+# Get the ZMQ gateway running.
+try:
+    main.run()
+except KeyboardInterrupt:
+    print('Gateway stopped by keyboard interrupt.')

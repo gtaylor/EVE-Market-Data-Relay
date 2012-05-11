@@ -1,37 +1,31 @@
 """
 This gateway accepts compressed unified uploader format messages over ZMQ.
 """
-# Logging has to be configured first before we do anything.
 import logging
 import zlib
-from logging.config import dictConfig
-from emdr.conf import default_settings as settings
-dictConfig(settings.LOGGING)
-logger = logging.getLogger('src.daemons.gateway_zmq.main')
+logger = logging.getLogger(__name__)
 
 import ujson
 import gevent
-from gevent import monkey; gevent.monkey.patch_all()
 import zmq.green as zmq
 
+from emdr.conf import default_settings as settings
 from emdr.daemons.gateway.exceptions import MalformedUploadError
 from emdr.core.serialization.exceptions import InvalidMarketOrderDataError
 from emdr.core.serialization import unified
 
-def start():
+def run():
     """
-    Fires up the announcer process.
+    Fires up the gateway-zmq process.
     """
     context = zmq.Context()
 
     receiver = context.socket(zmq.REP)
     for binding in settings.GATEWAY_ZMQ_RECEIVER_BINDINGS:
-        logger.info("Accepting connections from %s" % binding)
         receiver.bind(binding)
 
     sender = context.socket(zmq.PUB)
     for binding in settings.GATEWAY_ZMQ_SENDER_BINDINGS:
-        logger.info("Sending data to %s" % binding)
         sender.connect(binding)
 
     def send_reply(success, message=None):
@@ -47,27 +41,45 @@ def start():
         compressed_response = zlib.compress(ujson.dumps(response_dict))
         receiver.send(compressed_response)
 
+    def get_decompressed_message(message):
+        """
+        De-compresses the incoming message using zlib. Attempts several
+        different decompression methods, ending with the most permissive one.
+
+        :rtype: str
+        :returns: The de-compressed message JSON string.
+        :raises: zlib.error if decompression fails for all of our attempts.
+        """
+        try:
+            return zlib.decompress(message)
+        except zlib.error:
+            # The default decompression method failed, let's fall through to
+            # another approach.
+            pass
+
+        # If this succeeds, great, return. If not, let the zlib.error get
+        # passed up to the invoking worker.
+        return zlib.decompress(message, -15)
+
     def worker():
         """
         This is the worker function that re-sends the incoming messages out
         to any subscribers.
-
-        :param str message: A JSON string to re-broadcast.
         """
         while True:
             message = receiver.recv()
 
             try:
-                decompressed = zlib.decompress(message)
+                decompressed = get_decompressed_message(message)
             except zlib.error as exc:
                 send_reply(False, message=exc.message)
-                return
+                continue
 
             try:
                 parsed_message = unified.parse_from_json(decompressed)
             except (InvalidMarketOrderDataError, MalformedUploadError) as exc:
                 send_reply(False, message=exc.message)
-                return
+                continue
 
             # All is well.
             send_reply(True)
@@ -79,11 +91,11 @@ def start():
             # Relay to the Announcers.
             sender.send(compressed_msg)
 
-    logger.info("Gateway (ZMQ) is now listening for order data.")
-    logger.info("Spawning %d relay workers." % settings.GATEWAY_ZMQ_NUM_WORKERS)
+            logger.info("Accepted Unified %s upload from ?" % (
+                parsed_message.result_type,
+            ))
 
     for worker_num in range(settings.GATEWAY_ZMQ_NUM_WORKERS):
         gevent.spawn(worker())
 
-if __name__ == '__main__':
-    start()
+    logger.info("Gateway (ZMQ) is now listening for order data.")
