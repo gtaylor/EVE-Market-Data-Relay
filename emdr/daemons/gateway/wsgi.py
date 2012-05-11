@@ -47,6 +47,7 @@ def get_decompressed_message():
         # Straight POST body.
         message_body = request.body.read()
 
+    # TODO: Also handle 'deflate'.
     if request.headers.get('Content-Encoding', '') == 'gzip':
         try:
             # Try decompression with the adler checksum.
