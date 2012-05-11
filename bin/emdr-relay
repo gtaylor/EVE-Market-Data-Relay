@@ -3,33 +3,57 @@
 Relays listen to Announcers or other Relays for messages over SUB. Any
 messages received are pushed out to anyone below the Relay via PUB.
 """
+from logging.config import dictConfig
 import argparse
-from emdr.conf import default_settings
+from emdr.conf import default_settings as settings
+from emdr.core.command_utils import set_logger_level, print_cmd_header, print_cmd_footer
 
 parser = argparse.ArgumentParser(
-    description="The relay accepts order data from announcers, or other relays. " \
-                "The data is PUBlished to all SUBscribers, which are developer " \
+    description="The relay accepts order data from announcers, or other relays. "
+                "The data is PUBlished to all SUBscribers, which are developer "
                 "applications, and/or other relays.",
 )
 parser.add_argument(
-    '--listen', action='append', dest='listeners',
-    help="Overrides default relay receiver bindings. This determines how " \
-         "the processors (or other relays) connects to this relay to PUB " \
+    '--listener', action='append', dest='listeners',
+    help="Overrides default relay receiver bindings. This determines how "
+         "the processors (or other relays) connects to this relay to PUB "
          "messages.")
 parser.add_argument(
-    '--send', action='append', dest='senders',
-    help="Override default relay sender bindings. This determines how " \
+    '--sender', action='append', dest='senders',
+    help="Override default relay sender bindings. This determines how "
          "other relays or developer applications can connect to this relay.")
+parser.add_argument(
+    '--loglevel', action='store', dest='loglevel', default='INFO',
+    help="Overrides default logger level (DEBUG, INFO, WARNING, ERROR) "
+         "(default: %s)" % settings.LOGGING['loggers']['']['level'])
 
 parsed = parser.parse_args()
 
-if parsed.listeners:
-    print("* Overriding default relay receiver bindings.")
-    default_settings.RELAY_RECEIVER_BINDINGS = parsed.listeners
-if parsed.senders:
-    print("* Overriding default relay sender bindings.")
-    default_settings.RELAY_SENDER_BINDINGS = parsed.senders
+print_cmd_header('emdr-relay')
 
-# Importing this starts the relay.
+if parsed.listeners:
+    settings.RELAY_RECEIVER_BINDINGS = parsed.listeners
+if parsed.senders:
+    settings.RELAY_SENDER_BINDINGS = parsed.senders
+
+log_level = set_logger_level(parsed.loglevel)
+print("* Logging level: %s" % log_level)
+
+print("* Connect to Announcers via SUB:")
+for binding in settings.RELAY_RECEIVER_BINDINGS:
+    print("  - %s" % binding)
+
+print("* Accepting SUB connections on:")
+for binding in settings.RELAY_SENDER_BINDINGS:
+    print("  - %s" % binding)
+
+print_cmd_footer()
+
+dictConfig(settings.LOGGING)
+
+# Get the relay running.
 from emdr.daemons.relay import main
-main.start()
+try:
+    main.run()
+except KeyboardInterrupt:
+    print('Relay stopped by keyboard interrupt.')

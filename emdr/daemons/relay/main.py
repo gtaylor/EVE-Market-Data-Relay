@@ -4,16 +4,13 @@ they receive over PUB/SUB.
 """
 # Logging has to be configured first before we do anything.
 import logging
-from logging.config import dictConfig
-from emdr.conf import default_settings as settings
-dictConfig(settings.LOGGING)
-logger = logging.getLogger('src.daemons.relay.main')
+logger = logging.getLogger(__name__)
 
 import gevent
-from gevent import monkey; gevent.monkey.patch_all()
 import zmq.green as zmq
+from emdr.conf import default_settings as settings
 
-def start():
+def run():
     """
     Fires up the relay process.
     """
@@ -25,7 +22,6 @@ def start():
     for binding in settings.RELAY_RECEIVER_BINDINGS:
         # Relays bind upstream to an Announcer, or another Relay.
         receiver.connect(binding)
-        logger.info("Listening to %s" % binding)
 
     sender = context.socket(zmq.PUB)
     for binding in settings.RELAY_SENDER_BINDINGS:
@@ -42,11 +38,9 @@ def start():
         #import zlib
         #print zlib.decompress(message)
         sender.send(message)
+        logger.debug('Message relayed.')
 
     logger.info("Relay is now listening for order data.")
 
     while True:
         gevent.spawn(relay_worker, receiver.recv())
-
-if __name__ == '__main__':
-    start()

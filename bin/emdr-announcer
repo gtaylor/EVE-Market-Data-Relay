@@ -3,32 +3,55 @@
 Gateways connect to Announcers via PUB, and the Announcer distributes
 the message to those below it via PUB.
 """
+from logging.config import dictConfig
 import argparse
-from emdr.conf import default_settings
+from emdr.conf import default_settings as settings
+from emdr.core.command_utils import set_logger_level, print_cmd_header, print_cmd_footer
 
 parser = argparse.ArgumentParser(
-    description="The announcer accepts order data from processors. " \
-                "The data is PUBlished to all SUBscribers, which are developer " \
-                "applications, and/or Relays.",
-)
+    description="The announcer accepts order data from processors. "
+                "The data is PUBlished to all SUBscribers, which are developer "
+                "applications, and/or Relays.")
 parser.add_argument(
     '--listener', action='append', dest='listeners',
-    help="Overrides default announcer receiver bindings. This determines how " \
+    help="Overrides default announcer receiver bindings. This determines how "
          "the Gateways connect to this Announcer to PUB messages.")
 parser.add_argument(
     '--sender', action='append', dest='senders',
-    help="Override default Announcer sender bindings. This determines how " \
+    help="Override default Announcer sender bindings. This determines how "
          "relays or developer applications can connect to this announcer.")
+parser.add_argument(
+    '--loglevel', action='store', dest='loglevel', default='INFO',
+    help="Overrides default logger level (DEBUG, INFO, WARNING, ERROR) "
+         "(default: %s)" % settings.LOGGING['loggers']['']['level'])
 
 parsed = parser.parse_args()
 
-if parsed.listeners:
-    print("* Overriding default announcer receiver bindings.")
-    default_settings.ANNOUNCER_RECEIVER_BINDINGS = parsed.listeners
-if parsed.senders:
-    print("* Overriding default announcer sender bindings.")
-    default_settings.ANNOUNCER_SENDER_BINDINGS = parsed.senders
+print_cmd_header('emdr-announcer')
 
-# Importing this starts the announcer.
+if parsed.listeners:
+    settings.ANNOUNCER_RECEIVER_BINDINGS = parsed.listeners
+if parsed.senders:
+    settings.ANNOUNCER_SENDER_BINDINGS = parsed.senders
+
+log_level = set_logger_level(parsed.loglevel)
+print("* Logging level: %s" % log_level)
+
+print("* Accepting PUB connections on:")
+for binding in settings.ANNOUNCER_RECEIVER_BINDINGS:
+    print("  - %s" % binding)
+
+print("* Accepting SUB connections on:")
+for binding in settings.ANNOUNCER_SENDER_BINDINGS:
+    print("  - %s" % binding)
+
+print_cmd_footer()
+
+dictConfig(settings.LOGGING)
+
+# Get the announcer running.
 from emdr.daemons.announcer import main
-main.start()
+try:
+    main.run()
+except KeyboardInterrupt:
+    print('Announcer stopped by keyboard interrupt.')

@@ -16,9 +16,7 @@ sender = context.socket(zmq.PUB)
 # Get the list of transports to bind from settings. This allows us to PUB
 # messages to multiple announcers over a variety of socket types
 # (UNIX sockets and/or TCP sockets).
-print("* Market message data will be sent to:")
 for binding in settings.GATEWAY_SENDER_BINDINGS:
-    print("   - %s" % binding)
     sender.connect(binding)
 
 def push_message(parsed_message):

@@ -2,9 +2,10 @@
 """
 WSGI gateway application. Runs using bottle+gevent.
 """
+from logging.config import dictConfig
 import argparse
 from bottle import run
-from emdr.conf import default_settings
+from emdr.conf import default_settings as settings
 from emdr.core.command_utils import set_logger_level, print_cmd_header, print_cmd_footer
 
 parser = argparse.ArgumentParser(
@@ -16,37 +17,44 @@ parser.add_argument(
     help="Overrides default gateway sender bindings. This determines where " \
          "the gateway sends its messages, typically an Announcer.")
 parser.add_argument(
-    '--loglevel', action='store', dest='loglevel',
-    help="Overrides default logger level (DEBUG, INFO, WARNING, ERROR) (default: %s)" % default_settings.LOGGING['loggers']['']['level'])
+    '--loglevel', action='store', dest='loglevel', default='INFO',
+    help="Overrides default logger level (DEBUG, INFO, WARNING, ERROR) "
+         "(default: %s)" % settings.LOGGING['loggers']['']['level'])
 parser.add_argument(
     '--webport', action='store', dest='web_port',
-    help="Overrides default webserver port (default: %s)" % default_settings.GATEWAY_WEB_PORT)
+    help="Overrides default webserver port "
+         "(default: %s)" % settings.GATEWAY_WEB_PORT)
 
 parsed = parser.parse_args()
 
 print_cmd_header('emdr-gateway')
 
 if parsed.senders:
-    default_settings.GATEWAY_SENDER_BINDINGS = parsed.senders
-    print("* Overriding default gateway sender bindings: %s" % parsed.senders)
-
-if parsed.loglevel:
-    set_logger_level(parsed.loglevel)
-    print("* Logging level set to: %s" % parsed.loglevel)
-
+    settings.GATEWAY_SENDER_BINDINGS = parsed.senders
 if parsed.web_port:
-    default_settings.GATEWAY_WEB_PORT = parsed.web_port
+    settings.GATEWAY_WEB_PORT = parsed.web_port
+
+log_level = set_logger_level(parsed.loglevel)
+print("* Logging level: %s" % log_level)
+
+print("* Listening for HTTP market data on port: %s" % settings.GATEWAY_WEB_PORT)
+
+print("* Sending market data over PUB to Announcers:")
+for binding in settings.GATEWAY_SENDER_BINDINGS:
+    print("  - %s" % binding)
 
 #noinspection PyUnresolvedReferences
 from emdr.daemons.gateway import wsgi
 
 print_cmd_footer()
 
+dictConfig(settings.LOGGING)
+
 # Fire up a bottle+gevent process.
 run(
     host='localhost',
     server='gevent',
-    port=default_settings.GATEWAY_WEB_PORT,
+    port=settings.GATEWAY_WEB_PORT,
     # Do gevent's standard monkey patching.
     monkey=True,
     # Use libevent HTTP server.
