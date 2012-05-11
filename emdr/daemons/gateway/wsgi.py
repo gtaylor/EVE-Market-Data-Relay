@@ -8,11 +8,8 @@ gateway.order_pusher module.
 """
 # Logging has to be configured first before we do anything.
 import logging
-from logging.config import dictConfig
 import zlib
-from emdr.conf import default_settings as settings
 
-dictConfig(settings.LOGGING)
 logger = logging.getLogger(__name__)
 
 import gevent
@@ -42,15 +39,23 @@ def get_decompressed_message():
     :rtype: str
     :returns: The de-compressed request body.
     """
+    data_key = request.forms.get('data')
+    if data_key:
+        # This is a form-encoded POST. Support the silly people.
+        message_body = data_key
+    else:
+        # Straight POST body.
+        message_body = request.body.read()
+
     if request.headers.get('Content-Encoding', '') == 'gzip':
         try:
             # Try decompression with the adler checksum.
-            return zlib.decompress(request.body.read())
+            return zlib.decompress(message_body)
         except zlib.error:
             # Negative wbits supresses adler32 checksumming.
-            return zlib.decompress(request.body.read(), -15)
+            return zlib.decompress(message_body, -15)
     else:
-        return request.body.read()
+        return message_body
 
 def parse_and_error_handle(parser, data, upload_format):
     """

@@ -41,14 +41,16 @@ data = """
   ]
 }
 """
-data = ujson.loads(data)
-data = zlib.compress(ujson.dumps(data))#[2:-4]
+message = zlib.compress(ujson.dumps(ujson.loads(data)))[2:-4]
+
 headers = {
     'Content-Encoding': 'gzip',
 }
 
+#data = message
+data = {'data': message}
+
 r = requests.post(
-    #'http://master.eve-emdr.com/upload/unified/',
     'http://localhost:8080/upload/',
     data=data,
     headers=headers,

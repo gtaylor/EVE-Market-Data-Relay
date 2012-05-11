@@ -43,13 +43,12 @@ print("* Sending market data over PUB to Announcers:")
 for binding in settings.GATEWAY_SENDER_BINDINGS:
     print("  - %s" % binding)
 
-#noinspection PyUnresolvedReferences
-from emdr.daemons.gateway import wsgi
-
 print_cmd_footer()
 
 dictConfig(settings.LOGGING)
 
+#noinspection PyUnresolvedReferences
+from emdr.daemons.gateway import wsgi
 # Fire up a bottle+gevent process.
 run(
     host='localhost',
