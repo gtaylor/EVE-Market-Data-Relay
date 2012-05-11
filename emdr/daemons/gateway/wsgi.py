@@ -53,7 +53,7 @@ def get_decompressed_message():
             # Try decompression with the adler checksum.
             return zlib.decompress(message_body)
         except zlib.error:
-            # Negative wbits supresses adler32 checksumming.
+            # Negative wbits suppresses adler32 checksumming.
             return zlib.decompress(message_body, -15)
     else:
         return message_body
