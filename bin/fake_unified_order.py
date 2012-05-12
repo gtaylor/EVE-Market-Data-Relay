@@ -41,7 +41,7 @@ data = """
   ]
 }
 """
-message = zlib.compress(ujson.dumps(ujson.loads(data)))[2:-4]
+message = zlib.compress(ujson.dumps(ujson.loads(data)))#[2:-4]
 
 headers = {
     'Content-Encoding': 'gzip',
