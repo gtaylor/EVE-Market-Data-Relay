@@ -59,7 +59,7 @@ def run():
 
         # If this succeeds, great, return. If not, let the zlib.error get
         # passed up to the invoking worker.
-        return zlib.decompress(message, -15)
+        return zlib.decompress(message, 15 + 32)
 
     def worker():
         """
@@ -72,12 +72,14 @@ def run():
             try:
                 decompressed = get_decompressed_message(message)
             except zlib.error as exc:
+                logger.error("Error during decompression.")
                 send_reply(False, message=exc.message)
                 continue
 
             try:
                 parsed_message = unified.parse_from_json(decompressed)
             except (InvalidMarketOrderDataError, MalformedUploadError) as exc:
+                logger.error("Error during parsing.")
                 send_reply(False, message=exc.message)
                 continue
 

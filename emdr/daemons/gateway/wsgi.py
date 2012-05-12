@@ -47,14 +47,14 @@ def get_decompressed_message():
         # Straight POST body.
         message_body = request.body.read()
 
-    # TODO: Also handle 'deflate'.
-    if request.headers.get('Content-Encoding', '') == 'gzip':
-        try:
-            # Try decompression with the adler checksum.
-            return zlib.decompress(message_body)
-        except zlib.error:
-            # Negative wbits suppresses adler32 checksumming.
-            return zlib.decompress(message_body, -15)
+    content_encoding = request.headers.get('Content-Encoding', '')
+
+    if content_encoding == 'gzip':
+        # Disables header checking.
+        return zlib.decompress(message_body, 15 + 32)
+    elif content_encoding == 'deflate':
+        # Try decompression with the adler checksum.
+        return zlib.decompress(message_body)
     else:
         return message_body
 
