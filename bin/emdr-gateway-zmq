@@ -19,7 +19,7 @@ parser.add_argument(
     help="Overrides default gateway sender bindings. This determines where " \
          "the gateway sends its messages, typically an Announcer.")
 parser.add_argument(
-    '--loglevel', action='store', dest='loglevel',
+    '--loglevel', action='store', dest='loglevel', default='INFO',
     help="Overrides default logger level (DEBUG, INFO, WARNING, ERROR) "
          "(default: %s)" % settings.LOGGING['loggers']['']['level'])
 parser.add_argument(
