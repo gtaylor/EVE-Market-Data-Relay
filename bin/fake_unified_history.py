@@ -4,6 +4,7 @@ A fake history upload script, used to manually test the whole stack.
 """
 import ujson
 import requests
+import zlib
 
 data = """
 {
@@ -29,12 +30,27 @@ data = """
   ]
 }
 """
-data = ujson.loads(data)
-data = ujson.dumps(data)
+
+message = ujson.dumps(ujson.loads(data))
+
+headers = {
+    #'Content-Encoding': 'deflate'
+}
+
+# POST non-form encoded
+data = message
+
+# POST form-encoded
+#data = {'data': message}
+
+# Compressed request
+#data = zlib.compress(data)#[2:-4]
 
 r = requests.post(
     'http://localhost:8080/upload/unified/',
     data=data,
+    headers=headers,
 )
+
 print "RESPONSE"
 print r.text

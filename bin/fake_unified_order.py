@@ -41,14 +41,20 @@ data = """
   ]
 }
 """
-message = zlib.compress(ujson.dumps(ujson.loads(data)))#[2:-4]
+message = ujson.dumps(ujson.loads(data))
 
 headers = {
-    'Content-Encoding': 'gzip',
+    'Content-Encoding': 'deflate'
 }
 
+# POST non-form encoded
 #data = message
+
+# POST form-encoded
 data = {'data': message}
+
+# Compressed request
+data = zlib.compress(data)#[2:-4]
 
 r = requests.post(
     'http://localhost:8080/upload/',

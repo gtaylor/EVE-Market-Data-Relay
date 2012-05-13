@@ -39,24 +39,29 @@ def get_decompressed_message():
     :rtype: str
     :returns: The de-compressed request body.
     """
-    data_key = request.forms.get('data')
-    if data_key:
-        # This is a form-encoded POST. Support the silly people.
-        message_body = data_key
-    else:
-        # Straight POST body.
-        message_body = request.body.read()
-
     content_encoding = request.headers.get('Content-Encoding', '')
 
-    if content_encoding == 'gzip':
-        # Disables header checking.
-        return zlib.decompress(message_body, 15 + 32)
-    elif content_encoding == 'deflate':
-        # Try decompression with the adler checksum.
-        return zlib.decompress(message_body)
+    if content_encoding == 'gzip' or content_encoding == 'deflate':
+        # Compressed request
+        try:
+            # Auto header checking.
+            message_body = zlib.decompress(message_body, 15 + 32)
+        except zlib.error:
+            # Negative wbits suppresses adler32 checksumming.
+            message_body = zlib.decompress(message_body, -15)
+        if message_body[:5] == 'data=':
+            message_body = message_body[5:]
     else:
-        return message_body
+        # Uncompressed request
+        data_key = request.forms.get('data')
+        if data_key:
+            # This is a form-encoded POST. Support the silly people.
+            message_body = data_key
+        else:
+            # This is a non form-encoded POST body.
+            message_body = request.body.read()
+
+    return message_body
 
 def parse_and_error_handle(parser, data, upload_format):
     """
@@ -80,7 +85,7 @@ def parse_and_error_handle(parser, data, upload_format):
         return exc.message
 
     # Sends the parsed MarketOrderList or MarketHistoryList to the Announcers
-    # as compresesd JSON.
+    # as compressed JSON.
     gevent.spawn(order_pusher.push_message, parsed_message)
 
     logger.info("Accepted %s %s upload from %s" % (

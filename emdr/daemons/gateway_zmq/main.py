@@ -51,7 +51,7 @@ def run():
         :raises: zlib.error if decompression fails for all of our attempts.
         """
         try:
-            return zlib.decompress(message)
+            return zlib.decompress(message, 15 + 32)
         except zlib.error:
             # The default decompression method failed, let's fall through to
             # another approach.
@@ -59,7 +59,7 @@ def run():
 
         # If this succeeds, great, return. If not, let the zlib.error get
         # passed up to the invoking worker.
-        return zlib.decompress(message, 15 + 32)
+        return zlib.decompress(message, -15)
 
     def worker():
         """
