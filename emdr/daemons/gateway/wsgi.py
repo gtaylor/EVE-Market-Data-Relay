@@ -46,10 +46,10 @@ def get_decompressed_message():
         # Compressed request
         try:
             # Auto header checking.
-            message_body = zlib.decompress(message_body, 15 + 32)
+            message_body = zlib.decompress(request.body.read(), 15 + 32)
         except zlib.error:
             # Negative wbits suppresses adler32 checksumming.
-            message_body = zlib.decompress(message_body, -15)
+            message_body = zlib.decompress(request.body.read(), -15)
         # Url decode the body
         message_body = urllib.unquote_plus(message_body)
         if message_body[:5] == 'data=':
