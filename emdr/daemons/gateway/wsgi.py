@@ -51,7 +51,7 @@ def get_decompressed_message():
             # Negative wbits suppresses adler32 checksumming.
             message_body = zlib.decompress(message_body, -15)
         # Url decode the body
-        message_body = urllib.unquote(message_body)
+        message_body = urllib.unquote_plus(message_body)
         if message_body[:5] == 'data=':
             message_body = message_body[5:]
     else:

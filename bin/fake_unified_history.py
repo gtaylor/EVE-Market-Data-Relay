@@ -42,7 +42,7 @@ headers = {
 data = message
 
 # POST form-encoded
-#data = {'data': urllib.quote(message)}
+#data = {'data': urllib.quote_plus(message)}
 
 # Compressed request
 #data = zlib.compress(data)#[2:-4]
