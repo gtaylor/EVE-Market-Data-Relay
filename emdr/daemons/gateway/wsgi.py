@@ -8,6 +8,7 @@ gateway.order_pusher module.
 """
 # Logging has to be configured first before we do anything.
 import logging
+import urllib
 import zlib
 
 logger = logging.getLogger(__name__)
@@ -49,6 +50,8 @@ def get_decompressed_message():
         except zlib.error:
             # Negative wbits suppresses adler32 checksumming.
             message_body = zlib.decompress(message_body, -15)
+        # Url decode the body
+        message_body = urllib.unquote(message_body)
         if message_body[:5] == 'data=':
             message_body = message_body[5:]
     else:

@@ -3,6 +3,7 @@
 A fake order upload script, used to manually test the whole stack.
 """
 import ujson
+import urllib
 import requests
 import zlib
 
@@ -51,7 +52,7 @@ headers = {
 #data = message
 
 # POST form-encoded
-data = {'data': message}
+data = {'data': urllib.quote(message)}
 
 # Compressed request
 data = zlib.compress(data)#[2:-4]
