@@ -9,6 +9,7 @@ gateway.order_pusher module.
 # Logging has to be configured first before we do anything.
 import logging
 import urllib
+import urlparse
 import zlib
 
 logger = logging.getLogger(__name__)
@@ -42,20 +43,26 @@ def get_decompressed_message():
     """
     content_encoding = request.headers.get('Content-Encoding', '')
 
-    if content_encoding == 'gzip' or content_encoding == 'deflate':
-        # Compressed request
+    if content_encoding in ['gzip', 'deflate']:
+        # Compressed request. We have to decompress the body, then figure out
+        # if it's form-encoded.
         try:
             # Auto header checking.
             message_body = zlib.decompress(request.body.read(), 15 + 32)
         except zlib.error:
             # Negative wbits suppresses adler32 checksumming.
             message_body = zlib.decompress(request.body.read(), -15)
-        # Url decode the body
+
+        # Un-quote any escape sequences. If none are encountered (as is the
+        # case with an un-encoded POST body), do nothing.
         message_body = urllib.unquote_plus(message_body)
-        if message_body[:5] == 'data=':
-            message_body = message_body[5:]
+
+        form_enc_parsed = urlparse.parse_qs(message_body)
+        if form_enc_parsed:
+            message_body = form_enc_parsed['data'][0]
     else:
-        # Uncompressed request
+        # Uncompressed request. Bottle handles all of the parsing of the
+        # POST key/vals, or un-encoded body.
         data_key = request.forms.get('data')
         if data_key:
             # This is a form-encoded POST. Support the silly people.
