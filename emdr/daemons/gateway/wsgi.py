@@ -57,9 +57,20 @@ def get_decompressed_message():
         # case with an un-encoded POST body), do nothing.
         message_body = urllib.unquote_plus(message_body)
 
+        # At this point, we're not sure whether we're dealing with a straight
+        # un-encoded POST body, or a form-encoded POST. Attempt to parse the
+        # body. If it's not form-encoded, this will return an empty dict.
         form_enc_parsed = urlparse.parse_qs(message_body)
         if form_enc_parsed:
-            message_body = form_enc_parsed['data'][0]
+            # This is a form-encoded POST. The value of the data attrib will
+            # be the body we're looking for.
+            try:
+                message_body = form_enc_parsed['data'][0]
+            except (KeyError, IndexError):
+                raise MalformedUploadError(
+                    "No 'data' POST key/value found. Check your POST key "
+                    "name for spelling, and make sure you're passing a value."
+                )
     else:
         # Uncompressed request. Bottle handles all of the parsing of the
         # POST key/vals, or un-encoded body.
@@ -163,6 +174,12 @@ def upload_unified():
         # I'm curious how common this is, keep an eye out.
         logger.error("gzip error with %s: %s" % (get_remote_address(), exc.message))
         return exc.message
+    except MalformedUploadError as exc:
+        # They probably sent an encoded POST, but got the key/val wrong.
+        response.status = 400
+        logger.error("Error to %s: %s" % (get_remote_address(), exc.message))
+        return exc.message
+
 
     return parse_and_error_handle(
         unified.parse_from_json, message_body, 'Unified'
