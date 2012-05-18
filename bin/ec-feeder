@@ -141,7 +141,6 @@ class EVECentralFeedSMTPServer(smtpd.SMTPServer):
         volume_entered = columns[5]
         minimum_volume = columns[6]
         is_bid = columns[7]
-        print(is_bid)
         order_issue_date = columns[8]
         order_duration = columns[9]
         station_id = columns[10]
@@ -159,8 +158,7 @@ class EVECentralFeedSMTPServer(smtpd.SMTPServer):
             order_issue_date,
             '%Y-%m-%d %H:%M:%S'
         )
-        # TODO: This was bugged, see if I have variables named correctly.
-        is_bid = is_bid == 'True'
+        is_bid = is_bid == '1'
         # TODO: Pull this from the date header. For now, we'll approximate
         # that it takes 60 seconds to generate and deliver the email to us.
         generated_at = datetime.datetime.now() - datetime.timedelta(minutes=1)
