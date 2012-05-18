@@ -11,6 +11,7 @@ import argparse
 import asyncore
 import smtpd
 import datetime
+import logging
 from StringIO import StringIO
 
 import requests
@@ -40,6 +41,8 @@ print("Starting ec-feeder")
 print("  * Sending data to %s " % parsed.target_url)
 print("  * Chunk size: %d" % parsed.chunk_size)
 print("=" * 80)
+
+logger = logging.getLogger(name='ec-feeder')
 
 class EVECentralFeedSMTPServer(smtpd.SMTPServer):
     """
@@ -141,6 +144,7 @@ class EVECentralFeedSMTPServer(smtpd.SMTPServer):
         volume_entered = columns[5]
         minimum_volume = columns[6]
         is_bid = columns[7]
+        logger.warning(is_bid)
         order_issue_date = columns[8]
         order_duration = columns[9]
         station_id = columns[10]
