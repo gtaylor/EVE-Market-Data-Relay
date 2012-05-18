@@ -11,7 +11,6 @@ import argparse
 import asyncore
 import smtpd
 import datetime
-import logging
 from StringIO import StringIO
 
 import requests
@@ -41,8 +40,6 @@ print("Starting ec-feeder")
 print("  * Sending data to %s " % parsed.target_url)
 print("  * Chunk size: %d" % parsed.chunk_size)
 print("=" * 80)
-
-logger = logging.getLogger(name='ec-feeder')
 
 class EVECentralFeedSMTPServer(smtpd.SMTPServer):
     """
@@ -163,7 +160,7 @@ class EVECentralFeedSMTPServer(smtpd.SMTPServer):
             '%Y-%m-%d %H:%M:%S'
         )
         # TODO: This was bugged, see if I have variables named correctly.
-        is_bid = is_bid != 'True'
+        is_bid = is_bid == 'True'
         # TODO: Pull this from the date header. For now, we'll approximate
         # that it takes 60 seconds to generate and deliver the email to us.
         generated_at = datetime.datetime.now() - datetime.timedelta(minutes=1)
