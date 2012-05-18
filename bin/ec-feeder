@@ -144,7 +144,7 @@ class EVECentralFeedSMTPServer(smtpd.SMTPServer):
         volume_entered = columns[5]
         minimum_volume = columns[6]
         is_bid = columns[7]
-        logger.warning(is_bid)
+        print(is_bid)
         order_issue_date = columns[8]
         order_duration = columns[9]
         station_id = columns[10]
