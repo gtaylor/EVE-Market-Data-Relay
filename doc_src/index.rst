@@ -27,6 +27,7 @@ These links may also be useful to you.
 
 * Source repository: https://github.com/gtaylor/EVE-Market-Data-Relay
 * Issue tracker: https://github.com/gtaylor/EVE-Market-Data-Relay/issues
+* IRC Room: irc.coldfront.net #emdr
 * Mailing list: https://groups.google.com/forum/#!forum/eve-emdr
 * Thread on EVE Gate: https://forums.eveonline.com/default.aspx?g=posts&t=95454
 * Real-time data monitoring map: http://map.eve-emdr.com/
