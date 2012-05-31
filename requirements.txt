@@ -5,5 +5,5 @@ nose
 requests
 python-dateutil<2.0
 sphinx
-pyzmq
+git+http://github.com/zeromq/pyzmq.git
 pytz

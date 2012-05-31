@@ -11,7 +11,7 @@ import ujson
 from gevent.queue import Queue
 from gevent import monkey; gevent.monkey.patch_all()
 #noinspection PyUnresolvedReferences
-from gevent_zeromq import zmq
+import zmq.green as zmq
 
 from emdr.core.market_data import MarketOrder, MarketOrderList, MarketHistoryList, MarketHistoryEntry
 from emdr.core.serialization.unified import encode_to_json
