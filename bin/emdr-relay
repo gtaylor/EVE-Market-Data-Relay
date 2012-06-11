@@ -23,6 +23,15 @@ parser.add_argument(
     help="Override default relay sender bindings. This determines how "
          "other relays or developer applications can connect to this relay.")
 parser.add_argument(
+    '--dedupe-buffer', action='store', dest='dedupe_buffer',
+    help="Overrides default message de-duplication buffer size "
+         "(default: %s messages)" % settings.RELAY_DEDUPE_BUFFER)
+parser.add_argument(
+    '--enable-decompress', action='store_true', dest='enable_decompress',
+    help="Decompress all outbound messages (default: %s)" % (
+            'Disabled' if settings.RELAY_DECOMPRESS_MESSAGES else 'Enabled',
+        ))
+parser.add_argument(
     '--loglevel', action='store', dest='loglevel', default='INFO',
     help="Overrides default logger level (DEBUG, INFO, WARNING, ERROR) "
          "(default: %s)" % settings.LOGGING['loggers']['']['level'])
@@ -35,6 +44,10 @@ if parsed.listeners:
     settings.RELAY_RECEIVER_BINDINGS = parsed.listeners
 if parsed.senders:
     settings.RELAY_SENDER_BINDINGS = parsed.senders
+if parsed.dedupe_buffer:
+    settings.RELAY_DEDUPE_BUFFER = int(parsed.dedupe_buffer)
+if parsed.enable_decompress:
+    settings.RELAY_DECOMPRESS_MESSAGES = True
 
 log_level = set_logger_level(parsed.loglevel)
 print("* Logging level: %s" % log_level)
@@ -46,6 +59,14 @@ for binding in settings.RELAY_RECEIVER_BINDINGS:
 print("* Accepting SUB connections on:")
 for binding in settings.RELAY_SENDER_BINDINGS:
     print("  - %s" % binding)
+
+if settings.RELAY_DEDUPE_BUFFER:
+    print("* De-dupe buffer max size: %s" % settings.RELAY_DEDUPE_BUFFER)
+else:
+    print("* De-duping disabled.")
+
+if settings.RELAY_DECOMPRESS_MESSAGES:
+    print("* Outbound message de-compression enabled.")
 
 print_cmd_footer()
 
