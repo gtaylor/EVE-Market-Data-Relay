@@ -2,7 +2,6 @@
 A memcached-backed deduper. This is much more efficient than the deque backend,
 and should be used in production.
 """
-from collections import deque
 import pylibmc
 from emdr.conf import default_settings as settings
 from emdr.daemons.relay.dedupers.util import calc_hash_for_message
