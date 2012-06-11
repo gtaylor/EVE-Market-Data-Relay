@@ -66,3 +66,19 @@ your outlier is probably fraudulent and is best ignored.
 You also have the option of cross-referencing the APIs of other sites who
 do not consume EMDR data. While this can defeat some of the purpose of using
 EMDR, the option is there to complement the feed.
+
+Use EMDR's redundancy to your advantage
+---------------------------------------
+
+EMDR is built with high availability in mind. Our only single point of failure
+is Amazon's Route 53 DNS service, which has an excellent reliability track
+record.
+
+While you can connect to only one relay, you may wish to connect your consumer
+to two. This will allow your consumer to keep functioning, even if one of
+the relays it is subscribed to dies a fiery death. The only complication is
+that you will need to de-dupe the data coming in, as you'll be receiving
+two copies of each message (one from each relay).
+
+Optionally, fire up a private EMDR relay within your infrastructure and
+consume from that. It'll do the de-duplication for you.
