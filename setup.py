@@ -28,6 +28,7 @@ packages = [
     'emdr.daemons.gateway',
     'emdr.daemons.gateway_zmq',
     'emdr.daemons.relay',
+    'emdr.daemons.relay.dedupers',
 ]
 
 scripts = [
