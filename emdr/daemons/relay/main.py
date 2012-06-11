@@ -7,7 +7,6 @@ import logging
 
 logger = logging.getLogger(__name__)
 import zlib
-from collections import deque
 
 import gevent
 import zmq.green as zmq
