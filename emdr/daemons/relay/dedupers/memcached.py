@@ -24,11 +24,12 @@ def is_message_duped(message):
 
     # Generate a hash for the incoming message.
     message_hash = str(calc_hash_for_message(message))
+    cache_key = '%s%s' % (settings.RELAY_DEDUPE_STORE_KEY_PREFIX, message_hash)
     # Look at our queue of hashes to figure out if we've seen this
     # message yet.
-    was_already_seen = MC_CLIENT.get(message_hash) is not None
+    was_already_seen = MC_CLIENT.get(cache_key) is not None
     # We always push the message on to the queue, even if it ends up being
     # a dupe, since it "refreshes" the hash.
-    MC_CLIENT.set(message_hash, 1, time=settings.RELAY_DEDUPE_STORE_TIME)
+    MC_CLIENT.set(cache_key, 1, time=settings.RELAY_DEDUPE_STORE_TIME)
 
     return was_already_seen

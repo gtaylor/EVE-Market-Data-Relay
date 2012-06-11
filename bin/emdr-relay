@@ -49,6 +49,11 @@ dedupe_group.add_argument(
     help="For backends that store message hashes, this determines "
          "how long to do so (in seconds) "
          "(default: %s)" % settings.RELAY_DEDUPE_STORE_TIME)
+dedupe_group.add_argument(
+    '--dedupe-store-key-prefix', action='store', dest='dedupe_store_key_prefix',
+    help="For multi-tenant installs, set this key prefix on all relay "
+         "cache entries "
+         "(default: %s)" % settings.RELAY_DEDUPE_STORE_KEY_PREFIX)
 
 parsed = parser.parse_args()
 
@@ -64,6 +69,8 @@ if parsed.dedupe_store_time:
     settings.RELAY_DEDUPE_STORE_TIME = int(parsed.dedupe_store_time)
 if parsed.enable_decompress:
     settings.RELAY_DECOMPRESS_MESSAGES = True
+if parsed.dedupe_store_key_prefix:
+    settings.RELAY_DEDUPE_STORE_KEY_PREFIX = parsed.dedupe_store_key_prefix
 
 log_level = set_logger_level(parsed.loglevel)
 print("* Logging level: %s" % log_level)
@@ -79,6 +86,7 @@ for binding in settings.RELAY_SENDER_BINDINGS:
 print("* De-dupe backend: %s" % settings.RELAY_DEDUPE_BACKEND)
 print("* De-dupe backend connection: %s" % settings.RELAY_DEDUPE_BACKEND_CONN)
 print("* De-dupe backend hash store time: %s" % settings.RELAY_DEDUPE_STORE_TIME)
+print("* De-dupe backend store key prefix: %s" % settings.RELAY_DEDUPE_STORE_KEY_PREFIX)
 
 if settings.RELAY_DECOMPRESS_MESSAGES:
     print("* Outbound message de-compression enabled.")

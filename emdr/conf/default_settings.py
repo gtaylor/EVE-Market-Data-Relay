@@ -47,6 +47,10 @@ RELAY_DEDUPE_BACKEND_CONN = ["127.0.0.1"]
 # For timeout based backends, this determines how long (in seconds) we store
 # the message hashes.
 RELAY_DEDUPE_STORE_TIME = 300
+# For memcached and other key/value stores, this is prefixed to the hash
+# to form the cache key. This is useful to avoid clashes for multi-tenant
+# situations.
+RELAY_DEDUPE_STORE_KEY_PREFIX = 'emdr-relay-dd'
 
 #
 ## Logging Settings
