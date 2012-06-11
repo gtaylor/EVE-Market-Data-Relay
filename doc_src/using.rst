@@ -50,7 +50,7 @@ and simplejson_. For a more complete list of examples, see the
         subscriber = context.socket(zmq.SUB)
 
         # Connect to the first publicly available relay.
-        subscriber.connect('tcp://relay-linode-atl-1.eve-emdr.com:8050')
+        subscriber.connect('tcp://relay-ubiquity-chicago-1.eve-emdr.com:8050')
         # Disable filtering.
         subscriber.setsockopt(zmq.SUBSCRIBE, "")
 
@@ -87,7 +87,7 @@ PHP accesses EMDR via ZeroMQ's `php-zmq`_ PHP bindings:
     $subscriber = $context->getSocket(ZMQ::SOCKET_SUB);
 
     // Connect to the first publicly available relay.
-    $subscriber->connect("tcp://relay-linode-atl-1.eve-emdr.com:8050");
+    $subscriber->connect("tcp://relay-ubiquity-chicago-1.eve-emdr.com:8050");
     // Disable filtering.
     $subscriber->setSockOpt(ZMQ::SOCKOPT_SUBSCRIBE, "");
 
@@ -122,7 +122,7 @@ Ruby accesses EMDR via ZeroMQ's zmq_ Ruby bindings:
     subscriber = context.socket(ZMQ::SUB)
 
     // Connect to the first publicly available relay.
-    subscriber.connect("tcp://relay-linode-atl-1.eve-emdr.com:8050")
+    subscriber.connect("tcp://relay-ubiquity-chicago-1.eve-emdr.com:8050")
     subscriber.setsockopt(ZMQ::SUBSCRIBE,"")
 
     loop do
@@ -166,7 +166,7 @@ C# accesses EMDR via ZeroMQ's clrzmq_ binding:
                     using (var subscriber = context.Socket(SocketType.SUB))
                     {
                         //Connect to the first publicly available relay.
-                        subscriber.Connect("tcp://relay-linode-atl-1.eve-emdr.com:8050");
+                        subscriber.Connect("tcp://relay-ubiquity-chicago-1.eve-emdr.com:8050");
 
                         // Disable filtering.
                         subscriber.SetSockOpt(SocketOpt.SUBSCRIBE, Encoding.UTF8.GetBytes(""));
@@ -248,7 +248,7 @@ Visual Basic, like C#, accesses EMDR via ZeroMQ's clrzmq_ binding:
                 Using subscriber = context.Socket(SocketType.SUB)
 
                     'Connect to the first publicly available relay.
-                    subscriber.Connect("tcp://relay-linode-atl-1.eve-emdr.com:8050")
+                    subscriber.Connect("tcp://relay-ubiquity-chicago-1.eve-emdr.com:8050")
 
                     ' Disable filtering.
                     subscriber.SetSockOpt(SocketOpt.SUBSCRIBE, Encoding.UTF8.GetBytes(""))
@@ -317,7 +317,7 @@ Perl uses the `ZeroMQ-Perl`_ binding for Perl:
 
     my $cxt = ZeroMQ::Context->new;
     my $sock = $cxt->socket(ZMQ_SUB);
-    $sock->connect('tcp://relay-linode-atl-1.eve-emdr.com:8050');
+    $sock->connect('tcp://relay-ubiquity-chicago-1.eve-emdr.com:8050');
     $sock->setsockopt(ZMQ_SUBSCRIBE, "");
 
     while (1) {
@@ -360,7 +360,7 @@ Java uses jzmq_ binding:
             ZMQ.Socket subscriber = context.socket(ZMQ.SUB);
 
             // Connect to the first publicly available relay.
-            subscriber.connect("tcp://relay-linode-atl-1.eve-emdr.com:8050");
+            subscriber.connect("tcp://relay-ubiquity-chicago-1.eve-emdr.com:8050");
 
             // Disable filtering.
             subscriber.subscribe(new byte[0]);

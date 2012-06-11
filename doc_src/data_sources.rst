@@ -5,35 +5,15 @@
 Data Sources
 ============
 
-EMDR is 'fed' by a number of market data sites, in addition to individual
-player uploads. We're always looking to expand the feed to include more, so
-please consider taking a look at :doc:`uploading` for details on how to
-contribute data. There are instructions there for players and market data sites.
+EMDR is 'fed' data by player uploads. There are a number of clients that can
+be used to chip in, outlined in more detail on :doc:`uploading`.
 
-Current Sources
----------------
+Uploader applications monitor the EVE Online cache files on your machine,
+which are populated with market data as you browse around the in-game market
+dialogs.
 
-EMDR is currently relaying data from the following sources:
+Individual market orders are uploaded, along with market history (if you
+switch to history tabs for items).
 
-* `EVE Central`_ (orders only)
-* `EVE Addicts`_ (all direct uploads)
-* `EVE Marketdata`_ (orders+history via their recently updated API)
-* Direct player uploads (see: :doc:`uploading`)
-
-If we missed anything, or your site has started to feed data, please let us
-know via an entry in our `issue tracker`_.
-
-.. _EVE Central: http://eve-central.com/
-.. _EVE Addicts: http://eve.addicts.nl/
-.. _EVE Marketdata: http://eve-marketdata.com/
-
-Coming Soon
------------
-
-We are aware of the following upcoming additions to our data feed:
-
-* `EVE Marketeer`_ (all direct uploads, Callahan says sometime this weekend)
-* `EVEMon`_ Uploader (we'll be in default uploader endpoint, early June)
-
-.. _EVE Marketeer: http://www.evemarketeer.com/
-.. _EVEMon: http://evemon.battleclinic.com/
+Most well-designed uploader applications use small enough amounts of
+CPU and bandwidth as to run unnoticed.

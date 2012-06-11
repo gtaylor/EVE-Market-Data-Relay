@@ -26,7 +26,7 @@ def main():
     subscriber = context.socket(zmq.SUB)
 
     # Connect to the first publicly available relay.
-    subscriber.connect('tcp://relay-linode-atl-1.eve-emdr.com:8050')
+    subscriber.connect('tcp://relay-ubiquity-chicago-1.eve-emdr.com:8050')
     # Disable filtering.
     subscriber.setsockopt(zmq.SUBSCRIBE, "")
 

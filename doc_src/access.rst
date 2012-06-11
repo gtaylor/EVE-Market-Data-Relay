@@ -9,7 +9,7 @@ In order to get access to the EMDR network, you will merely need to connect
 to a relay. For your convenience, we have listed the relays below that have
 available capacity.
 
-* tcp://relay-linode-atl-1.eve-emdr.com:8050 (Linode, Atlanta -- Open)
+* tcp://relay-ubiquity-chicago-1.eve-emdr.com:8050 (Ubiquity Hosting, Chicago -- Open)
 
 Once you have chosen a relay, simply adapt the sample in
 :doc:`using` to use the hostname/port of the relay of your choice.
