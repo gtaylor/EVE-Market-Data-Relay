@@ -1,9 +1,12 @@
 bottle
 ujson
 gevent
-nose
 requests
 python-dateutil<2.0
-sphinx
 git+http://github.com/zeromq/pyzmq.git
 pytz
+# Only required for developers
+nose
+sphinx
+# Only required for relays
+pylibmc

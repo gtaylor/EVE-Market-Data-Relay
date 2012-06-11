@@ -23,18 +23,32 @@ parser.add_argument(
     help="Override default relay sender bindings. This determines how "
          "other relays or developer applications can connect to this relay.")
 parser.add_argument(
-    '--dedupe-buffer', action='store', dest='dedupe_buffer',
-    help="Overrides default message de-duplication buffer size "
-         "(default: %s messages)" % settings.RELAY_DEDUPE_BUFFER)
-parser.add_argument(
-    '--enable-decompress', action='store_true', dest='enable_decompress',
-    help="Decompress all outbound messages (default: %s)" % (
-            'Disabled' if settings.RELAY_DECOMPRESS_MESSAGES else 'Enabled',
-        ))
-parser.add_argument(
     '--loglevel', action='store', dest='loglevel', default='INFO',
     help="Overrides default logger level (DEBUG, INFO, WARNING, ERROR) "
          "(default: %s)" % settings.LOGGING['loggers']['']['level'])
+parser.add_argument(
+    '--enable-decompress', action='store_true', dest='enable_decompress',
+    help="Decompress all outbound messages (default: %s)" % (
+        'Disabled' if settings.RELAY_DECOMPRESS_MESSAGES else 'Enabled',
+    ))
+
+dedupe_group = parser.add_argument_group(
+    'Message Deduplication',
+    "Settings for message de-duplication."
+)
+dedupe_group.add_argument(
+    '--dedupe-backend', action='store', dest='dedupe_backend',
+    help="The dedupe backend to use. One of: deque, memcached "
+         "(default: %s)" % settings.RELAY_DEDUPE_BACKEND)
+dedupe_group.add_argument(
+    '--dedupe-conn', action='store', dest='dedupe_conn',
+    help="Backend-specific connection string, if needed "
+         "(default: %s)" % settings.RELAY_DEDUPE_BACKEND_CONN[0])
+dedupe_group.add_argument(
+    '--dedupe-store-time', action='store', dest='dedupe_store_time',
+    help="For backends that store message hashes, this determines "
+         "how long to do so (in seconds) "
+         "(default: %s)" % settings.RELAY_DEDUPE_STORE_TIME)
 
 parsed = parser.parse_args()
 
@@ -44,8 +58,10 @@ if parsed.listeners:
     settings.RELAY_RECEIVER_BINDINGS = parsed.listeners
 if parsed.senders:
     settings.RELAY_SENDER_BINDINGS = parsed.senders
-if parsed.dedupe_buffer:
-    settings.RELAY_DEDUPE_BUFFER = int(parsed.dedupe_buffer)
+if parsed.dedupe_backend:
+    settings.RELAY_DEDUPE_BACKEND = parsed.dedupe_backend
+if parsed.dedupe_store_time:
+    settings.RELAY_DEDUPE_STORE_TIME = int(parsed.dedupe_store_time)
 if parsed.enable_decompress:
     settings.RELAY_DECOMPRESS_MESSAGES = True
 
@@ -60,10 +76,9 @@ print("* Accepting SUB connections on:")
 for binding in settings.RELAY_SENDER_BINDINGS:
     print("  - %s" % binding)
 
-if settings.RELAY_DEDUPE_BUFFER:
-    print("* De-dupe buffer max size: %s" % settings.RELAY_DEDUPE_BUFFER)
-else:
-    print("* De-duping disabled.")
+print("* De-dupe backend: %s" % settings.RELAY_DEDUPE_BACKEND)
+print("* De-dupe backend connection: %s" % settings.RELAY_DEDUPE_BACKEND_CONN)
+print("* De-dupe backend hash store time: %s" % settings.RELAY_DEDUPE_STORE_TIME)
 
 if settings.RELAY_DECOMPRESS_MESSAGES:
     print("* Outbound message de-compression enabled.")

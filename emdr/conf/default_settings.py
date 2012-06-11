@@ -39,9 +39,14 @@ RELAY_RECEIVER_BINDINGS = ["ipc:///tmp/announcer-sender.sock"]
 RELAY_SENDER_BINDINGS = ["ipc:///tmp/relay-sender.sock"]
 # If True, outbound messages to subscribers are decompressed.
 RELAY_DECOMPRESS_MESSAGES = False
-# How big of a simple de-duping buffer to keep. If 0, de-duping is disabled.
-# The higher this is set, the more CPU and RAM that gets used in de-duping.
-RELAY_DEDUPE_BUFFER = 1000
+# Default to memcached, as it's fast.
+RELAY_DEDUPE_BACKEND = "memcached"
+# For dedupe backends that require a connection string of some sort, store it
+# here. We'll default to localhost for now. Use a list of strings.
+RELAY_DEDUPE_BACKEND_CONN = ["127.0.0.1"]
+# For timeout based backends, this determines how long (in seconds) we store
+# the message hashes.
+RELAY_DEDUPE_STORE_TIME = 300
 
 #
 ## Logging Settings
