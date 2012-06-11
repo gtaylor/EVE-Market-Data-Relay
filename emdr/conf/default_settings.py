@@ -37,8 +37,15 @@ ANNOUNCER_SENDER_BINDINGS = ["ipc:///tmp/announcer-sender.sock"]
 RELAY_RECEIVER_BINDINGS = ["ipc:///tmp/announcer-sender.sock"]
 # PUB - Bind
 RELAY_SENDER_BINDINGS = ["ipc:///tmp/relay-sender.sock"]
+# If True, outbound messages to subscribers are decompressed.
+RELAY_DECOMPRESS_MESSAGES = False
+# How big of a simple de-duping buffer to keep. If 0, de-duping is disabled.
+# The higher this is set, the more CPU and RAM that gets used in de-duping.
+RELAY_DEDUPE_BUFFER = 2000
 
-
+#
+## Logging Settings
+#
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': True,
