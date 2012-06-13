@@ -18,10 +18,11 @@ import gevent
 #noinspection PyUnresolvedReferences
 from bottle import run, request, response, post, default_app
 
+from emds.formats import unified
+from emds.formats.exceptions import ParseError
 from emdr.daemons.gateway import order_pusher
 from emdr.daemons.gateway.exceptions import MalformedUploadError
 from emdr.core.serialization.exceptions import InvalidMarketOrderDataError
-from emdr.core.serialization import unified
 from emdr.core.serialization import eve_marketeer
 
 def get_remote_address():
@@ -98,7 +99,9 @@ def parse_and_error_handle(parser, data, upload_format):
     """
     try:
         parsed_message = parser(data)
-    except (InvalidMarketOrderDataError, MalformedUploadError) as exc:
+    except (
+        InvalidMarketOrderDataError, MalformedUploadError, ParseError, TypeError, ValueError
+    ) as exc:
         # Something bad happened. We know this will return at least a
         # semi-useful error message, so do so.
         response.status = 400
@@ -110,7 +113,7 @@ def parse_and_error_handle(parser, data, upload_format):
     gevent.spawn(order_pusher.push_message, parsed_message)
 
     logger.info("Accepted %s %s upload from %s" % (
-        upload_format, parsed_message.result_type, get_remote_address()
+        upload_format, parsed_message.list_type, get_remote_address()
     ))
     # Goofy, but apparently expected by EVE Market Data Uploader.
     return '1'

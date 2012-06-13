@@ -1,7 +1,14 @@
 try:
-    from setuptools import setup
+    from setuptools import setup, find_packages
 except ImportError:
     from distutils.core import setup
+
+    def find_packages(exclude=None):
+        """
+        Just stub this. If you're packaging EMDS, you need setuptools. If
+        you're installing, not so much.
+        """
+        return
 
 import emdr
 
@@ -14,31 +21,14 @@ required = [
     'pyzmq',
     'pytz',
     'cython',
-]
-
-packages = [
-    'emdr',
-    'emdr.conf',
-    'emdr.core',
-    'emdr.core.serialization',
-    'emdr.core.serialization.eve_marketeer',
-    'emdr.core.serialization.unified',
-    'emdr.daemons',
-    'emdr.daemons.announcer',
-    'emdr.daemons.gateway',
-    'emdr.daemons.gateway_zmq',
-    'emdr.daemons.relay',
-    'emdr.daemons.relay.dedupers',
+    'emds',
 ]
 
 scripts = [
     'bin/emdr-announcer',
     'bin/emdr-gateway',
-    'bin/emdr-gateway-zmq',
     'bin/emdr-relay',
     'bin/emdr-snooper',
-    'bin/ec-feeder',
-    'bin/emd-feeder',
 ]
 
 setup(
@@ -49,7 +39,7 @@ setup(
     author='Greg Taylor',
     author_email='gtaylor@gc-taylor.com',
     url='https://github.com/gtaylor/EVE-Market-Data-Relay',
-    packages=packages,
+    packages=find_packages(exclude=['tests', 'emds']),
     scripts=scripts,
     package_data={'': ['LICENSE']},
     include_package_data=True,

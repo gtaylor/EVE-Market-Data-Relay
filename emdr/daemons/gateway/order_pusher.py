@@ -5,7 +5,7 @@ market data to the Announcer daemons.
 import logging
 import zlib
 import zmq.green as zmq
-from emdr.core.serialization import unified
+from emds.formats import unified
 from emdr.conf import default_settings as settings
 
 logger = logging.getLogger(__name__)

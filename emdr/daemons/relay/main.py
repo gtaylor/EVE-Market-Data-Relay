@@ -46,7 +46,6 @@ def run():
             message = zlib.decompress(message)
 
         sender.send(message)
-        logger.debug('Message relayed.')
 
     logger.info("Relay is now listening for order data.")
 
