@@ -16,10 +16,11 @@ logger = logging.getLogger(__name__)
 
 import gevent
 #noinspection PyUnresolvedReferences
-from bottle import run, request, response, post, default_app
+from bottle import run, request, response, get, post, default_app
 
 from emds.formats import unified
 from emds.formats.exceptions import ParseError
+from emdr import __version__ as EMDR_VERSION
 from emdr.daemons.gateway import order_pusher
 from emdr.daemons.gateway.exceptions import MalformedUploadError
 from emdr.core.serialization.exceptions import InvalidMarketOrderDataError
@@ -203,3 +204,12 @@ def upload():
         # formed uploads that have no POST keys will be caught by this, and
         # a JSON error will be shown. This may confuse some users.
         return upload_unified()
+
+@get('/health_check/')
+def health_check():
+    """
+    This should only be used by the gateway monitoring script. It is used
+    to detect whether the gateway is still alive, and whether it should remain
+    in the DNS rotation.
+    """
+    return EMDR_VERSION
