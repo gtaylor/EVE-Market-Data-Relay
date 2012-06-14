@@ -5,33 +5,46 @@
 EVE Market Data Relay (EMDR)
 ============================
 
-EVE Market Data Relay is  a super-scalable, super-stable way to accept a large
-amount of user-submitted market data (via uploaders), and re-broadcast said
-data in near real-time to a large number of subscribers.
+EVE Market Data Relay (EMDR) is a super scalable, highly available firehose of
+real-time market data. For those that wish to record price and history data
+as it comes in, EMDR will help you do so as efficiently and reliably as
+possible. EMDR's data feed is open to the public, and is developed as an
+open source project.
 
-The end result is that those writing market-data driven applications can
-simply subscribe to a "firehose" of market data, without having
-to hassle with writing uploaders, data submission APIs, or scraping data from
-other market sites.
+EMDR may appeal to you if:
+
+* You need real-time access to market data, as soon as possible. Perhaps for
+  sending out price/inventory level alerts, notification of lucrative
+  trade routes, or real-time charts and graphs.
+* You want to record prices over time.
+* You want the absolutely most complete set of data that you can get.
+* The effort and overhead of getting large amounts of direct player uploads to
+  your site is too much to bear.
+
+EMDR's primary goals are:
+
+* Ensuring that all market sites have access to player-uploaded market data.
+* Extremely high reliability.
+* Minimize expense to those running EMDR (shared burden).
+* Minimize expense to those consuming the feed (bandwidth).
 
 For a more complete run-down, see :doc:`overview`.
 
-Learning more
--------------
-
-To learn more about EMDR, see the :doc:`overview`.
-
 **License:** EVE Market Data Relay is licensed under the `BSD License`_.
 
-These links may also be useful to you.
+Assorted Info
+-------------
 
-* Source repository: https://github.com/gtaylor/EVE-Market-Data-Relay
-* Issue tracker: https://github.com/gtaylor/EVE-Market-Data-Relay/issues
-* IRC Room: irc.coldfront.net #emdr
-* Mailing list: https://groups.google.com/forum/#!forum/eve-emdr
-* Thread on EVE Gate: https://forums.eveonline.com/default.aspx?g=posts&t=95454
-* Real-time data monitoring map: http://map.eve-emdr.com/
-* @gctaylor on Twitter: https://twitter.com/#!/gctaylor
+* `Mailing list`_ - If you are consuming the feed, make sure
+  to subscribe to this for important announcements. This is also one of the
+  best places to ask questions or discuss EMDR stuff.
+* IRC Room - irc.coldfront.net #emdr, an excellent place for getting quick
+  help, or hanging out with other developers and consumers.
+* `Issue tracker`_ - Report bugs here.
+* `Source code <GitHub project>`_ - For those wanting to hack on EMDR.
+* `EMDR map`_ - See the solar systems light up as
+  market data arrives.
+* `@gctaylor Twitter`_ - Tweets from the maintainer.
 
 General Topics
 --------------
