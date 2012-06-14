@@ -4,13 +4,17 @@ EVE Market Data Relay
 :Author: Greg Taylor
 :License: BSD
 
-This project is a proof-of-concept for a super-scalable, affordable way to
+This project is a super-scalable, affordable way to
 accept a large amount of user-submitted market data (via uploaders), and
 re-broadcast said data in realtime to a number of subscribers.
 
-The end result is that those writing market-data driven applications could
+The end result is that those writing market-data driven applications can
 simply subscribe to a "firehose" of market data, and get going, without having
 to hassle with uploaders or data submission APIs.
+
+Additionally, the consumers may accept very large amounts of data without the
+overhead associated with a ton of HTTP connections. EMDR's ZeroMQ underpinnings
+are hugely more efficient.
 
 Documentation
 -------------

@@ -16,35 +16,20 @@ Market data is uploaded to EMDR by default.
 
 .. _EVEMon: http://evemon.battleclinic.com/
 
-With the EVE Marketeer Client
------------------------------
+With other clients
+------------------
 
-While we prefer EVEMon, you can use the EVE Marketeer Client as well:
+While we prefer EVEMon, you can use any client that supports the
+`Unified Uploader Interchange Format`_. An up to date list is maintained
+here: `Clients supporting UUIF`_.
 
-* Download/install the `EVE Marketeer Uploader`_.
-* Run the application.
-* Go to the Endpoints tab.
-* Hit 'Add'.
-* Enter 'EMDR' for the name.
-* Leave data type as EVE Marketeer & Marketdata.
+Steps vary from client to client, but here is the typical process:
+
+* Open the dialog that lets you specify where to send market data.
+* Create a new endpoint. Select Unified format if it asks.
 * Set the URL to: http://upload.eve-emdr.com/upload/
-* Enter EMDR for upload key.
-* Hit Save.
-* You're all set. Get uploading!
+* Enter your upload key, if you feel like it. Otherwise, just make something
+  up or leave it blank.
+* Hit save, and start uploading.
 
 You can then use any market service's auto-uploader pages.
-
-.. _EVE Marketeer Uploader: http://www.evemarketeer.com/uploader
-
-Other Clients
--------------
-
-Any client that supports either Unified Uploader Interchange format, or
-EVE Marketeer/EVE Market Data format will also work just fine. The following
-clients fall under this designation:
-
-* Contribtastic for Mac
-
-Simply point your client at: http://upload.eve-emdr.com/upload/
-
-The message format will be auto-detected and parsed accordingly.
