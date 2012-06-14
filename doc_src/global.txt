@@ -5,6 +5,7 @@
 .. _@gctaylor Twitter: https://twitter.com/#!/gctaylor
 
 .. _Unified Uploader Interchange Format: http://dev.eve-central.com/unifieduploader/start
+.. _Clients supporting UUIF: http://dev.eve-central.com/unifieduploader/implementations
 
 .. _Python: http://python.org
 .. _nose: http://somethingaboutorange.com/mrl/projects/nose/
