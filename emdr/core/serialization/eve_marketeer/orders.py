@@ -4,7 +4,7 @@ Parser for the EVE Marketeer and EVE Market Data uploader format.
 import csv
 import logging
 from StringIO import StringIO
-from emdr.core.market_data import MarketOrderList, MarketOrder
+from emds.data_structures import MarketOrderList, MarketOrder
 from emdr.core.serialization.common_utils import parse_datetime
 from emdr.core.serialization.exceptions import InvalidMarketOrderDataError
 
