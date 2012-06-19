@@ -55,10 +55,6 @@ def get_decompressed_message():
             # Negative wbits suppresses adler32 checksumming.
             message_body = zlib.decompress(request.body.read(), -15)
 
-        # Un-quote any escape sequences. If none are encountered (as is the
-        # case with an un-encoded POST body), do nothing.
-        message_body = urllib.unquote_plus(message_body)
-
         # At this point, we're not sure whether we're dealing with a straight
         # un-encoded POST body, or a form-encoded POST. Attempt to parse the
         # body. If it's not form-encoded, this will return an empty dict.
