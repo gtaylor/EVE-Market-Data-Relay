@@ -12,8 +12,8 @@ available capacity.
 ==========================================  ==================  ==============  ==================  ====================================================================
 URI                                         ISP                 Location        Access              Notes
 ==========================================  ==================  ==============  ==================  ====================================================================
-tcp://relay-us-central-1.eve-emdr.com:8050  Ubuquity Hosting    Chicago, IL     Open                Use this relay if you have no preference.
-tcp://emdr-relay.eve-aim.com:8050           Linode              Newark, NJ      Open - See Notes    This is only available to other Linodes in the Newark, NJ location.
+tcp://relay-us-central-1.eve-emdr.com:8050  Ubuquity Hosting    Chicago, IL     Open                Use this relay if you have no preference. Volunteered by udsaxman.
+tcp://relay-eu-germany-1.eve-emdr.com:8050  Hetzner             Germany         Open                Default European relay. Volunteered by Otaci.
 ==========================================  ==================  ==============  ==================  ====================================================================
 
 Once you have chosen a relay, simply adapt the sample in

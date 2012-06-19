@@ -399,3 +399,63 @@ Java uses jzmq_ binding:
     }
 
 .. _jzmq: http://www.zeromq.org/bindings:java
+
+Erlang
+^^^^^^
+
+Erlang uses erlzmq2_ binding:
+
+.. code-block:: erlang
+
+    #!/usr/bin/env escript
+
+    % you will need the ZeroMQ Erlang library: https://github.com/zeromq/erlzmq2
+    % I also use jiffy for Json: https://github.com/davisp/jiffy
+
+    main(_Args) ->
+      {ok, Context} = erlzmq:context(),
+      {ok, Subscriber} = erlzmq:socket(Context, sub),
+      ok = erlzmq:connect(Subscriber,"tcp://relay-us-central-1.eve-emdr.com:8050"),
+      ok = erlzmq:setsockopt(Subscriber, subscribe, <<>>),
+      msgcheck(Subscriber).
+
+    msgcheck(Subscriber) ->
+      {ok,Msg} = erlzmq:recv(Subscriber),
+      io:format("~p\n",[jiffy:decode(zlib:uncompress(Msg))]),
+      msgcheck(Subscriber).
+
+.. _erlzmq2: https://github.com/zeromq/erlzmq2
+
+Node.js
+^^^^^^^
+
+Node.js uses the `zeromq.node`_ binding:
+
+.. code-block:: javascript
+
+    /*
+     *  Example node.js EMDR client
+     */
+
+    var zmq = require('zmq');
+    var zlib = require('zlib');
+
+    var sock = zmq.socket('sub');
+
+    // Connect to the first publicly available relay.
+    sock.connect('tcp://relay-us-central-1.eve-emdr.com:8050');
+    // Disable filtering
+    sock.subscribe('');
+
+    sock.on('message', function(msg){
+        // Receive raw market JSON strings.
+        var market_json = zlib.inflate(msg);
+
+        // Un-serialize the JSON data.
+        var market_data = JSON.parse(market_json);
+
+        // Do something useful
+        console.log(market_data);
+    });
+
+.. _zeromq.node: http://www.zeromq.org/bindings:node-js
