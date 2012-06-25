@@ -14,6 +14,7 @@ URI                                         ISP                 Location        
 ==========================================  ==================  ==============  ==================  ====================================================================
 tcp://relay-us-central-1.eve-emdr.com:8050  Ubuquity Hosting    Chicago, IL     Open                Use this relay if you have no preference. Volunteered by udsaxman.
 tcp://relay-eu-germany-1.eve-emdr.com:8050  Hetzner             Germany         Open                Default European relay. Volunteered by Otaci.
+tcp://relay-eu-france-1.eve-emdr.com:8050   Kimsufi (OVH)       France          Open                Also an excellent European relay. Volunteered by Jognu.
 ==========================================  ==================  ==============  ==================  ====================================================================
 
 Once you have chosen a relay, simply adapt the sample in
