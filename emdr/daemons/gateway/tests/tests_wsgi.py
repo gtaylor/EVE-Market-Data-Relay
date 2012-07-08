@@ -3,7 +3,7 @@ Tests for the full wsgi.py module, and all of its submodules.
 """
 import unittest
 import datetime
-from emdr.core.market_data import MarketOrder, MarketOrderList
+from emds.data_structures import MarketOrder, MarketOrderList
 
 class GatewayWSGITests(unittest.TestCase):
     """

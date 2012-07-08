@@ -8,7 +8,6 @@ gateway.order_pusher module.
 """
 # Logging has to be configured first before we do anything.
 import logging
-import urllib
 import urlparse
 import zlib
 
@@ -23,8 +22,7 @@ from emds.formats.exceptions import ParseError
 from emdr import __version__ as EMDR_VERSION
 from emdr.daemons.gateway import order_pusher
 from emdr.daemons.gateway.exceptions import MalformedUploadError
-from emdr.core.serialization.exceptions import InvalidMarketOrderDataError
-from emdr.core.serialization import eve_marketeer
+from emds.exceptions import EMDSError
 
 def get_remote_address():
     """
@@ -97,7 +95,7 @@ def parse_and_error_handle(parser, data, upload_format):
     try:
         parsed_message = parser(data)
     except (
-        InvalidMarketOrderDataError, MalformedUploadError, ParseError, TypeError, ValueError
+        EMDSError, MalformedUploadError, TypeError, ValueError
     ) as exc:
         # Something bad happened. We know this will return at least a
         # semi-useful error message, so do so.
@@ -114,48 +112,6 @@ def parse_and_error_handle(parser, data, upload_format):
     ))
     # Goofy, but apparently expected by EVE Market Data Uploader.
     return '1'
-
-@post('/upload/eve_marketeer/')
-def upload_eve_marketeer():
-    """
-    This view accepts uploads in EVE Marketeer or EVE Marketdata format. These
-    typically arrive via the EVE Unified Uploader client.
-    """
-    if request.forms.log.startswith('none'):
-        logger.error('Rejecting empty EMK order or history list.')
-        # EVE Marketeer Uploader uploads an empty entry when a given item isn't
-        # available in the player's filtered area. This typically happens when
-        # market scanners point them there. We'll just not our head and go
-        # along for now.
-        return '1'
-
-    # Message dicts are a way to package/wrap uploaded data in a way that lets
-    # the processor nodes know what format the upload is in. The payload attrib
-    # contains the format-specific stuff.
-    message_dict = {
-        'format': 'eve_marketeer',
-        'remote_address': get_remote_address(),
-        'payload': {
-            # 'orders' or 'history'
-            'upload_type': request.forms.upload_type,
-            'type_id': request.forms.type_id,
-            'region_id': request.forms.region_id,
-            # CSV, with \r\n delimited records.
-            'log': request.forms.log,
-            # 'EVEUnifiedUploader'
-            'developer_key': request.forms.developer_key,
-            # String, like '6.0'
-            'version': request.forms.version,
-            # 2012-03-11 01:24:33
-            'generated_at': request.forms.generated_at,
-            # Upload key, arbitrary
-            'upload_key': request.forms.upload_key,
-        }
-    }
-
-    return parse_and_error_handle(
-        eve_marketeer.parse_from_payload, message_dict['payload'], 'EMK'
-    )
 
 @post('/upload/unified/')
 def upload_unified():
@@ -191,15 +147,8 @@ def upload():
     Convenience URL that determines what format the upload is coming in,
     then routes to the correct logic for said format.
     """
-    if request.forms.upload_key and request.forms.developer_key:
-        # EVE Marketeer has these two form values.
-        return upload_eve_marketeer()
-    else:
-        # Since Unified format is a straight POST with a body, we'll naively
-        # assume anything else is the Unified format. Note that improperly
-        # formed uploads that have no POST keys will be caught by this, and
-        # a JSON error will be shown. This may confuse some users.
-        return upload_unified()
+    # We only support UUDIF for now.
+    return upload_unified()
 
 @get('/health_check/')
 def health_check():
