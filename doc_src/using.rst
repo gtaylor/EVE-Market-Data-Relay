@@ -97,7 +97,7 @@ PHP accesses EMDR via ZeroMQ's `php-zmq`_ PHP bindings:
     	// Un-serialize the JSON data to a named array.
     	$market_data = json_decode($market_json);
     	// Dump the market data to stdout. Or, you know, do more fun things here.
-    	printf($market_data);
+    	var_dump($market_data);
     }
 
 .. _php-zmq: http://www.zeromq.org/bindings:php
