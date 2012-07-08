@@ -5,7 +5,7 @@ import csv
 import logging
 from StringIO import StringIO
 from emds.data_structures import MarketHistoryList, MarketHistoryEntry
-from emds.formats.common_utils import parse_datetime
+from emds.formats.unified.unified_utils import parse_datetime
 
 logger = logging.getLogger(__name__)
 

@@ -5,8 +5,8 @@ import csv
 import logging
 from StringIO import StringIO
 from emds.data_structures import MarketOrderList, MarketOrder
-from emds.formats.common_utils import parse_datetime
 from emdr.core.serialization.exceptions import InvalidMarketOrderDataError
+from emds.formats.unified.unified_utils import parse_datetime
 
 logger = logging.getLogger(__name__)
 
