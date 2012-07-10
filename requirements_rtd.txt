@@ -1,0 +1,9 @@
+# Requirements for ReadTheDocs.
+emds
+bottle
+gevent
+requests
+python-dateutil<2.0
+pytz
+# Only required for developers
+sphinx
