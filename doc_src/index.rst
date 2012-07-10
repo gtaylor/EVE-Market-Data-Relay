@@ -41,7 +41,7 @@ Assorted Info
 * IRC Room - irc.coldfront.net #emdr, an excellent place for getting quick
   help, or hanging out with other developers and consumers.
 * `Issue tracker`_ - Report bugs here.
-* `Source code <GitHub project>`_ - For those wanting to hack on EMDR.
+* `GitHub project`_ - Source code and issue tracking.
 * `EMDR map`_ - See the solar systems light up as
   market data arrives.
 * `@gctaylor Twitter`_ - Tweets from the maintainer.
