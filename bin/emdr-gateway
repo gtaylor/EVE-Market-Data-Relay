@@ -24,6 +24,10 @@ parser.add_argument(
     '--webport', action='store', dest='web_port',
     help="Overrides default webserver port "
          "(default: %s)" % settings.GATEWAY_WEB_PORT)
+parser.add_argument(
+    '--ip-key-salt', action='store', dest='ip_key_salt',
+    help="If provided, set a salted hash of each uploader's IP address as " \
+         "the EMDR upload key. Used for consumers to track problematic uploaders.")
 
 parsed = parser.parse_args()
 
@@ -33,6 +37,8 @@ if parsed.senders:
     settings.GATEWAY_SENDER_BINDINGS = parsed.senders
 if parsed.web_port:
     settings.GATEWAY_WEB_PORT = parsed.web_port
+if parsed.ip_key_salt:
+    settings.GATEWAY_IP_KEY_SALT = str(parsed.ip_key_salt)
 
 log_level = set_logger_level(parsed.loglevel)
 print("* Logging level: %s" % log_level)

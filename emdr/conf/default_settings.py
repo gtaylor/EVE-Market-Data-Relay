@@ -10,6 +10,9 @@ This module contains the default settings that stand unless overridden.
 GATEWAY_WEB_PORT = 8080
 # PUB - Connect
 GATEWAY_SENDER_BINDINGS = ["ipc:///tmp/announcer-receiver.sock"]
+# If set as a string, this value is used as the salt to create a hash of
+# each uploader's IP address. This in turn gets set as the EMDR upload key.
+GATEWAY_IP_KEY_SALT = None
 
 #
 ## ZeroMQ-based Gateway Daemon Settings

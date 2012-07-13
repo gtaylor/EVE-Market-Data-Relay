@@ -10,6 +10,7 @@ gateway.order_pusher module.
 import logging
 import urlparse
 import zlib
+import hashlib
 
 logger = logging.getLogger(__name__)
 
@@ -18,11 +19,11 @@ import gevent
 from bottle import run, request, response, get, post, default_app
 
 from emds.formats import unified
-from emds.formats.exceptions import ParseError
+from emds.exceptions import EMDSError
 from emdr import __version__ as EMDR_VERSION
 from emdr.daemons.gateway import order_pusher
 from emdr.daemons.gateway.exceptions import MalformedUploadError
-from emds.exceptions import EMDSError
+from emdr.conf import default_settings as settings
 
 def get_remote_address():
     """
@@ -102,6 +103,13 @@ def parse_and_error_handle(parser, data, upload_format):
         response.status = 400
         logger.error("Error to %s: %s" % (get_remote_address(), exc.message))
         return exc.message
+
+    ip_hash_salt = settings.GATEWAY_IP_KEY_SALT
+    if ip_hash_salt:
+        # If an IP hash is set, salt+hash the uploader's IP address and set
+        # it as the EMDR upload key value.
+        ip_hash = hashlib.sha1(ip_hash_salt + get_remote_address()).hexdigest()
+        parsed_message.upload_keys.append({'EMDR': ip_hash})
 
     # Sends the parsed MarketOrderList or MarketHistoryList to the Announcers
     # as compressed JSON.
