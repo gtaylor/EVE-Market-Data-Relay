@@ -67,6 +67,14 @@ You also have the option of cross-referencing the APIs of other sites who
 do not consume EMDR data. While this can defeat some of the purpose of using
 EMDR, the option is there to complement the feed.
 
+Drop the banhammer on vandals
+-----------------------------
+
+Uploaders may be uniquely identified via the ``EMDR`` key/value pair in each
+message's ``uploadKeys`` list. The value of the ``EMDR`` key is a salted,
+hashed string unique to the uploader's IP address. While this may be spoofed,
+it will offer some ability to blacklist obviously malicious users.
+
 Use EMDR's redundancy to your advantage
 ---------------------------------------
 
