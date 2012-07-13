@@ -16,12 +16,24 @@ Market data is uploaded to EMDR by default.
 
 .. _EVEMon: http://evemon.battleclinic.com/
 
+With EMDU (Mac, Linux, and Windows)
+-----------------------------------
+
+EMDU_ (EVE Market Data Uploader) is a cross-platform, console-based market
+uploader client. It uploads directly to EMDR. For those who are running
+Mac or Linux, this client should run beautifully for you. It runs on Windows,
+as well, but it's probably easier to install EVEMon.
+
+See the the `install instructions`_ for how to get started.
+
+.. _install instructions: https://github.com/gtaylor/EVE-Market-Data-Uploader/blob/master/README.rst
+
 With other clients
 ------------------
 
 While we prefer EVEMon, you can use any client that supports the
-`Unified Uploader Interchange Format`_. An up to date list is maintained
-here: `Clients supporting UUIF`_.
+`Unified Uploader Data Interchange Format`_. An up to date list is maintained
+here: `Clients supporting UUDIF`_.
 
 Steps vary from client to client, but here is the typical process:
 

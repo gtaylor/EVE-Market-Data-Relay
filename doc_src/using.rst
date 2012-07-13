@@ -18,9 +18,9 @@ begin receiving data.
 Data Format
 -----------
 
-All data coming out of EMDR is in `Unified Uploader Interchange Format`_,
+All data coming out of EMDR is in `Unified Uploader Data Interchange Format`_,
 which is a JSON-based standard for market orders and history. See the
-`spec <Unified Uploader Interchange Format>`_ for more details.
+`spec <Unified Uploader Data Interchange Format>`_ for more details.
 
 Examples for various languages
 ------------------------------

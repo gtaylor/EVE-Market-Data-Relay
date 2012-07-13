@@ -2,10 +2,11 @@
 .. _issue tracker: https://github.com/gtaylor/EVE-Market-Data-Relay/issues
 .. _mailing list: https://groups.google.com/forum/#!forum/eve-emdr
 .. _EMDR map: http://map.eve-emdr.com/
+.. _EMDU: https://github.com/gtaylor/EVE-Market-Data-Uploader
 .. _@gctaylor Twitter: https://twitter.com/#!/gctaylor
 
-.. _Unified Uploader Interchange Format: http://dev.eve-central.com/unifieduploader/start
-.. _Clients supporting UUIF: http://dev.eve-central.com/unifieduploader/implementations
+.. _Unified Uploader Data Interchange Format: http://dev.eve-central.com/unifieduploader/start
+.. _Clients supporting UUDIF: http://dev.eve-central.com/unifieduploader/implementations
 
 .. _Python: http://python.org
 .. _nose: http://somethingaboutorange.com/mrl/projects/nose/

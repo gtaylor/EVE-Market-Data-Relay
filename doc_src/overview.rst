@@ -28,7 +28,7 @@ possibility. All before getting to the fun stuff!
 
 EVE Market Data Relay (EMDR) allows you to forgo all of this drudgery, and
 instead, connect to a firehose of data in the standardized
-`Unified Uploader Interchange Format`_ format. EMDR's ZeroMQ_ underpinnings also
+`Unified Uploader Data Interchange Format`_ format. EMDR's ZeroMQ_ underpinnings also
 make it easier, and exponentially more efficient than accepting HTTP
 uploads directly.
 
@@ -61,7 +61,7 @@ For any given submitted market order, here is the flow said order goes through::
 
 First, the order hits the **Gateway**, which is a simple HTTP application
 that parses the message. Incoming messages are in
-`Unified Uploader Interchange Format`_.
+`Unified Uploader Data Interchange Format`_.
 
 The Gateway interprets the message, validates it, normalizes anything weird,
 then pipes it to all of the root-level **Announcers** in the network.
