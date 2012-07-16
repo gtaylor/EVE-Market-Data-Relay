@@ -109,7 +109,7 @@ def parse_and_error_handle(parser, data, upload_format):
         # If an IP hash is set, salt+hash the uploader's IP address and set
         # it as the EMDR upload key value.
         ip_hash = hashlib.sha1(ip_hash_salt + get_remote_address()).hexdigest()
-        parsed_message.upload_keys.append({'EMDR': ip_hash})
+        parsed_message.upload_keys.append({'name': 'EMDR', 'key': ip_hash})
 
     # Sends the parsed MarketOrderList or MarketHistoryList to the Announcers
     # as compressed JSON.
