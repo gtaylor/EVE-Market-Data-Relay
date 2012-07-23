@@ -17,6 +17,7 @@ tcp://relay-us-central-1.eve-emdr.com:8050  Ubuquity Hosting    Chicago, IL     
 tcp://relay-eu-germany-1.eve-emdr.com:8050  Hetzner             Germany         Open                Default European relay. Volunteered by Otaci.
 tcp://relay-eu-france-1.eve-emdr.com:8050   Kimsufi (OVH)       France          Open                Also an excellent European relay. Volunteered by Jognu.
 tcp://relay-eu-france-2.eve-emdr.com:8050   Kimsufi (OVH)       France          Open                Second French relay. Volunteered by StinGer ShoGun.
+tcp://relay-eu-denmark-1.eve-emdr.com:8050  ComX                Denmark         Open                Volunteered by Karbowiak.
 ==========================================  ==================  ==============  ==================  ====================================================================
 
 Once you have chosen a relay, simply adapt the sample in
