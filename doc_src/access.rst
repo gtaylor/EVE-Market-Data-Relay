@@ -15,10 +15,10 @@ URI                                         ISP                 Location        
 tcp://relay-us-east-1.eve-emdr.com:8050     Linode              Newark, NJ      Open                East coast relay. Volunteered by Nicholas E.
 tcp://relay-us-central-1.eve-emdr.com:8050  Ubuquity Hosting    Chicago, IL     Open                Central US relay. Volunteered by udsaxman.
 tcp://relay-us-west-1.eve-emdr.com:8050     Cogent              Sacramento, CA  Open                West coast US realy. Volunteered by Yann of EVE Central.
-tcp://relay-eu-germany-1.eve-emdr.com:8050  Hetzner             Germany         Open                Default European relay. Volunteered by Otaci.
-tcp://relay-eu-france-1.eve-emdr.com:8050   Kimsufi (OVH)       France          Open                Also an excellent European relay. Volunteered by Jognu.
-tcp://relay-eu-france-2.eve-emdr.com:8050   Kimsufi (OVH)       France          Open                Second French relay. Volunteered by StinGer ShoGun.
+tcp://relay-eu-france-1.eve-emdr.com:8050   Kimsufi (OVH)       France          Open                Volunteered by Jognu.
+tcp://relay-eu-france-2.eve-emdr.com:8050   Kimsufi (OVH)       France          Open                Volunteered by StinGer ShoGun.
 tcp://relay-eu-denmark-1.eve-emdr.com:8050  ComX                Denmark         Open                Volunteered by Karbowiak.
+tcp://relay-eu-germany-1.eve-emdr.com:8050  Hetzner             Germany         Open                Volunteered by Otaci.
 ==========================================  ==================  ==============  ==================  ====================================================================
 
 Once you have chosen a relay, simply adapt the sample in
