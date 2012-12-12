@@ -1,5 +1,7 @@
 .. _volunteering:
 
+.. include:: global.txt
+
 Volunteering computing resources
 ================================
 
@@ -12,21 +14,9 @@ If you have idle computing resources, or would like to share capacity on
 a machine, we'd love to have it. ``gtaylor`` is available to assist with setup
 and configuration.
 
-Relays
-------
+Current status
+--------------
 
-Relays are our current need. These are at the lowest rung of the ladder, and
-are where consumers connect to get their data. Relay access policy is completely
-up to the volunteer. Relays can be 100% open to the public, or completely
-restricted however you'd like.
-
-Relay characteristics:
-
-* Traffic depends entirely upon how many consumers are connected. However,
-  most don't exceed 500 kb/s.
-* Processor usage isn't huge. We've had great success running on Linodes and
-  other virtual machines without issues.
-* RAM usage is about 8-16 MB.
-
-If you'd like to volunteer a relay, please get in touch with gtaylor via email:
-``gtaylor (at) gc-taylor (dot) com``
+We currently have everything that we need. Special thanks to everyone
+who volunteered to help make this happen. Should our needs change, this page
+will be updated, and announcement will land on the `mailing list`_.

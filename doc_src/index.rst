@@ -57,6 +57,7 @@ is all you need.
    :maxdepth: 2
 
    overview
+   sites
    uploading
 
 Consumer Documentation
