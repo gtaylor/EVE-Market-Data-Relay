@@ -15,6 +15,8 @@ Market sites
 
 * `Element 43`_
 * `EVE Addicts`_
+* `EVE Marketdata`_
 
 .. _Element 43: http://www.element-43.com/
 .. _EVE Addicts: http://eve.addicts.nl/
+.. _EVE Marketdata: http://eve-marketdata.com/
