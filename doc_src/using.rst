@@ -449,13 +449,13 @@ Node.js uses the `zeromq.node`_ binding:
 
     sock.on('message', function(msg){
         // Receive raw market JSON strings.
-        var market_json = zlib.inflate(msg);
+        zlib.inflate(msg, function(err, market_json) {
+            // Un-serialize the JSON data.
+            var market_data = JSON.parse(market_json);
 
-        // Un-serialize the JSON data.
-        var market_data = JSON.parse(market_json);
-
-        // Do something useful
-        console.log(market_data);
+            // Do something useful
+            console.log(market_data);
+        });
     });
 
 .. _zeromq.node: http://www.zeromq.org/bindings:node-js
