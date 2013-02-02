@@ -7,8 +7,8 @@ Sites using EMDR
 
 EMDR delivers nearly a million messages a day to a number of different
 projects around the world. Some of these projects are listed below. If we're
-a project, please file an issue in the `issue tracker`_ with the name and a
-URL to the project. Bonus points for describing what you're doing.
+missing a project, please file an issue in the `issue tracker`_ with the name 
+and a URL to the project. Bonus points for describing what you're doing.
 
 Market sites
 ------------
