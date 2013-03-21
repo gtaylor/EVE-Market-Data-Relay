@@ -121,18 +121,18 @@ Ruby accesses EMDR via ZeroMQ's zmq_ Ruby bindings:
     context = ZMQ::Context.new
     subscriber = context.socket(ZMQ::SUB)
 
-    // Connect to the first publicly available relay.
+    # Connect to the first publicly available relay.
     subscriber.connect("tcp://relay-us-central-1.eve-emdr.com:8050")
     subscriber.setsockopt(ZMQ::SUBSCRIBE,"")
 
     loop do
-      // Receive raw market JSON strings.
+      # Receive raw market JSON strings.
       subscriber.recv_string(string = '')
-      // Un-compress the stream.
+      # Un-compress the stream.
       market_json = Zlib::Inflate.new(Zlib::MAX_WBITS).inflate(string)
-      // Un-serialize the JSON data.
+      # Un-serialize the JSON data.
       market_data = JSON.parse(market_json)
-      // Dump the market data to stdout. Or, you know, do more fun things here.
+      # Dump the market data to stdout. Or, you know, do more fun things here.
       puts market_data
     end
 
