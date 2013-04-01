@@ -14,7 +14,7 @@ URI                                         ISP                 Location        
 ==========================================  ==================  ==============  ==================  ====================================================================
 tcp://relay-us-west-1.eve-emdr.com:8050     Cogent              Sacramento, CA  Open                West coast US realy. Volunteered by Yann of EVE Central.
 tcp://relay-us-central-1.eve-emdr.com:8050  Ubuquity Hosting    Chicago, IL     Open                Central US relay. Volunteered by udsaxman.
-tcp://relay-us-east-1.eve-emdr.com:8050     Linode              Newark, NJ      Open                East coast US realy. Volunteered by Snipa.
+tcp://relay-us-east-1.eve-emdr.com:8050     Digital Ocean       New York, NY    Open                East coast US realy. Volunteered by Drapko Nitzhonot.
 tcp://relay-ca-east-1.eve-emdr.com:8050     OVH                 Beauharnois     Open                East coast Canadian realy. Volunteered by Netheranthem.
 tcp://relay-eu-uk-1.eve-emdr.com:8050       ???                 UK              Open                UK relay. Volunteered by FuzzySteve.
 tcp://relay-eu-france-2.eve-emdr.com:8050   Kimsufi (OVH)       France          Open                Volunteered by StinGer ShoGun.
