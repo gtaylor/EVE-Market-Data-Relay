@@ -2,6 +2,7 @@
 """
 WSGI gateway application. Runs using bottle+gevent.
 """
+from gevent import monkey; monkey.patch_all()
 from logging.config import dictConfig
 import argparse
 from bottle import run
