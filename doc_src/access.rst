@@ -18,7 +18,6 @@ tcp://relay-us-east-1.eve-emdr.com:8050     Digital Ocean       New York, NY    
 tcp://relay-eu-uk-1.eve-emdr.com:8050       ???                 UK              Open                UK relay. Volunteered by FuzzySteve.
 tcp://relay-eu-france-2.eve-emdr.com:8050   Kimsufi (OVH)       France          Open                Volunteered by StinGer ShoGun.
 tcp://relay-eu-denmark-1.eve-emdr.com:8050  ComX                Denmark         Open                Volunteered by Karbowiak.
-tcp://relay-eu-germany-1.eve-emdr.com:8050  Hetzner             Germany         Open                Volunteered by Otaci.
 ==========================================  ==================  ==============  ==================  ====================================================================
 
 Once you have chosen a relay, simply adapt the sample in
