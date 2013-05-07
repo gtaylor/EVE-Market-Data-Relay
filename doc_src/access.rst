@@ -16,6 +16,7 @@ tcp://relay-us-west-1.eve-emdr.com:8050     Cogent              Sacramento, CA  
 tcp://relay-us-central-1.eve-emdr.com:8050  Ubuquity Hosting    Chicago, IL     Open                Central US relay. Volunteered by udsaxman.
 tcp://relay-us-east-1.eve-emdr.com:8050     Digital Ocean       New York, NY    Open                East coast US realy. Volunteered by Drapko Nitzhonot.
 tcp://relay-ca-east-1.eve-emdr.com:8050     OVH US              Montreal, CA    Open                Canadian/US relay. Volunteered by Karbowiak.
+tcp://relay-eu-sweden-1.eve-emdr.com:8050   Bredband2           Sweden          Open                Swedish relay. Volunteered by Bengt Ericsson.
 tcp://relay-eu-uk-1.eve-emdr.com:8050       ???                 UK              Open                UK relay. Volunteered by FuzzySteve.
 tcp://relay-eu-france-2.eve-emdr.com:8050   Kimsufi (OVH)       France          Open                Volunteered by StinGer ShoGun.
 tcp://relay-eu-denmark-1.eve-emdr.com:8050  ComX                Denmark         Open                Volunteered by Karbowiak.
