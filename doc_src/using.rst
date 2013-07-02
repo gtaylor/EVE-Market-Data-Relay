@@ -22,6 +22,32 @@ All data coming out of EMDR is in `Unified Uploader Data Interchange Format`_,
 which is a JSON-based standard for market orders and history. See the
 `spec <Unified Uploader Data Interchange Format>`_ for more details.
 
+An important note on keeping up
+-------------------------------
+
+Our relays use PUB/SUB to broadcast market data to the consumers. Within each
+relay is a buffer for each consumer. If the consumer is
+having a hard time keeping up with the flow of data from the relay, the relay's
+send buffer will gradually fill, since data is being produced faster than 
+the consumer can receive it. Once the buffer reaches a certain size, we 
+start discarding messages, which can be a very bad thing for your application. 
+Here is the relevant quote from the ZeroMQ documentation::
+
+    When a ZMQ_PUB socket enters an exceptional state due to having reached 
+    the high water mark for a subscriber, then any messages that would be 
+    sent to the subscriber in question shall instead be dropped until the 
+    exceptional state ends. The zmq_send() function shall never block for 
+    this socket type.
+    
+The important take-away is that when designing your consumers, you'll want
+to either do as little processing in your consumer as possible, or make 
+sure that your network IO remains async or non-blocking so that you 
+don't lose any messages.
+
+.. tip:: While the examples below are a good way to get you started, you
+    will probably need to adapt them with this IO concern in mind as you
+    add more.
+
 Examples for various languages
 ------------------------------
 
