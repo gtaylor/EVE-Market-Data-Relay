@@ -19,6 +19,10 @@ Ideally, you have a dedicated process that is just enough to connect to EMDR
 and save the data to your DB backend. We suggest doing any aggregation or
 additional processing in another process, to make sure you don't lose any
 data due to blocking or bugs introduced in your processing/aggregation code.
+If your consumer can't process the incoming data fast enough
+to keep up with the relay, we end up discarding pending messages
+on the relay to prevent buffer overflow. The end result is that you will lose
+messages.
 
 For an idea of what this looks like, see our greenlet_consumer_ code example.
 This is written in Python, using gevent_ to perform the DB saves using
