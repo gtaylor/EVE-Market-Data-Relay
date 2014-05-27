@@ -4,6 +4,7 @@
 .. _EMDR map: http://map.eve-emdr.com/
 .. _EMDU: https://github.com/gtaylor/EVE-Market-Data-Uploader
 .. _@gctaylor Twitter: https://twitter.com/#!/gctaylor
+.. _EMDR monitor: http://monitor.eve-emdr.com
 
 .. _Unified Uploader Data Interchange Format: http://dev.eve-central.com/unifieduploader/start
 .. _Clients supporting UUDIF: http://dev.eve-central.com/unifieduploader/implementations
