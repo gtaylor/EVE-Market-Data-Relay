@@ -42,6 +42,7 @@ Assorted Info
   help, or hanging out with other developers and consumers.
 * `Issue tracker`_ - Report bugs here.
 * `GitHub project`_ - Source code and issue tracking.
+* `EMDR monitor`_ - EMDR relay/announcer monitor web app.
 * `EMDR map`_ - See the solar systems light up as
   market data arrives.
 * `@gctaylor Twitter`_ - Tweets from the maintainer.
