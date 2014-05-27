@@ -7,7 +7,8 @@ Getting access to the EMDR network
 
 In order to get access to the EMDR network, you will merely need to connect
 to a relay. For your convenience, we have listed the relays below that have
-available capacity.
+available capacity. If you'd like to verify the health of a relay before
+using it, check out our `EMDR monitor`_.
 
 ==========================================  ==================  ==============  ==================  ====================================================================
 URI                                         ISP                 Location        Access              Notes
