@@ -164,6 +164,66 @@ Ruby accesses EMDR via ZeroMQ's zmq_ Ruby bindings:
 
 .. _zmq: http://www.zeromq.org/bindings:ruby
 
+Go
+^^
+
+.. code-block:: go
+
+	package main
+
+	import (
+		"log"
+		"bytes"
+		"io/ioutil"
+		"compress/zlib"
+		zmq "github.com/pebbe/zmq2" // or zmq3/zmq4
+	)
+
+	// go run emdr_client_example.go
+	func main() {
+		client, err := zmq.NewSocket(zmq.SUB)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		// Connect
+		err = client.Connect("tcp://relay-us-central-1.eve-emdr.com:8050")
+		client.SetSubscribe("")
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		// Endless loop.
+		for {
+			// Receive message from ZeroMQ.
+			msg, err := client.Recv(0)
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			// Prepare to decode.
+			decoded, err := ZlibDecode(msg)
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			// Output as json string, should do something useful at this point ...
+			log.Printf("%s", decoded)
+		}
+	}
+
+	func ZlibDecode(encoded string) (decoded []byte, err error) {
+		b := bytes.NewBufferString(encoded)
+		pipeline, err := zlib.NewReader(b)
+
+		if err == nil {
+			defer pipeline.Close()
+			decoded, err = ioutil.ReadAll(pipeline)
+		}
+
+		return
+	}
+
 C#
 ^^
 
