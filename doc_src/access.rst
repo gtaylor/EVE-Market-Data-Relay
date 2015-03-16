@@ -19,6 +19,7 @@ tcp://relay-us-east-1.eve-emdr.com:8050     Vultr               New Jersey, NJ  
 tcp://relay-ca-east-1.eve-emdr.com:8050     OVH US              Montreal, CA    Open                Canadian/US relay. Volunteered by Karbowiak.
 tcp://relay-eu-germany-1.eve-emdr.com:8050  Hetzner             Germany         Open                German relay. Volunteered by FuzzySteve.
 tcp://relay-eu-germany-2.eve-emdr.com:8050  Hetzner             Germany         Open                German relay. Volunteered by Agedon Group, Inc.
+tcp://relay-eu-germany-3.eve-emdr.com:8050  Intergenia          Germany         Open                German relay. Volunteered by EVE-HQ.com.
 tcp://relay-eu-denmark-1.eve-emdr.com:8050  ComX                Denmark         Open                Volunteered by Karbowiak.
 ==========================================  ==================  ==============  ==================  ====================================================================
 
