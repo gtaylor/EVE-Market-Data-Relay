@@ -16,10 +16,10 @@ URI                                         ISP                 Location        
 tcp://relay-us-west-1.eve-emdr.com:8050     Cogent              Sacramento, CA  Open                West coast US realy. Volunteered by Yann of EVE Central.
 tcp://relay-us-central-1.eve-emdr.com:8050  Ubuquity Hosting    Chicago, IL     Open                Central US relay. Volunteered by udsaxman.
 tcp://relay-us-east-1.eve-emdr.com:8050     Vultr               New Jersey, NJ  Open                East coast US realy. Volunteered by Drapko Nitzhonot.
-tcp://relay-ca-east-1.eve-emdr.com:8050     OVH US              Montreal, CA    Open                Canadian/US relay. Volunteered by Karbowiak.
 tcp://relay-eu-germany-1.eve-emdr.com:8050  Hetzner             Germany         Open                German relay. Volunteered by FuzzySteve.
 tcp://relay-eu-germany-2.eve-emdr.com:8050  Hetzner             Germany         Open                German relay. Volunteered by Agedon Group, Inc.
 tcp://relay-eu-germany-3.eve-emdr.com:8050  Intergenia          Germany         Open                German relay. Volunteered by EVE-HQ.com.
+tcp://relay-eu-germany-4.eve-emdr.com:8050  Hetzner             Germany         Open                German relay. Volunteered by Karbowiak.
 tcp://relay-eu-denmark-1.eve-emdr.com:8050  ComX                Denmark         Open                Volunteered by Karbowiak.
 ==========================================  ==================  ==============  ==================  ====================================================================
 
