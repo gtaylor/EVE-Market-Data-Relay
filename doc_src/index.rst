@@ -34,12 +34,11 @@ For a more complete run-down, see :doc:`overview`.
 
 Assorted Info
 -------------
-
 * `Mailing list`_ - If you are consuming the feed, make sure
   to subscribe to this for important announcements. This is also one of the
   best places to ask questions or discuss EMDR stuff.
-* IRC Room - irc.coldfront.net #emdr, an excellent place for getting quick
-  help, or hanging out with other developers and consumers.
+* Slack Channel - `join #emdr on tweetfleet.slack.com <slack://channel?team=T03CDJ6FV&id=C1L4ZPQAC>`_, an excellent place for getting quick
+  help, or hanging out with other developers and consumers. Get your account `here <https://www.fuzzwork.co.uk/tweetfleet-slack-invites/>`_ if you don't have one!
 * `Issue tracker`_ - Report bugs here.
 * `GitHub project`_ - Source code and issue tracking.
 * `EMDR monitor`_ - EMDR relay/announcer monitor web app.
