@@ -61,8 +61,6 @@ run(
     host='localhost',
     server='gevent',
     port=settings.GATEWAY_WEB_PORT,
-    # Do gevent's standard monkey patching.
-    monkey=True,
     # Use libevent HTTP server.
     fast=True
 )
