@@ -5,5 +5,6 @@ gevent
 requests
 python-dateutil<2.0
 pytz
+sphinx_rtd_theme>=0.2.4
 # Only required for developers
 sphinx
