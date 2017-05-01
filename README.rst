@@ -3,6 +3,9 @@ EVE Market Data Relay
 
 :Author: Greg Taylor
 :License: BSD
+:Status: Unmaintained
+
+**With the introduction of native-to-EVE market APIs, the EMDR project has ran its course. As of May 1, 2017, we have shuttered the network. This repo will remain in an archived state. Thanks to all who helped make EMDR a success!**
 
 This project is a super-scalable, affordable way to
 accept a large amount of user-submitted market data (via uploaders), and
