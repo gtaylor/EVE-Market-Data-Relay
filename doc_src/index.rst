@@ -5,6 +5,8 @@
 EVE Market Data Relay (EMDR)
 ============================
 
+**With the introduction of native-to-EVE market APIs, the EMDR project has ran its course. As of May 1, 2017, we have shuttered the network. This repo will remain in an archived state. Thanks to all who helped make EMDR a success!**
+
 EVE Market Data Relay (EMDR) is a super scalable, highly available firehose of
 real-time market data. For those that wish to record price and history data
 as it comes in, EMDR will help you do so as efficiently and reliably as
